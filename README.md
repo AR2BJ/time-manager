@@ -6,7 +6,7 @@
 <br>
 
 <div align="center">
-  <img src="/public/picture/logo-4.png" alt="Time Manager Logo" height="145" />
+  <img src="/public/picture/logo-2.png" alt="Time Manager Logo" height="145" />
 </div>
 
 <br/>
