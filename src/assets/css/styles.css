@@ -1,0 +1,281 @@
+@import "tailwindcss";
+@import "./loading.css";
+
+/* ============================= */
+/* THEME TOKENS START */
+/* ============================= */
+
+@theme {
+  --color-bg: #030712;
+  --color-surface: #111827;
+  --color-surface-2: #1f2937;
+  --color-surface-3: #2e3f5e;
+  --color-surface-4: #40567e;
+  --color-primary: #ffffff;
+  --color-secondary: #9ca3af;
+  --color-tertiary: #64748b;
+  --color-inverse: #ffffff;
+  --color-border: #374151;
+  --color-brand: #00bba7;
+  --breakpoint-xs: 23.4375rem;
+}
+
+/* ============================================ */
+/* DARK THEME - OPTIMIZED FOR HIGH CONTRAST    */
+/* ============================================ */
+.dark {
+  /* ===== BASE BACKGROUNDS ===== */
+  --color-bg: #0b0f19;
+  --color-surface: #161f30;
+  --color-surface-2: #222f47;
+  --color-surface-3: #2e3f5e;
+  --color-surface-4: #40567e;
+
+  /* ===== TEXT COLORS ===== */
+  --color-primary: #ffffff;
+  --color-secondary: #94a3b8;
+  --color-tertiary: #64748b;
+  --color-inverse: #ffffff;
+
+  /* ===== BORDERS & DIVIDERS ===== */
+  --color-border: #2e3f5e;
+  --color-border-light: #1e293b;
+  --color-border-strong: #475569;
+
+  /* ===== BRAND & ACTIONS ===== */
+  --color-brand: #00bba7;
+  --color-brand-hover: #33c9b9;
+  --color-brand-active: #66d6ca;
+  --color-brand-light: rgba(0, 187, 167, 0.15);
+
+  /* ===== BUTTONS ===== */
+  --color-btn-primary-bg: #00bba7;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-hover: #33c9b9;
+  --color-btn-primary-active: #66d6ca;
+
+  --color-btn-secondary-bg: #222f47;
+  --color-btn-secondary-text: #f8fafc;
+  --color-btn-secondary-border: #2e3f5e;
+  --color-btn-secondary-hover: #2e3f5e;
+  --color-btn-secondary-active: #384f76;
+
+  /* ===== STATES ===== */
+  --color-hover: #1e293b;
+  --color-active: #2e3f5e;
+  --color-focus-ring: #00bba7;
+  --color-disabled: #1e293b;
+  --color-disabled-text: #475569;
+
+  /* ===== SUCCESS / ERROR / WARNING ===== */
+  --color-success: #10b981;
+  --color-success-light: rgba(16, 185, 129, 0.15);
+  --color-error: #ef4444;
+  --color-error-light: rgba(239, 68, 68, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-light: rgba(245, 158, 11, 0.15);
+
+  /* ===== SHADOWS ===== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.7);
+
+  .apexcharts-legend-text {
+    color: #e2e8f0 !important;
+  }
+}
+
+/* ============================================ */
+/* LIGHT THEME - MAX READABILITY & PREMIUM UI   */
+/* ============================================ */
+.light {
+  /* ===== BASE BACKGROUNDS ===== */
+  --color-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f4f7;
+  --color-surface-3: #e2e8f0;
+  --color-surface-4: #d2d8df;
+
+  /* ===== TEXT COLORS ===== */
+  --color-primary: #0f172a;
+  --color-secondary: #475569;
+  --color-tertiary: #64748b;
+  --color-inverse: #ffffff;
+
+  /* ===== BORDERS & DIVIDERS ===== */
+  --color-border: #cbd5e1;
+  --color-border-light: #e2e8f0;
+  --color-border-strong: #94a3b8;
+
+  /* ===== BRAND & ACTIONS ===== */
+  --color-brand: #00bba7;
+  --color-brand-hover: #00a896;
+  --color-brand-active: #009585;
+  --color-brand-light: #e6f9f7;
+
+  /* ===== BUTTONS ===== */
+  --color-btn-primary-bg: #00bba7;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-hover: #00a896;
+  --color-btn-primary-active: #009585;
+
+  --color-btn-secondary-bg: #ffffff;
+  --color-btn-secondary-text: #0f172a;
+  --color-btn-secondary-border: #cbd5e1;
+  --color-btn-secondary-hover: #f8fafc;
+  --color-btn-secondary-active: #f1f5f9;
+
+  --color-btn-ghost-text: #475569;
+  --color-btn-ghost-hover: #f1f5f9;
+  --color-btn-ghost-active: #e2e8f0;
+
+  /* ===== STATES ===== */
+  --color-hover: #f8fafc;
+  --color-active: #f1f5f9;
+  --color-focus-ring: #00bba7;
+  --color-disabled: #f1f5f9;
+  --color-disabled-text: #94a3b8;
+
+  /* ===== SUCCESS / ERROR / WARNING ===== */
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fed7aa;
+
+  /* ===== SHADOWS ===== */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.12);
+  --shadow-xl: 0 24px 36px -6px rgba(15, 23, 42, 0.15);
+
+  .apexcharts-legend-text {
+    color: #161f30 !important;
+  }
+}
+
+/* ============================= */
+/* THEME TOKENS END */
+/* ============================= */
+
+body {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.btn-primary {
+  background: color-mix(in oklab, var(--color-btn-primary-bg) 80%, transparent);
+  color: var(--color-btn-primary-text);
+  transition: all 0.2s ease;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-stat-title {
+  color: var(--color-tertiary);
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* NEW PREMIUM NAV & SIDEBAR STYLES             */
+/* ============================================ */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  color: var(--color-secondary);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: var(--color-surface-2);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+/* Desktop Navigation Active State */
+.nav-item.active {
+  background-color: color-mix(in oklab, var(--color-brand) 80%, transparent);
+  color: var(--color-btn-primary-text);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Navigation Active State */
+.mobile-nav-btn.active {
+  color: color-mix(in oklab, var(--color-brand) 80%, transparent);
+}
+
+.mobile-nav-btn.active i {
+  font-weight: 900;
+}
+
+.mobile-nav-btn {
+  position: relative;
+  width: 64px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.mobile-nav-btn.active {
+  color: color-mix(in oklab, var(--color-brand) 80%, transparent);
+  padding-top: 0;
+}
+
+.mobile-nav-btn.active i {
+  transform: scale(1.1);
+  color: color-mix(in oklab, var(--color-brand) 80%, transparent);
+  text-shadow: 0 0 10px rgba(0, 187, 167, 0.2);
+}
+
+@keyframes micro-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+.animate-micro-ping {
+  animation: micro-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: 100px;
+  }
+}
+
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: 80px;
+  }
+}

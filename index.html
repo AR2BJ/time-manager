@@ -1,0 +1,97 @@
+<!doctype html>
+<html
+  lang="en"
+  class="bg-surface text-primary scroll-smooth scrollbar-thin scrollbar-thumb-surface-2"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Time Manager</title>
+    <link
+      href="./src/assets/css/styles.css"
+      rel="stylesheet"
+    />
+    <link
+      type="text/css"
+      href="./vendor/fontawesome/css/all.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="./favicon.ico"
+      type="image/x-icon"
+    />
+
+    <script src="./src/app/theme.js"></script>
+  </head>
+
+  <body class="min-h-screen bg-surface text-primary">
+    <!-- ============================= -->
+    <!-- APP CONTAINER START -->
+    <!-- ============================= -->
+
+    <div
+      id="app-loader"
+      class="fixed inset-0 z-9999 grid place-items-center"
+    >
+      <div class="loader">
+        <span class="hour"></span>
+        <span class="min"></span>
+        <span class="circel"></span>
+      </div>
+    </div>
+
+    <div
+      id="app"
+      class="hidden px-8 py-12 lg:ps-8 transition-all duration-300"
+    >
+      <div id="header-container"></div>
+
+      <div id="desktop-nav-container"></div>
+
+      <div id="times-view-container"></div>
+
+      <div id="analytics-view-container"></div>
+
+      <div id="calendar-view-container"></div>
+
+      <div id="matrix-view-container"></div>
+
+      <div id="settings-view-container"></div>
+
+      <div id="edit-modals-container"></div>
+
+      <div id="delete-modals-container"></div>
+
+      <div id="help-modal-container"></div>
+
+      <div
+        id="notification-container"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-400 flex flex-col gap-3 min-w-80 max-w-md"
+      ></div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- APP CONTAINER END -->
+    <!-- ============================= -->
+
+    <div id="mobile-nav-container"></div>
+
+    <button
+      id="scroll-to-top-btn"
+      class="fixed bottom-24 lg:bottom-6 right-6 z-40 hidden opacity-0 scale-75 h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-brand/80 text-white shadow-lg transition duration-400 hover:bg-(--color-brand-hover) hover:scale-110"
+      title="Scroll to top"
+    >
+      <i class="fa-regular fa-chevron-up text-lg"></i>
+    </button>
+
+    <script
+      type="module"
+      src="./src/app/app.js"
+    ></script>
+    <script src="./vendor/fontawesome/js/all.js"></script>
+  </body>
+</html>

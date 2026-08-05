@@ -1,0 +1,33 @@
+{
+  "name": "time-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AR2BJ/time-manager.git"
+  },
+  "keywords": [],
+  "author": "AR2BJ",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/AR2BJ/time-manager/issues"
+  },
+  "homepage": "https://github.com/AR2BJ/time-manager#readme",
+  "devDependencies": {
+    "vite": "^8.1.1",
+    "vite-plugin-pwa": "^1.3.0"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "apexcharts": "^6.5.0",
+    "tailwindcss": "^4.3.3"
+  }
+}
