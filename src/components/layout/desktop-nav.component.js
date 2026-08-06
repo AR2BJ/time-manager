@@ -21,7 +21,7 @@ export const DesktopNavComponent = {
           <div class="separator w-3/4 h-px border-b border-border"></div>
 
           <button
-            id="nav-times"
+            id="nav-timer"
             class="nav-item justify-center shadow-brand/10"
             title="Times"
           >
@@ -34,22 +34,6 @@ export const DesktopNavComponent = {
             title="Analytics"
           >
             <i class="fa-regular fa-chart-line text-xl"></i>
-          </button>
-
-          <button
-            id="nav-calendar"
-            class="nav-item justify-center"
-            title="Calendar"
-          >
-            <i class="fa-regular fa-calendar text-lg"></i>
-          </button>
-          
-          <button
-            id="nav-matrix"
-            class="nav-item justify-center"
-            title="Matrix"
-          >
-            <i class="fa-regular fa-table-cells text-lg"></i>
           </button>
         </div>
 

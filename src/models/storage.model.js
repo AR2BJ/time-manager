@@ -1,54 +1,55 @@
 import { formatDate } from "@/utils/helpers.js";
 
-export const STORAGE_KEY = "time_manager";
+export const STORAGE_KEY = "time_manager_data";
 export const STORAGE_VERSION = 1;
 
-function normalizeTag(tag) {
-  if (typeof tag === "string") {
-    return { id: crypto.randomUUID(), name: tag.trim() };
-  }
+/**
+ * Normalizes a lightweight task entity for Standalone mode
+ */
+function normalizeTask(task) {
   return {
-    id: String(tag.id || crypto.randomUUID()),
-    name: String(tag.name || tag.title || "").trim(),
+    id: String(task.id || crypto.randomUUID()),
+    title: task.title || "Untitled Task",
+    status: task.status || "todo",
+    estimatedPomodoros: Number(task.estimatedPomodoros) || 1,
+    completedPomodoros: Number(task.completedPomodoros) || 0,
+    createdAt: task.createdAt || formatDate(new Date()),
   };
 }
 
-function normalizeTime(time) {
+/**
+ * Normalizes a completed time session log
+ */
+function normalizeSession(session) {
   return {
-    id: String(time.id || crypto.randomUUID()),
-    title: time.title || "Untitled Time",
-    description: time.description || "",
-    status: time.status || "todo",
-    priority: time.priority || "low",
-    dueDate: time.dueDate || null,
-    createdAt: time.createdAt || formatDate(new Date()),
-    updatedAt: time.updatedAt || formatDate(new Date()) || null,
-    completedAt: time.completedAt || null,
-    estimatedMinutes: Number(time.estimatedMinutes) || 0,
-    archived: Boolean(time.archived),
-    tags: Array.isArray(time.tags)
-      ? time.tags.map((t) => (typeof t === "object" ? t.id : String(t)))
-      : [],
-    subtimes: Array.isArray(time.subtimes)
-      ? time.subtimes.map((st) => ({
-          id: String(st.id || crypto.randomUUID()),
-          title: st.title || "",
-          completed: Boolean(st.completed),
-          createdAt: time.createdAt || formatDate(new Date()),
-          updatedAt: time.updatedAt || formatDate(new Date()) || null,
-        }))
-      : [],
+    id: String(session.id || crypto.randomUUID()),
+    taskId: session.taskId || null,
+    taskTitle: session.taskTitle || "Untitled",
+    type: session.type || "pomodoro",
+    durationSeconds: Number(session.durationSeconds) || 0,
+    completedAt: session.completedAt || formatDate(new Date()),
   };
 }
 
 function migrateData(data) {
-  const times = Array.isArray(data.times) ? data.times : [];
-  const tags = Array.isArray(data.tags) ? data.tags : [];
+  const tasks = Array.isArray(data.tasks) ? data.tasks : [];
+  const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+  const settings = data.settings || {};
 
   return {
     version: STORAGE_VERSION,
-    tags: tags.map(normalizeTag),
-    times: times.map(normalizeTime),
+    tasks: tasks.map(normalizeTask),
+    sessions: sessions.map(normalizeSession),
+    settings: {
+      pomodoroWorkTime: Number(settings.pomodoroWorkTime) || 25,
+      shortBreakTime: Number(settings.shortBreakTime) || 5,
+      longBreakTime: Number(settings.longBreakTime) || 15,
+      autoStartBreaks: Boolean(settings.autoStartBreaks),
+      autoStartPomodoros: Boolean(settings.autoStartPomodoros),
+      notificationSound: settings.notificationSound !== false,
+      lastSelectedSoundId: settings.lastSelectedSoundId || "rain-forest",
+      volume: Number(settings.volume) ?? 50,
+    },
   };
 }
 
@@ -58,12 +59,13 @@ export function saveToStorage(data) {
       STORAGE_KEY,
       JSON.stringify({
         version: STORAGE_VERSION,
-        tags: data.tags || [],
-        times: data.times || [],
+        tasks: data.tasks || [],
+        sessions: data.sessions || [],
+        settings: data.settings || {},
       }),
     );
   } catch (error) {
-    console.error("Failed to save data to localStorage:", error);
+    console.error("Failed to save Time Manager data to localStorage:", error);
   }
 }
 
@@ -72,12 +74,9 @@ export function loadFromStorage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
 
-    const data = JSON.parse(raw);
-    const migrated = migrateData(data);
-
-    return migrated;
+    return migrateData(JSON.parse(raw));
   } catch (error) {
-    console.error("Failed to load data from localStorage:", error);
+    console.error("Failed to load Time Manager data from localStorage:", error);
     return null;
   }
 }

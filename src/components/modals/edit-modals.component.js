@@ -26,7 +26,7 @@ export const EditModalsComponent = {
                 <p
                   class="text-[11px] w-40 xs:w-auto lg:text-xs text-secondary truncate"
                 >
-                  Update time attributes and manage subtimes.
+                  Update time attributes and manage subtasks.
                 </p>
               </div>
             </div>
@@ -179,7 +179,7 @@ export const EditModalsComponent = {
                   </div>
                   <div>
                     <h4 class="text-xs lg:text-sm font-semibold text-primary">
-                      Subtimes Management
+                      Subtasks Management
                     </h4>
                     <p class="text-[10px] lg:text-xs leading-4 text-secondary">
                       Add and track execution steps.
@@ -189,7 +189,7 @@ export const EditModalsComponent = {
 
                 <div class="flex items-center gap-2 lg:gap-3">
                   <span
-                    id="subtime-progress-badge"
+                    id="subtask-progress-badge"
                     class="text-[10px] lg:text-xs font-mono text-secondary px-2 lg:px-3 py-1 rounded-lg bg-surface border border-border shrink-0"
                   >
                     0/0 Done
@@ -207,13 +207,13 @@ export const EditModalsComponent = {
                   class="w-full flex relative items-center gap-2 rounded-xl border border-border bg-surface"
                 >
                   <input
-                    id="new-subtime-input"
+                    id="new-subtask-input"
                     type="text"
-                    placeholder="Add a new subtime item..."
+                    placeholder="Add a new subtask item..."
                     class="w-full h-10 lg:h-11 flex-1 rounded-xl bg-transparent px-3.5 pe-23 text-xs lg:text-sm text-primary placeholder:text-secondary/70 outline-none focus:border-brand/80 transition"
                   />
                   <button
-                    id="add-subtime-btn"
+                    id="add-subtask-btn"
                     type="button"
                     class="w-20 h-10 lg:h-11 absolute right-0 px-3.5 rounded-e-xl bg-brand/10 text-brand/80 transition hover:bg-brand/20 font-semibold text-xs lg:text-sm flex items-center gap-1.5 shrink-0 cursor-pointer"
                   >
@@ -222,7 +222,7 @@ export const EditModalsComponent = {
                 </div>
 
                 <div
-                  id="edit-subtimes-list"
+                  id="edit-subtasks-list"
                   class="w-full"
                 ></div>
               </div>

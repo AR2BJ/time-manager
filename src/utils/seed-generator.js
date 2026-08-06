@@ -87,20 +87,20 @@ function getRandomTagIds(availableTagObjects) {
   return shuffled.slice(0, count).map((tag) => tag.id);
 }
 
-function getRandomSubtimes() {
+function getRandomSubtasks() {
   const count = getRandomInt(0, 4);
-  const subtimes = [];
+  const subtasks = [];
 
   for (let i = 0; i < count; i++) {
-    subtimes.push({
-      id: `subtime-${Date.now()}-${i}-${Math.random()
+    subtasks.push({
+      id: `subtask-${Date.now()}-${i}-${Math.random()
         .toString(36)
         .substring(2, 5)}`,
       title: getRandomElement(SUBTASK_TEMPLATES),
       completed: false,
     });
   }
-  return subtimes;
+  return subtasks;
 }
 
 export function generateDynamicMockData(count = 20) {
@@ -167,20 +167,20 @@ export function generateDynamicMockData(count = 20) {
     capacityTracker[targetDate].total++;
 
     let status = getRandomElement(STATUSES);
-    let subtimes = getRandomSubtimes();
+    let subtasks = getRandomSubtasks();
 
-    if (subtimes.length > 0) {
+    if (subtasks.length > 0) {
       if (status === "done") {
-        subtimes = subtimes.map((st) => ({ ...st, completed: true }));
+        subtasks = subtasks.map((st) => ({ ...st, completed: true }));
       } else {
         let completedCount = 0;
-        subtimes = subtimes.map((st) => {
+        subtasks = subtasks.map((st) => {
           const isCompleted = Math.random() > 0.5;
           if (isCompleted) completedCount++;
           return { ...st, completed: isCompleted };
         });
 
-        if (completedCount === subtimes.length) {
+        if (completedCount === subtasks.length) {
           status = "done";
         }
       }
@@ -192,7 +192,7 @@ export function generateDynamicMockData(count = 20) {
         ? formatDate(subtractDays(today, getRandomInt(0, 10)))
         : null;
 
-    const completedSubtimeIdsBeforeDone = subtimes
+    const completedSubtaskIdsBeforeDone = subtasks
       .filter((st) => st.completed)
       .map((st) => st.id);
 
@@ -209,8 +209,8 @@ export function generateDynamicMockData(count = 20) {
       archived,
       tags: timeTagIds,
       estimatedMinutes: getRandomElement([15, 30, 45, 60, 120]),
-      subtimes,
-      completedSubtimeIdsBeforeDone,
+      subtasks,
+      completedSubtaskIdsBeforeDone,
     });
   }
 

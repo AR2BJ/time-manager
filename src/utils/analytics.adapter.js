@@ -23,7 +23,7 @@ function getDaysInMonth(year, month) {
 
 /**
  * Extracts daily activity counters mapped by ISO date strings (YYYY-MM-DD)
- * using time creation dates and completed subtimes/statuses.
+ * using time creation dates and completed subtasks/statuses.
  */
 function getActivityMap(times) {
   const map = {};
@@ -35,9 +35,9 @@ function getActivityMap(times) {
       map[createdIso] = (map[createdIso] || 0) + 1;
     }
 
-    // Increment activity for completed subtimes if timestamp exists or default to createdAt
-    if (Array.isArray(time.subtimes)) {
-      time.subtimes.forEach((st) => {
+    // Increment activity for completed subtasks if timestamp exists or default to createdAt
+    if (Array.isArray(time.subtasks)) {
+      time.subtasks.forEach((st) => {
         if (st.completed) {
           const dateKey = st.completedAt
             ? st.completedAt.split("T")[0]

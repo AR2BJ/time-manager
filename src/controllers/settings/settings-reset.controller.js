@@ -5,9 +5,7 @@ import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
 import { SettingsArchiveController } from "./settings-archive.controller.js";
 import { SettingsTagController } from "./settings-tag.controller.js";
-import { TimeController } from "../time.controller.js";
 import { generateDynamicMockData } from "@/utils/seed-generator";
-import { renderTimeList } from "@/views/times/time-list.renderer.js";
 
 export const SettingsResetController = {
   keydownHandler: null,
@@ -54,13 +52,11 @@ export const SettingsResetController = {
       try {
         const dynamicMockData = generateDynamicMockData(mockDataCount);
 
-        StateManager.save(dynamicMockData.times, dynamicMockData.tags || []);
+        // StateManager.save(dynamicMockData.times, dynamicMockData.tags || []);
 
         state.activeTab = "active";
         state.currentView = "times";
 
-        renderTimeList(StateManager.getFilteredTimes(), state.activeTab);
-        TimeController.refreshUI();
         SettingsTagController.renderTagsList();
 
         setTimeout(() => {
@@ -97,7 +93,6 @@ export const SettingsResetController = {
 
   resetSession() {
     StateManager.init();
-    TimeController.refreshUI();
     SettingsTagController.renderTagsList();
   },
 
@@ -172,8 +167,6 @@ export const SettingsResetController = {
 
         renderTimeList([], state.activeTab);
 
-        TimeController.refreshUI();
-
         SettingsTagController.renderTagsList();
 
         NotificationService.show({
@@ -204,7 +197,6 @@ export const SettingsResetController = {
                   StateManager.getFilteredTimes(),
                   state.activeTab,
                 );
-                TimeController.refreshUI();
                 SettingsTagController.renderTagsList();
               } finally {
                 GlobalLoaderService.hide();

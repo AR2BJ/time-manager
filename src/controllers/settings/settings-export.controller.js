@@ -81,13 +81,13 @@ export const SettingsExportController = {
       content += `- **Completed At:** ✅ ${time.completedAt || "N/A"}\n`;
       content += `- **Archived:** ${time.archived ? "📦 Yes" : "⚡ No"}\n\n`;
 
-      content += `#### 📋 Subtimes (${(time.subtimes || []).filter((st) => st.completed).length}/${
-        (time.subtimes || []).length
+      content += `#### 📋 Subtasks (${(time.subtasks || []).filter((st) => st.completed).length}/${
+        (time.subtasks || []).length
       })\n`;
-      if (!time.subtimes || time.subtimes.length === 0) {
-        content += `_No subtimes defined._\n\n`;
+      if (!time.subtasks || time.subtasks.length === 0) {
+        content += `_No subtasks defined._\n\n`;
       } else {
-        time.subtimes.forEach((st) => {
+        time.subtasks.forEach((st) => {
           content += `- [${st.completed ? "x" : " "}] ${st.title} (ID: ${st.id})\n`;
         });
         content += `\n`;
@@ -125,12 +125,12 @@ export const SettingsExportController = {
       "Updated At",
       "Completed At",
       "Archived",
-      "Subtimes",
+      "Subtasks",
     ];
     content += headers.join(",") + "\n";
 
     times.forEach((t) => {
-      const subtimesSerialized = (t.subtimes || [])
+      const subtasksSerialized = (t.subtasks || [])
         .map((st) => `[${st.completed ? "X" : " "}] ${st.title} (ID: ${st.id})`)
         .join(" | ");
 
@@ -147,7 +147,7 @@ export const SettingsExportController = {
         escapeCsvValue(t.updatedAt),
         escapeCsvValue(t.completedAt),
         escapeCsvValue(t.archived ? "Yes" : "No"),
-        escapeCsvValue(subtimesSerialized),
+        escapeCsvValue(subtasksSerialized),
       ];
       content += row.join(",") + "\n";
     });

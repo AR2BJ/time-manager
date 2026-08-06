@@ -1,8 +1,8 @@
 import {
-  calculateSubtimeProgress,
+  calculateSubtaskProgress,
   getDaysRemaining,
   isOverdue,
-  openSubtimesState,
+  openSubtasksState,
 } from "@/utils/helpers.js";
 
 import { state } from "@/models/state.model";
@@ -61,29 +61,29 @@ export const TimeItemComponent = {
     };
     const statusClass = statusStyles[time.status] || statusStyles.todo;
 
-    const subtimeProgress = calculateSubtimeProgress(time.subtimes);
-    const hasSubtimes =
-      Array.isArray(time.subtimes) && time.subtimes.length > 0;
+    const subtaskProgress = calculateSubtaskProgress(time.subtasks);
+    const hasSubtasks =
+      Array.isArray(time.subtasks) && time.subtasks.length > 0;
 
-    const subtimeProgressColor =
-      subtimeProgress.percentage === 100
+    const subtaskProgressColor =
+      subtaskProgress.percentage === 100
         ? "bg-emerald-500/80"
-        : subtimeProgress.percentage <= 65 && subtimeProgress.percentage >= 35
+        : subtaskProgress.percentage <= 65 && subtaskProgress.percentage >= 35
           ? "bg-amber-500/80"
-          : subtimeProgress.percentage <= 35 && subtimeProgress.percentage > 0
+          : subtaskProgress.percentage <= 35 && subtaskProgress.percentage > 0
             ? "bg-red-500/80"
-            : subtimeProgress.percentage === 0
+            : subtaskProgress.percentage === 0
               ? "bg-slate-500/80"
               : "bg-brand/80";
 
-    const subtimePercentColor =
-      subtimeProgress.percentage === 100
+    const subtaskPercentColor =
+      subtaskProgress.percentage === 100
         ? "text-emerald-500/80"
-        : subtimeProgress.percentage <= 65 && subtimeProgress.percentage >= 35
+        : subtaskProgress.percentage <= 65 && subtaskProgress.percentage >= 35
           ? "text-amber-500/80"
-          : subtimeProgress.percentage <= 35 && subtimeProgress.percentage > 0
+          : subtaskProgress.percentage <= 35 && subtaskProgress.percentage > 0
             ? "text-red-500/80"
-            : subtimeProgress.percentage === 0
+            : subtaskProgress.percentage === 0
               ? "text-slate-500/80"
               : "text-brand/80";
 
@@ -96,7 +96,7 @@ export const TimeItemComponent = {
       : "fa-box-archive text-amber-500/80";
 
     const checkTooltip = isCompleted ? "Uncheck Time" : "Check Time";
-    const isExpanded = openSubtimesState.has(time.id);
+    const isExpanded = openSubtasksState.has(time.id);
 
     return `
       <div
@@ -314,13 +314,13 @@ export const TimeItemComponent = {
         </div>
 
         ${
-          hasSubtimes
+          hasSubtasks
             ? `
                 <div class="mt-2 border-t border-border/60 pt-2">
                   <button
                     type="button"
                     data-time-id="${time.id}"
-                    class="toggle-subtimes-btn w-full flex flex-wrap sm:flex-nowrap items-center justify-between gap-5 p-2 rounded-md hover:bg-surface-3/40 transition cursor-pointer group/sub-hdr text-left"
+                    class="toggle-subtasks-btn w-full flex flex-wrap sm:flex-nowrap items-center justify-between gap-5 p-2 rounded-md hover:bg-surface-3/40 transition cursor-pointer group/sub-hdr text-left"
                   >
                     <div
                       class="w-full sm:w-fit flex justify-center xs:justify-start items-center gap-2"
@@ -329,8 +329,8 @@ export const TimeItemComponent = {
                       <span
                         class="text-[11px] sm:text-xs font-bold text-secondary group-hover/sub-hdr:text-primary transition"
                       >
-                        Subtimes
-                        (${subtimeProgress.completedCount}/${subtimeProgress.totalCount})
+                        Subtasks
+                        (${subtaskProgress.completedCount}/${subtaskProgress.totalCount})
                       </span>
                     </div>
 
@@ -339,18 +339,18 @@ export const TimeItemComponent = {
                         class="w-full sm:w-32 h-1.5 rounded-full bg-surface-2 overflow-hidden"
                       >
                         <div
-                          class="h-full ${subtimeProgressColor} transition-all duration-300"
-                          style="width: ${subtimeProgress.percentage}%"
+                          class="h-full ${subtaskProgressColor} transition-all duration-300"
+                          style="width: ${subtaskProgress.percentage}%"
                         ></div>
                       </div>
 
                       <span
-                        class="text-[11px] font-mono font-bold ${subtimePercentColor}"
-                        >${subtimeProgress.percentage}%</span
+                        class="text-[11px] font-mono font-bold ${subtaskPercentColor}"
+                        >${subtaskProgress.percentage}%</span
                       >
 
                       <div
-                        class="subtime-chevron w-5 h-5 rounded-md flex items-center justify-center text-secondary group-hover/sub-hdr:text-primary transition-transform duration-300 ${
+                        class="subtask-chevron w-5 h-5 rounded-md flex items-center justify-center text-secondary group-hover/sub-hdr:text-primary transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
                         }"
                       >
@@ -360,12 +360,12 @@ export const TimeItemComponent = {
                   </button>
 
                   <div
-                    id="subtimes-container-${time.id}"
-                    class="subtimes-dropdown-body ${
+                    id="subtasks-container-${time.id}"
+                    class="subtasks-dropdown-body ${
                       isExpanded ? "" : "hidden"
                     } animate-slide-down space-y-1.5 pt-2 ps-1 pe-1"
                   >
-                    ${time.subtimes
+                    ${time.subtasks
                       .map(
                         (st) => `
                       <div
@@ -381,8 +381,8 @@ export const TimeItemComponent = {
                           <button
                             type="button"
                             data-time-id="${time.id}"
-                            data-subtime-id="${st.id}"
-                            class="subtime-toggle w-6 h-6 shrink-0 rounded-md border-2 flex items-center justify-center transition peer hover:cursor-pointer ${
+                            data-subtask-id="${st.id}"
+                            class="subtask-toggle w-6 h-6 shrink-0 rounded-md border-2 flex items-center justify-center transition peer hover:cursor-pointer ${
                               st.completed
                                 ? "bg-brand/80 border-brand/80 text-(--color-btn-primary-text) shadow-lg shadow-brand/20"
                                 : "border-border text-secondary hover:border-brand/80 hover:text-brand/80"
@@ -395,8 +395,8 @@ export const TimeItemComponent = {
 
                           <span
                             data-time-id="${time.id}"
-                            data-subtime-id="${st.id}"
-                            class="subtime-toggle text-sm text-primary truncate ${
+                            data-subtask-id="${st.id}"
+                            class="subtask-toggle text-sm text-primary truncate ${
                               st.completed ? "line-through opacity-50" : ""
                             }"
                           >

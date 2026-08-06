@@ -1,5 +1,5 @@
 import {
-  calculateSubtimeProgress,
+  calculateSubtaskProgress,
   getDaysRemaining,
   isOverdue,
 } from "@/utils/helpers.js";
@@ -27,20 +27,20 @@ export const DashboardComponent = {
       isOverdue(t.dueDate, t.status),
     ).length;
 
-    // Subtimes Aggregation
-    let totalSubtimes = 0;
-    let completedSubtimes = 0;
+    // Subtasks Aggregation
+    let totalSubtasks = 0;
+    let completedSubtasks = 0;
 
     activeTimes.forEach((t) => {
-      if (Array.isArray(t.subtimes) && t.subtimes.length > 0) {
-        totalSubtimes += t.subtimes.length;
-        completedSubtimes += t.subtimes.filter((st) => st.completed).length;
+      if (Array.isArray(t.subtasks) && t.subtasks.length > 0) {
+        totalSubtasks += t.subtasks.length;
+        completedSubtasks += t.subtasks.filter((st) => st.completed).length;
       }
     });
 
-    const subtimeRate =
-      totalSubtimes > 0
-        ? Math.round((completedSubtimes / totalSubtimes) * 100)
+    const subtaskRate =
+      totalSubtasks > 0
+        ? Math.round((completedSubtasks / totalSubtasks) * 100)
         : 0;
 
     const overallCompletionRate =
@@ -233,16 +233,16 @@ export const DashboardComponent = {
           <div class="flex items-center justify-between z-10">
             <span
               class="text-xs font-bold text-secondary uppercase tracking-wider"
-              >Subtime Velocity</span
+              >Subtask Velocity</span
             >
             <span
               class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
-              >${completedSubtimes}/${totalSubtimes} Units</span
+              >${completedSubtasks}/${totalSubtasks} Units</span
             >
           </div>
           <div class="z-10 mt-3">
             <div class="text-3xl font-black text-primary tracking-tight">
-              ${subtimeRate}%
+              ${subtaskRate}%
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
               Micro-execution lifecycle progress
@@ -611,10 +611,10 @@ export const DashboardComponent = {
                   class="text-lg font-bold text-primary flex items-center gap-2"
                 >
                   <i class="fa-regular fa-sliders text-brand/80 text-xl"></i>
-                  Time-Level Execution & Subtime Progress
+                  Time-Level Execution & Subtask Progress
                 </h4>
                 <p class="text-xs text-secondary/80 mt-0.5 font-medium">
-                  Granular view of active work items, subtime ratios, and
+                  Granular view of active work items, subtask ratios, and
                   milestone health.
                 </p>
               </div>
@@ -648,37 +648,37 @@ export const DashboardComponent = {
                     `
                   : times
                       .map((time) => {
-                        const subtimeInfo = calculateSubtimeProgress(
-                          time.subtimes,
+                        const subtaskInfo = calculateSubtaskProgress(
+                          time.subtasks,
                         );
                         const daysRemaining = getDaysRemaining(time.dueDate);
                         const overdue = isOverdue(time.dueDate, time.status);
                         const isDone = time.status === "done";
                         const absDays = Math.abs(daysRemaining);
 
-                        const subtimeProgressColor =
-                          subtimeInfo.percentage === 100
+                        const subtaskProgressColor =
+                          subtaskInfo.percentage === 100
                             ? "bg-emerald-500/80"
-                            : subtimeInfo.percentage <= 65 &&
-                                subtimeInfo.percentage >= 35
+                            : subtaskInfo.percentage <= 65 &&
+                                subtaskInfo.percentage >= 35
                               ? "bg-amber-500/80"
-                              : subtimeInfo.percentage <= 35 &&
-                                  subtimeInfo.percentage > 0
+                              : subtaskInfo.percentage <= 35 &&
+                                  subtaskInfo.percentage > 0
                                 ? "bg-red-500/80"
-                                : subtimeInfo.percentage === 0
+                                : subtaskInfo.percentage === 0
                                   ? "bg-slate-500/80"
                                   : "bg-brand/80";
 
-                        const subtimePercentColor =
-                          subtimeInfo.percentage === 100
+                        const subtaskPercentColor =
+                          subtaskInfo.percentage === 100
                             ? "text-emerald-500/80"
-                            : subtimeInfo.percentage <= 65 &&
-                                subtimeInfo.percentage >= 35
+                            : subtaskInfo.percentage <= 65 &&
+                                subtaskInfo.percentage >= 35
                               ? "text-amber-500/80"
-                              : subtimeInfo.percentage <= 35 &&
-                                  subtimeInfo.percentage > 0
+                              : subtaskInfo.percentage <= 35 &&
+                                  subtaskInfo.percentage > 0
                                 ? "text-red-500/80"
-                                : subtimeInfo.percentage === 0
+                                : subtaskInfo.percentage === 0
                                   ? "text-slate-500/80"
                                   : "text-brand/80";
 
@@ -844,20 +844,20 @@ export const DashboardComponent = {
                                   class="flex flex-wrap sm:flex-nowrap justify-between items-center text-[11px]"
                                 >
                                   <span class="text-secondary font-medium"
-                                    >Subtimes</span
+                                    >Subtasks</span
                                   >
                                   <span
-                                    class="font-mono font-bold ${subtimePercentColor}"
-                                    >${subtimeInfo.completedCount}/${subtimeInfo.totalCount}
-                                    (${subtimeInfo.percentage}%)</span
+                                    class="font-mono font-bold ${subtaskPercentColor}"
+                                    >${subtaskInfo.completedCount}/${subtaskInfo.totalCount}
+                                    (${subtaskInfo.percentage}%)</span
                                   >
                                 </div>
                                 <div
                                   class="w-full h-1.5 bg-surface-2 rounded-full overflow-hidden"
                                 >
                                   <div
-                                    class="h-full ${subtimeProgressColor} transition-all duration-300"
-                                    style="width: ${subtimeInfo.percentage}%"
+                                    class="h-full ${subtaskProgressColor} transition-all duration-300"
+                                    style="width: ${subtaskInfo.percentage}%"
                                   ></div>
                                 </div>
                               </div>

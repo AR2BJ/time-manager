@@ -4,8 +4,6 @@ import { generateId, todayISO } from "@/utils/helpers";
 import { GlobalLoaderService } from "@/services/loader.service";
 import { NotificationService } from "@/services/notification.service.js";
 import { SettingsTagController } from "./settings-tag.controller.js";
-import { TimeController } from "../time.controller.js";
-import { renderTimeList } from "@/views/times/time-list.renderer.js";
 
 export const SettingsImportController = {
   init() {
@@ -102,9 +100,6 @@ export const SettingsImportController = {
           state.activeTab = "active";
           state.currentView = "times";
 
-          renderTimeList(StateManager.getFilteredTimes(), state.activeTab);
-
-          TimeController.refreshUI();
           SettingsTagController.renderTagsList();
 
           NotificationService.show({
@@ -180,13 +175,13 @@ export const SettingsImportController = {
       );
       const archivedMatch = block.match(/- \*\*Archived:\*\*\s*(.+)/);
 
-      const subtimes = [];
-      const subtimeLines = block.match(/- \[(x| )\] (.+)\(ID: (.+)\)/g);
-      if (subtimeLines) {
-        subtimeLines.forEach((line) => {
+      const subtasks = [];
+      const subtaskLines = block.match(/- \[(x| )\] (.+)\(ID: (.+)\)/g);
+      if (subtaskLines) {
+        subtaskLines.forEach((line) => {
           const match = line.match(/- \[(x| )\] (.+)\(ID: (.+)\)/);
           if (match) {
-            subtimes.push({
+            subtasks.push({
               id: match[3].trim(),
               title: match[2].trim(),
               completed: match[1] === "x",
@@ -237,7 +232,7 @@ export const SettingsImportController = {
               ? completedAtMatch[1].trim()
               : null,
           archived: archivedMatch ? archivedMatch[1].includes("Yes") : false,
-          subtimes,
+          subtasks,
         });
       }
     });
@@ -313,12 +308,12 @@ export const SettingsImportController = {
           updatedAt,
           completedAt,
           archivedStr,
-          subtimesRaw,
+          subtasksRaw,
         ] = cols;
 
-        const subtimes = [];
-        if (subtimesRaw && subtimesRaw.trim()) {
-          const stItems = subtimesRaw.split(" | ");
+        const subtasks = [];
+        if (subtasksRaw && subtasksRaw.trim()) {
+          const stItems = subtasksRaw.split(" | ");
 
           stItems.forEach((item, idx) => {
             const cleanItem = item.trim();
@@ -328,7 +323,7 @@ export const SettingsImportController = {
             );
 
             if (match) {
-              subtimes.push({
+              subtasks.push({
                 id: match[3].trim(),
                 title: match[2].trim(),
                 completed: match[1] === "X",
@@ -343,11 +338,11 @@ export const SettingsImportController = {
                 .trim();
 
               if (statusMatch) {
-                subtimes.push({
+                subtasks.push({
                   id: idMatch
                     ? idMatch[1].trim()
-                    : `subtime-${Date.now()}-${idx}`,
-                  title: title || "Untitled Subtime",
+                    : `subtask-${Date.now()}-${idx}`,
+                  title: title || "Untitled Subtask",
                   completed: statusMatch[1] === "X",
                 });
               }
@@ -388,7 +383,7 @@ export const SettingsImportController = {
               ? completedAt.trim()
               : null,
           archived: archivedStr ? archivedStr.trim() === "Yes" : false,
-          subtimes,
+          subtasks,
         });
       }
     }

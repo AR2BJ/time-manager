@@ -1,7 +1,7 @@
-export const openSubtimesState = new Set();
+export const openSubtasksState = new Set();
 
-export function clearOpenSubtimesState() {
-  openSubtimesState.clear();
+export function clearOpenSubtasksState() {
+  openSubtasksState.clear();
 }
 
 export function getTimeMatrixAttributes(time) {
@@ -162,13 +162,13 @@ export function getDaysRemaining(dueDateStr) {
   return diffDays;
 }
 
-export function calculateSubtimeProgress(subtimes = []) {
-  if (!Array.isArray(subtimes) || subtimes.length === 0) {
+export function calculateSubtaskProgress(subtasks = []) {
+  if (!Array.isArray(subtasks) || subtasks.length === 0) {
     return { completedCount: 0, totalCount: 0, percentage: 0 };
   }
 
-  const completedCount = subtimes.filter((st) => st.completed).length;
-  const totalCount = subtimes.length;
+  const completedCount = subtasks.filter((st) => st.completed).length;
+  const totalCount = subtasks.length;
   const percentage = Math.round((completedCount / totalCount) * 100);
 
   return { completedCount, totalCount, percentage };

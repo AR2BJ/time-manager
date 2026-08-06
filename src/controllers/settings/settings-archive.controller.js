@@ -1,6 +1,5 @@
 import { NotificationService } from "@/services/notification.service.js";
 import { StateManager } from "@/models/state.model.js";
-import { TimeController } from "../time.controller.js";
 
 export const SettingsArchiveController = {
   init() {
@@ -88,7 +87,6 @@ export const SettingsArchiveController = {
 
     if (modified) {
       StateManager.save(times);
-      TimeController.refreshUI();
 
       NotificationService.show({
         type: "info",

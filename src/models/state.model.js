@@ -1,171 +1,242 @@
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
+export const defaultTrackList = [
+  {
+    id: "rain-forest",
+    title: "Rain & Forest Stream (10 Hours)",
+    type: "youtube",
+    youtubeId: "mPZkdNFkNps",
+  },
+  {
+    id: "brown-noise",
+    title: "Pure Brown Noise (No Loop)",
+    type: "youtube",
+    youtubeId: "RqzGzwTY-6w",
+  },
+  {
+    id: "fireplace",
+    title: "Fireplace Crackle",
+    type: "youtube",
+    youtubeId: "L_LUpnjgPso",
+  },
+];
+
 export const state = {
-  times: [],
-  tags: [],
-  lastDeletedTime: null,
-  activeTab: "active",
-  calendarMode: "day",
-  matrixMode: "eisenhower",
-  currentView: "times",
-  selectedTag: "all",
-  currentPriority: "low",
-  currentStatus: "todo",
-  dateFilter: "all",
-  sortBy: "priority",
-  searchQuery: "",
+  // Navigation Views: 'timer' | 'history' | 'analytics' | 'settings'
+  currentView: "timer",
+
+  // Selected Active Task for Focus Session
+  activeTaskId: null,
+
+  // Active Timer Mode: 'pomodoro' | 'flow'
+  activeMode: "pomodoro",
+
+  // Core Timer State
+  timer: {
+    isRunning: false,
+    isPaused: false,
+    timeRemaining: 25 * 60, // seconds for Pomodoro
+    duration: 25 * 60, // total duration in seconds for progress ring/bar
+    flowTime: 0, // elapsed time in Flow Mode (seconds)
+    pomodoroSessionCount: 0,
+    currentPhase: "work", // 'work' | 'shortBreak' | 'longBreak'
+  },
+
+  // Ambient Sound Streamer State
+  soundPlayer: {
+    isPlaying: false,
+    currentSoundId: "rain-forest",
+    volume: 50,
+    trackList: [...defaultTrackList],
+  },
+
+  // Lightweight Tasks List (Standalone Mode)
+  tasks: [],
+
+  // Logged Focus Sessions History
+  sessions: [],
+
+  // System Settings
+  settings: {
+    pomodoroWorkTime: 25,
+    shortBreakTime: 5,
+    longBreakTime: 15,
+    autoStartBreaks: false,
+    autoStartPomodoros: false,
+    notificationSound: true,
+  },
 };
+
+// Internal listeners list for Observer pattern
+const listeners = new Set();
 
 export const StateManager = {
   init() {
     const saved = loadFromStorage();
     if (saved) {
-      state.times = saved.times || [];
-      state.tags = saved.tags || [];
+      state.tasks = saved.tasks || [];
+      state.sessions = saved.sessions || [];
+      if (saved.settings) {
+        state.settings = { ...state.settings, ...saved.settings };
+        state.timer.timeRemaining = state.settings.pomodoroWorkTime * 60;
+        state.timer.duration = state.settings.pomodoroWorkTime * 60;
+        state.soundPlayer.volume = saved.settings.volume ?? 50;
+        state.soundPlayer.currentSoundId =
+          saved.settings.lastSelectedSoundId || "rain-forest";
+      }
     }
+
+    // Auto-select first active task if available
+    const firstTask = state.tasks.find((t) => t.status !== "done");
+    if (firstTask) {
+      state.activeTaskId = firstTask.id;
+    }
+
+    this.notify();
     return state;
   },
 
-  getTimes() {
-    return state.times;
-  },
-
-  getTags() {
-    return state.tags;
-  },
-
-  getFilteredTimes() {
-    let list = this.getTimes();
-
-    if (state.activeTab === "active") {
-      list = list.filter((time) => !time.archived && time.status !== "done");
-    } else if (state.activeTab === "completed") {
-      list = list.filter((time) => !time.archived && time.status === "done");
-    } else if (state.activeTab === "archived") {
-      list = list.filter((time) => time.archived);
+  // --- Observer Pattern ---
+  subscribe(listener) {
+    if (typeof listener === "function") {
+      listeners.add(listener);
     }
-
-    if (state.selectedTag && state.selectedTag !== "all") {
-      list = list.filter((time) => time.tags.includes(state.selectedTag));
-    }
-
-    if (state.activeTab === "active" && state.currentStatus !== "todo") {
-      list = list.filter((time) => time.status === state.currentStatus);
-    }
-
-    if (state.currentPriority && state.currentPriority !== "low") {
-      list = list.filter((time) => time.priority === state.currentPriority);
-    }
-
-    if (state.dateFilter && state.dateFilter !== "all") {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const todayStr = today.toISOString().split("T")[0];
-
-      list = list.filter((time) => {
-        if (state.dateFilter === "no_date") return !time.dueDate;
-        if (!time.dueDate) return false;
-
-        const timeDate = new Date(time.dueDate + "T00:00:00");
-
-        if (state.dateFilter === "today") return time.dueDate === todayStr;
-        if (state.dateFilter === "overdue")
-          return timeDate < today && time.status !== "done";
-        if (state.dateFilter === "this_week") {
-          const nextWeek = new Date(today);
-          nextWeek.setDate(today.getDate() + 7);
-          return timeDate >= today && timeDate <= nextWeek;
-        }
-
-        return true;
-      });
-    }
-
-    if (state.searchQuery) {
-      const query = state.searchQuery.toLowerCase().trim();
-      list = list.filter((time) => {
-        const title = (time.title || "").toLowerCase();
-        const description = (time.description || "").toLowerCase();
-
-        const tagsMatch = time.tags?.some((tagId) => {
-          const tagObj = state.tags.find((t) => t.id === tagId);
-          return tagObj ? tagObj.name.toLowerCase().includes(query) : false;
-        });
-
-        return (
-          title.includes(query) || description.includes(query) || tagsMatch
-        );
-      });
-    }
-
-    return this.sortTimes(list, state.sortBy);
+    return () => listeners.delete(listener); // Unsubscribe cleanup function
   },
 
-  sortTimes(times, sortBy) {
-    const priorityWeight = { high: 3, medium: 2, low: 1 };
-    const statusWeight = { blocked: 4, in_progress: 3, todo: 2, done: 1 };
-
-    return [...times].sort((a, b) => {
-      if (sortBy === "priority")
-        return (
-          (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0)
-        );
-      if (sortBy === "status")
-        return (statusWeight[b.status] || 0) - (statusWeight[a.status] || 0);
-      if (sortBy === "dueDate") {
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate) - new Date(b.dueDate);
-      }
-      if (sortBy === "title") return a.title.localeCompare(b.title);
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
+  notify() {
+    listeners.forEach((listener) => listener(state));
   },
 
-  setDateFilter(filter) {
-    state.dateFilter = filter;
-  },
-
-  setSelectedTag(tag) {
-    state.selectedTag = tag;
-  },
-
-  setPriority(priority) {
-    state.currentPriority = priority;
-  },
-
-  setStatus(status) {
-    state.currentStatus = status;
-  },
-
-  setSortBy(sortBy) {
-    state.sortBy = sortBy;
-  },
-
-  setMatrixMode(mode) {
-    state.matrixMode = mode;
-  },
-
-  setCalendarMode(mode) {
-    state.calendarMode = mode;
-  },
-
-  setTab(tab) {
-    state.activeTab = tab;
-  },
-
+  // --- Views ---
   setView(view) {
     state.currentView = view;
+    this.notify();
   },
 
-  setSearchQuery(query) {
-    state.searchQuery = query;
+  // --- Mode ---
+  setMode(mode) {
+    state.activeMode = mode;
+    this.notify();
   },
 
-  save(times = state.times, tags = state.tags) {
-    state.times = times;
-    state.tags = tags;
-    saveToStorage({ times: state.times, tags: state.tags });
+  // --- Task Management ---
+  setActiveTaskId(taskId) {
+    state.activeTaskId = taskId;
+    this.notify();
+  },
+
+  getActiveTask() {
+    return state.tasks.find((t) => t.id === state.activeTaskId) || null;
+  },
+
+  getTasks() {
+    return state.tasks;
+  },
+
+  addTask(title, estimatedPomodoros = 1) {
+    if (!title || !title.trim()) return null;
+
+    const newTask = {
+      id: crypto.randomUUID(),
+      title: title.trim(),
+      status: "todo",
+      estimatedPomodoros: Number(estimatedPomodoros) || 1,
+      completedPomodoros: 0,
+      createdAt: new Date().toISOString(),
+    };
+
+    state.tasks.unshift(newTask);
+    state.activeTaskId = newTask.id;
+    this.save();
+    this.notify();
+    return newTask;
+  },
+
+  toggleTaskStatus(taskId) {
+    const task = state.tasks.find((t) => t.id === taskId);
+    if (task) {
+      task.status = task.status === "done" ? "todo" : "done";
+      this.save();
+      this.notify();
+    }
+  },
+
+  // --- Timer State Controls ---
+  updateTimerState(newTimerState) {
+    state.timer = { ...state.timer, ...newTimerState };
+    this.notify();
+  },
+
+  resetTimer() {
+    const isPomodoro = state.activeMode === "pomodoro";
+    const defaultSecs = state.settings.pomodoroWorkTime * 60;
+
+    state.timer = {
+      isRunning: false,
+      isPaused: false,
+      timeRemaining: isPomodoro ? defaultSecs : 0,
+      duration: isPomodoro ? defaultSecs : 0,
+      flowTime: 0,
+      pomodoroSessionCount: state.timer.pomodoroSessionCount,
+      currentPhase: "work",
+    };
+    this.notify();
+  },
+
+  // --- Sessions Log ---
+  addSession(sessionData = {}) {
+    const activeTask = this.getActiveTask();
+    const session = {
+      id: crypto.randomUUID(),
+      taskId: sessionData.taskId || state.activeTaskId || null,
+      taskTitle:
+        sessionData.taskTitle ||
+        (activeTask ? activeTask.title : "Untitled Session"),
+      type: sessionData.type || state.activeMode,
+      durationSeconds: sessionData.durationSeconds || 0,
+      completedAt: new Date().toISOString(),
+    };
+
+    state.sessions.unshift(session);
+
+    if (session.taskId) {
+      const task = state.tasks.find((t) => t.id === session.taskId);
+      if (task) {
+        task.completedPomodoros += 1;
+      }
+    }
+
+    this.save();
+    this.notify();
+  },
+
+  // --- Sound Player ---
+  setSoundPlaying(isPlaying) {
+    state.soundPlayer.isPlaying = isPlaying;
+    this.notify();
+  },
+
+  setSoundTrack(soundId) {
+    state.soundPlayer.currentSoundId = soundId;
+    state.settings.lastSelectedSoundId = soundId;
+    this.save();
+    this.notify();
+  },
+
+  setVolume(volume) {
+    state.soundPlayer.volume = volume;
+    state.settings.volume = volume;
+    this.save();
+    this.notify();
+  },
+
+  // --- Persistence ---
+  save() {
+    saveToStorage({
+      tasks: state.tasks,
+      sessions: state.sessions,
+      settings: state.settings,
+    });
   },
 };

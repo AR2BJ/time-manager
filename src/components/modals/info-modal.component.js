@@ -240,13 +240,13 @@ export const InfoModalComponent = {
                 <h4
                   class="text-xs sm:text-sm font-bold text-brand/80 uppercase tracking-wide flex items-center gap-2"
                 >
-                  <i class="fa-regular fa-layer-group"></i> Subtimes & Progress
+                  <i class="fa-regular fa-layer-group"></i> Subtasks & Progress
                 </h4>
                 <p
                   class="text-xs sm:text-sm text-secondary mt-1.5 leading-relaxed"
                 >
-                  Break complex times into actionable subtimes inside the Edit
-                  Modal. Track completion progress dynamically as subtimes are
+                  Break complex times into actionable subtasks inside the Edit
+                  Modal. Track completion progress dynamically as subtasks are
                   marked done.
                 </p>
               </div>
