@@ -73,7 +73,7 @@ export const TimerView = {
             class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2"
           >
             <div
-              class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-8 w-full max-w-xs shadow-inner"
+              class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner"
             >
               <div
                 id="mode-indicator"
@@ -98,17 +98,17 @@ export const TimerView = {
             </div>
 
             <div
-              class="relative my-2 flex items-center justify-center w-72 h-72 sm:w-88 sm:h-88"
+              class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110"
             >
               <svg
                 id="timer-svg-container"
                 class="w-full h-full transform -rotate-90 origin-center relative z-0"
-                viewBox="0 0 280 280"
+                viewBox="0 0 320 320"
               >
                 <circle
-                  cx="140"
-                  cy="140"
-                  r="120"
+                  cx="160"
+                  cy="160"
+                  r="140"
                   class="stroke-surface-3"
                   stroke-width="10"
                   fill="transparent"
@@ -116,22 +116,22 @@ export const TimerView = {
 
                 <circle
                   id="timer-progress-ring"
-                  cx="140"
-                  cy="140"
-                  r="120"
+                  cx="160"
+                  cy="160"
+                  r="140"
                   class="stroke-brand origin-center transition-all duration-300"
                   stroke-width="10"
                   stroke-linecap="round"
                   fill="transparent"
-                  stroke-dasharray="753.98"
-                  stroke-dashoffset="753.98"
+                  stroke-dasharray="879.64"
+                  stroke-dashoffset="879.64"
                 />
               </svg>
 
               <canvas
                 id="flow-comet-canvas"
-                width="280"
-                height="280"
+                width="320"
+                height="320"
                 class="absolute inset-0 w-full h-full pointer-events-none z-10 transition-opacity duration-300 opacity-0"
               ></canvas>
 
@@ -163,7 +163,7 @@ export const TimerView = {
 
             <div
               id="timer-controls-container"
-              class="mt-8 flex items-center gap-4 w-full justify-center min-h-14"
+              class="mt-6 flex items-center gap-4 w-full justify-center min-h-14"
             ></div>
           </div>
 

@@ -125,9 +125,9 @@ export const TimerController = {
         state.activeMode === "flow" &&
         (state.timer.isRunning || state.timer.isPaused)
       ) {
-        const centerX = 140;
-        const centerY = 140;
-        const radius = 120;
+        const centerX = 160;
+        const centerY = 160;
+        const radius = 140;
         const strokeWidth = 10;
 
         let currentFlowSeconds = this.accumulatedFlowTime;
@@ -223,7 +223,7 @@ export const TimerController = {
 
     if (!displayEl) return;
 
-    const CIRCUMFERENCE = 753.98;
+    const CIRCUMFERENCE = 879.64;
 
     if (state.activeMode === "pomodoro") {
       this.stopFlowAnimation();
