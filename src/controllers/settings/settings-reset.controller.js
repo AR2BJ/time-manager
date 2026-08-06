@@ -3,8 +3,8 @@ import { StateManager, state } from "@/models/state.model.js";
 import { GlobalLoaderService } from "@/services/loader.service";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
-import { SettingsArchiveController } from "./settings-archive.controller.js";
-import { generateDynamicMockData } from "@/utils/seed-generator";
+
+// import { generateDynamicMockData } from "@/utils/seed-generator";
 
 export const SettingsResetController = {
   keydownHandler: null,
@@ -43,13 +43,12 @@ export const SettingsResetController = {
     });
 
     setTimeout(() => {
-      SettingsArchiveController.runAutoArchivePipeline();
       this.resetSession();
     }, 200);
 
     setTimeout(() => {
       try {
-        const dynamicMockData = generateDynamicMockData(mockDataCount);
+        // const dynamicMockData = generateDynamicMockData(mockDataCount);
 
         // StateManager.save(dynamicMockData.times, dynamicMockData.tags || []);
 

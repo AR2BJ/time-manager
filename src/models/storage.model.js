@@ -1,4 +1,4 @@
-import { formatDate } from "@/utils/helpers.js";
+import { formatDate, generateId } from "@/utils/helpers.js";
 
 export const STORAGE_KEY = "time_manager_data";
 export const STORAGE_VERSION = 2; // Incremented version for enhanced timer persistence schema
@@ -8,7 +8,7 @@ export const STORAGE_VERSION = 2; // Incremented version for enhanced timer pers
  */
 function normalizeTask(task) {
   return {
-    id: String(task.id || crypto.randomUUID()),
+    id: String(task.id || generateId()),
     title: task.title || "Untitled Task",
     status: task.status || "todo",
     estimatedPomodoros: Number(task.estimatedPomodoros) || 1,
@@ -22,7 +22,7 @@ function normalizeTask(task) {
  */
 function normalizeSession(session) {
   return {
-    id: String(session.id || crypto.randomUUID()),
+    id: String(session.id || generateId()),
     taskId: session.taskId || null,
     taskTitle: session.taskTitle || "Untitled",
     type: session.type || "pomodoro",
@@ -64,6 +64,7 @@ function migrateData(data) {
       pomodoroWorkTime,
       shortBreakTime: Number(settings.shortBreakTime) || 5,
       longBreakTime: Number(settings.longBreakTime) || 15,
+      longBreakInterval: Number(settings.longBreakInterval) || 4,
       autoStartBreaks: Boolean(settings.autoStartBreaks),
       autoStartPomodoros: Boolean(settings.autoStartPomodoros),
       notificationSound: settings.notificationSound !== false,

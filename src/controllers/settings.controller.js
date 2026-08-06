@@ -1,4 +1,3 @@
-import { SettingsArchiveController } from "./settings/settings-archive.controller.js";
 import { SettingsExportController } from "./settings/settings-export.controller.js";
 import { SettingsImportController } from "./settings/settings-import.controller.js";
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
@@ -12,7 +11,6 @@ export const SettingsController = {
     // Initialize sub-controllers
     SettingsImportController.init();
     SettingsResetController.init();
-    SettingsArchiveController.init();
   },
 
   bindThemeEvents() {
