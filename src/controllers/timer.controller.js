@@ -1,12 +1,15 @@
 import { StateManager, state } from "@/models/state.model.js";
 
+import { ActiveTaskCardComponent } from "@/components/features/task/active-task-card.component";
 import { AnalyticsView } from "@/views/analytics-view.js";
 import { DesktopNavComponent } from "@/components/layout/desktop-nav.component.js";
 import { HeaderComponent } from "@/components/shared/header.component.js";
-import { InfoModalComponent } from "@/components/modals/info-modal.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
+import { ModalController } from "./modal.controller";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
+import { TaskController } from "./task.controller";
 import { TimerView } from "@/views/timer-view.js";
+import { TodayOverviewComponent } from "@/components/features/task/today-overview.component";
 import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
 
@@ -17,13 +20,16 @@ export const TimerController = {
 
   init() {
     StateManager.init();
+    timerService.initFromSavedState();
+    TaskController.init();
+    ModalController.init();
+
     this.renderComponents();
     this.bindStaticEvents();
     this.bindTimerEvents();
     this.bindSoundEvents();
     this.bindTimerShortcuts();
     this.bindMenuToggle();
-    this.bindModalEvents();
 
     this.refreshUI();
 
@@ -38,9 +44,10 @@ export const TimerController = {
       "desktop-nav-container": DesktopNavComponent.render,
       "mobile-nav-container": MobileNavComponent.render,
       "timer-view-container": TimerView.render,
+      "active-task-container": ActiveTaskCardComponent.render,
+      "today-overview-container": TodayOverviewComponent.render,
       "analytics-view-container": AnalyticsView.render,
       "settings-view-container": SettingsViewComponent.render,
-      "help-modal-container": InfoModalComponent.render,
     };
 
     Object.entries(renderMap).forEach(([id, renderFn]) => {
@@ -49,6 +56,8 @@ export const TimerController = {
         container.innerHTML = renderFn();
       }
     });
+
+    this.renderTaskWidgets();
   },
 
   bindTimerEvents() {
@@ -230,13 +239,15 @@ export const TimerController = {
       flowCanvas?.classList.add("opacity-0");
       progressRing?.classList.remove("opacity-0");
 
-      const totalSeconds = state.timer.timeRemaining;
+      const totalSeconds = Number.isFinite(state.timer.timeRemaining)
+        ? state.timer.timeRemaining
+        : 1500;
       const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
       const secs = String(totalSeconds % 60).padStart(2, "0");
       displayEl.textContent = `${mins}:${secs}`;
 
       if (progressRing) {
-        const totalDuration = state.timer.totalPhaseDuration || 1500;
+        const totalDuration = state.timer.duration || 1500;
         const elapsedTime = totalDuration - totalSeconds;
         const progressFraction = Math.min(
           Math.max(elapsedTime / totalDuration, 0),
@@ -259,12 +270,14 @@ export const TimerController = {
       }
 
       if (subInfo) {
-        subInfo.textContent = `Completed Sessions: ${state.timer.pomodoroSessionCount}`;
+        subInfo.textContent = `Completed Sessions: ${state.timer.pomodoroSessionCount || 0}`;
       }
     } else if (state.activeMode === "flow") {
       progressRing?.classList.add("opacity-0");
 
-      const totalSeconds = state.timer.flowTime;
+      const totalSeconds = Number.isFinite(state.timer.flowTime)
+        ? state.timer.flowTime
+        : 0;
       const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
       const secs = String(totalSeconds % 60).padStart(2, "0");
       displayEl.textContent = `${mins}:${secs}`;
@@ -297,7 +310,7 @@ export const TimerController = {
               id="btn-timer-start"
               class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-solid fa-play pointer-events-none"></i>
+              <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">Start Focus</span>
             </button>
           `;
@@ -307,7 +320,7 @@ export const TimerController = {
               id="btn-timer-pause"
               class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-amber-500 px-8 text-base font-bold text-white shadow-lg shadow-amber-500/25 hover:bg-amber-600 transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-solid fa-pause pointer-events-none"></i>
+              <i class="fa-regular fa-pause pointer-events-none"></i>
               <span class="pointer-events-none">Pause</span>
             </button>
           `;
@@ -318,7 +331,7 @@ export const TimerController = {
               class="flex h-14 items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-6 text-sm font-bold text-rose-500 hover:bg-rose-500/20 transition cursor-pointer active:scale-95"
               title="Stop & Reset"
             >
-              <i class="fa-solid fa-square pointer-events-none"></i>
+              <i class="fa-regular fa-square pointer-events-none"></i>
               <span class="pointer-events-none">Stop</span>
             </button>
 
@@ -326,7 +339,7 @@ export const TimerController = {
               id="btn-timer-continue"
               class="flex h-14 min-w-40 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-solid fa-play pointer-events-none"></i>
+              <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">Continue</span>
             </button>
           `;
@@ -352,6 +365,7 @@ export const TimerController = {
       if (event.code === "Space") {
         event.preventDefault();
         const { isRunning, isPaused } = state.timer;
+
         if (!isRunning || isPaused) {
           this.flowStartTimestamp = performance.now();
           timerService.start();
@@ -441,29 +455,6 @@ export const TimerController = {
     });
   },
 
-  bindModalEvents() {
-    const helpToggle = document.getElementById("help-toggle");
-    const helpModal = document.getElementById("help-modal");
-    const closeHelpModal = document.getElementById("close-help-modal");
-    const btnCloseHelp = document.getElementById("btn-close-help");
-    const helpBackdrop = document.getElementById("help-modal-backdrop");
-
-    const openHelp = () => {
-      helpModal?.classList.replace("hidden", "flex");
-      document.body.classList.add("overflow-hidden");
-    };
-
-    const closeHelp = () => {
-      helpModal?.classList.replace("flex", "hidden");
-      document.body.classList.remove("overflow-hidden");
-    };
-
-    helpToggle?.addEventListener("click", openHelp);
-    closeHelpModal?.addEventListener("click", closeHelp);
-    btnCloseHelp?.addEventListener("click", closeHelp);
-    helpBackdrop?.addEventListener("click", closeHelp);
-  },
-
   bindStaticEvents() {
     const scrollTopBtn = document.getElementById("scroll-to-top-btn");
 
@@ -486,15 +477,48 @@ export const TimerController = {
     });
   },
 
+  renderTaskWidgets() {
+    const taskContainer = document.getElementById("active-task-container");
+    const overviewContainer = document.getElementById(
+      "today-overview-container",
+    );
+
+    if (taskContainer) {
+      taskContainer.innerHTML = ActiveTaskCardComponent.render();
+    }
+    if (overviewContainer) {
+      overviewContainer.innerHTML = TodayOverviewComponent.render();
+    }
+  },
+
   refreshUI() {
     this.updateTimerDisplay();
     this.updateAudioUI();
     this.updateModeStyles(state.activeMode);
+    this.renderTaskWidgets();
   },
 
-  handleModeSwitch(mode) {
-    StateManager.setMode(mode);
-    this.updateModeStyles(mode);
+  handleModeSwitch(targetMode) {
+    if (state.activeMode === targetMode) return;
+
+    if (state.timer.isRunning || state.timer.isPaused) {
+      ModalController.openConfirm({
+        title: "Switch Timer Mode?",
+        message: `Timer is currently active. Are you sure you want to stop it and switch to ${targetMode.toUpperCase()} mode?`,
+        onConfirm: () => {
+          timerService.stopAndTransition();
+          StateManager.setMode(targetMode);
+          StateManager.resetTimer();
+          this.updateModeStyles(targetMode);
+          this.refreshUI();
+        },
+      });
+      return;
+    }
+
+    StateManager.setMode(targetMode);
+    StateManager.resetTimer();
+    this.updateModeStyles(targetMode);
     this.refreshUI();
   },
 

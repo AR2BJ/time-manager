@@ -3,7 +3,6 @@ import { generateId, todayISO } from "@/utils/helpers";
 
 import { GlobalLoaderService } from "@/services/loader.service";
 import { NotificationService } from "@/services/notification.service.js";
-import { SettingsTagController } from "./settings-tag.controller.js";
 
 export const SettingsImportController = {
   init() {
@@ -99,8 +98,6 @@ export const SettingsImportController = {
 
           state.activeTab = "active";
           state.currentView = "times";
-
-          SettingsTagController.renderTagsList();
 
           NotificationService.show({
             type: "success",

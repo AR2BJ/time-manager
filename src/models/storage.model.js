@@ -1,7 +1,7 @@
 import { formatDate } from "@/utils/helpers.js";
 
 export const STORAGE_KEY = "time_manager_data";
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2; // Incremented version for enhanced timer persistence schema
 
 /**
  * Normalizes a lightweight task entity for Standalone mode
@@ -31,17 +31,37 @@ function normalizeSession(session) {
   };
 }
 
+/**
+ * Normalizes live timer dynamic state for seamless rehydration
+ */
+function normalizeTimer(timer, defaultWorkTime = 25) {
+  const fallbackSecs = defaultWorkTime * 60;
+  return {
+    // If the browser was reloaded during an active tick, safety-pause to prevent time sync issues
+    isRunning: false,
+    isPaused: Boolean(timer?.isRunning || timer?.isPaused),
+    timeRemaining: Number(timer?.timeRemaining) ?? fallbackSecs,
+    duration: Number(timer?.duration) ?? fallbackSecs,
+    flowTime: Number(timer?.flowTime) || 0,
+    pomodoroSessionCount: Number(timer?.pomodoroSessionCount) || 0,
+    currentPhase: timer?.currentPhase || "work",
+  };
+}
+
 function migrateData(data) {
   const tasks = Array.isArray(data.tasks) ? data.tasks : [];
   const sessions = Array.isArray(data.sessions) ? data.sessions : [];
   const settings = data.settings || {};
+  const pomodoroWorkTime = Number(settings.pomodoroWorkTime) || 25;
 
   return {
     version: STORAGE_VERSION,
+    activeMode: data.activeMode === "flow" ? "flow" : "pomodoro",
     tasks: tasks.map(normalizeTask),
     sessions: sessions.map(normalizeSession),
+    timer: normalizeTimer(data.timer, pomodoroWorkTime),
     settings: {
-      pomodoroWorkTime: Number(settings.pomodoroWorkTime) || 25,
+      pomodoroWorkTime,
       shortBreakTime: Number(settings.shortBreakTime) || 5,
       longBreakTime: Number(settings.longBreakTime) || 15,
       autoStartBreaks: Boolean(settings.autoStartBreaks),
@@ -59,8 +79,10 @@ export function saveToStorage(data) {
       STORAGE_KEY,
       JSON.stringify({
         version: STORAGE_VERSION,
+        activeMode: data.activeMode || "pomodoro",
         tasks: data.tasks || [],
         sessions: data.sessions || [],
+        timer: data.timer || {},
         settings: data.settings || {},
       }),
     );

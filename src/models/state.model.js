@@ -31,7 +31,7 @@ export const state = {
   // Active Timer Mode: 'pomodoro' | 'flow'
   activeMode: "pomodoro",
 
-  // Core Timer State
+  // Core Timer State (Supports both Pomodoro & Flow Mode context isolation)
   timer: {
     isRunning: false,
     isPaused: false,
@@ -61,6 +61,7 @@ export const state = {
     pomodoroWorkTime: 25,
     shortBreakTime: 5,
     longBreakTime: 15,
+    longBreakInterval: 4,
     autoStartBreaks: false,
     autoStartPomodoros: false,
     notificationSound: true,
@@ -74,15 +75,19 @@ export const StateManager = {
   init() {
     const saved = loadFromStorage();
     if (saved) {
+      state.activeMode = saved.activeMode || "pomodoro";
       state.tasks = saved.tasks || [];
       state.sessions = saved.sessions || [];
+
       if (saved.settings) {
         state.settings = { ...state.settings, ...saved.settings };
-        state.timer.timeRemaining = state.settings.pomodoroWorkTime * 60;
-        state.timer.duration = state.settings.pomodoroWorkTime * 60;
         state.soundPlayer.volume = saved.settings.volume ?? 50;
         state.soundPlayer.currentSoundId =
           saved.settings.lastSelectedSoundId || "rain-forest";
+      }
+
+      if (saved.timer) {
+        state.timer = { ...state.timer, ...saved.timer };
       }
     }
 
@@ -116,7 +121,10 @@ export const StateManager = {
 
   // --- Mode ---
   setMode(mode) {
+    if (state.activeMode === mode) return;
+
     state.activeMode = mode;
+    this.save();
     this.notify();
   },
 
@@ -132,6 +140,33 @@ export const StateManager = {
 
   getTasks() {
     return state.tasks;
+  },
+
+  getTodaySessions() {
+    const today = new Date().toISOString().split("T")[0];
+    return state.sessions.filter((session) => {
+      const sessionDate = new Date(session.completedAt)
+        .toISOString()
+        .split("T")[0];
+      return sessionDate === today;
+    });
+  },
+
+  getTodayOverview() {
+    const todaySessions = this.getTodaySessions();
+    const sessionsDone = todaySessions.length;
+
+    const totalSeconds = todaySessions.reduce(
+      (acc, s) => acc + (s.durationSeconds || 0),
+      0,
+    );
+
+    const totalMinutes = Math.round(totalSeconds / 60);
+
+    return {
+      sessionsDone,
+      totalMinutes,
+    };
   },
 
   addTask(title, estimatedPomodoros = 1) {
@@ -165,6 +200,7 @@ export const StateManager = {
   // --- Timer State Controls ---
   updateTimerState(newTimerState) {
     state.timer = { ...state.timer, ...newTimerState };
+    this.save(); // Ensures state persistence on timer update ticks/actions
     this.notify();
   },
 
@@ -172,15 +208,19 @@ export const StateManager = {
     const isPomodoro = state.activeMode === "pomodoro";
     const defaultSecs = state.settings.pomodoroWorkTime * 60;
 
-    state.timer = {
-      isRunning: false,
-      isPaused: false,
-      timeRemaining: isPomodoro ? defaultSecs : 0,
-      duration: isPomodoro ? defaultSecs : 0,
-      flowTime: 0,
-      pomodoroSessionCount: state.timer.pomodoroSessionCount,
-      currentPhase: "work",
-    };
+    if (isPomodoro) {
+      state.timer.isRunning = false;
+      state.timer.isPaused = false;
+      state.timer.timeRemaining = defaultSecs;
+      state.timer.duration = defaultSecs;
+      state.timer.currentPhase = "work";
+    } else {
+      state.timer.isRunning = false;
+      state.timer.isPaused = false;
+      state.timer.flowTime = 0;
+    }
+
+    this.save();
     this.notify();
   },
 
@@ -234,8 +274,10 @@ export const StateManager = {
   // --- Persistence ---
   save() {
     saveToStorage({
+      activeMode: state.activeMode,
       tasks: state.tasks,
       sessions: state.sessions,
+      timer: state.timer,
       settings: state.settings,
     });
   },

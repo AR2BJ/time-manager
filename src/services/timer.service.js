@@ -8,26 +8,21 @@ class TimerService {
   }
 
   /**
+   * Safe initialization from stored state
+   */
+  initFromSavedState() {
+    if (state.timer?.isRunning && !state.timer?.isPaused) {
+      StateManager.updateTimerState({ isPaused: true, isRunning: false });
+    }
+  }
+
+  /**
    * Starts or resumes the timer based on the active mode (Pomodoro or Flow)
    */
   start() {
     if (state.timer.isRunning && !state.timer.isPaused) return;
 
-    StateManager.updateTimerState({
-      isRunning: true,
-      isPaused: false,
-    });
-
-    // Start background sound if a track is selected
-    if (state.soundPlayer.currentSoundId) {
-      const currentTrack = state.soundPlayer.trackList.find(
-        (t) => t.id === state.soundPlayer.currentSoundId,
-      );
-      if (currentTrack && currentTrack.youtubeId) {
-        soundService.playTrack(currentTrack.youtubeId);
-        StateManager.setSoundPlaying(true);
-      }
-    }
+    StateManager.updateTimerState({ isRunning: true, isPaused: false });
 
     clearInterval(this.timerInterval);
     this.timerInterval = setInterval(() => {
@@ -39,13 +34,8 @@ class TimerService {
    * Pauses the active timer
    */
   pause() {
-    if (!state.timer.isRunning) return;
-
     clearInterval(this.timerInterval);
-    StateManager.updateTimerState({
-      isRunning: true,
-      isPaused: true,
-    });
+    StateManager.updateTimerState({ isPaused: true });
 
     soundService.pause();
     StateManager.setSoundPlaying(false);
@@ -58,14 +48,12 @@ class TimerService {
     clearInterval(this.timerInterval);
 
     if (state.activeMode === "flow") {
-      if (state.timer.flowTime >= 10) {
-        StateManager.addSession({
-          type: "flow",
-          durationSeconds: state.timer.flowTime,
-        });
-      }
-      this.reset();
-    } else if (state.activeMode === "pomodoro") {
+      StateManager.updateTimerState({
+        isRunning: false,
+        isPaused: false,
+        flowTime: 0,
+      });
+    } else {
       const durationMap = {
         work: (state.settings.pomodoroWorkTime || 25) * 60,
         shortBreak: (state.settings.shortBreakTime || 5) * 60,
@@ -79,12 +67,12 @@ class TimerService {
         isRunning: false,
         isPaused: false,
         timeRemaining: currentPhaseDuration,
-        totalPhaseDuration: currentPhaseDuration,
+        duration: currentPhaseDuration,
       });
-
-      soundService.pause();
-      StateManager.setSoundPlaying(false);
     }
+
+    soundService.pause();
+    StateManager.setSoundPlaying(false);
   }
 
   /**
@@ -104,7 +92,7 @@ class TimerService {
   _tick() {
     if (state.activeMode === "pomodoro") {
       this._handlePomodoroTick();
-    } else if (state.activeMode === "flow") {
+    } else {
       this._handleFlowTick();
     }
   }
@@ -128,7 +116,7 @@ class TimerService {
    * @private
    */
   _handleFlowTick() {
-    const newFlowTime = state.timer.flowTime + 1;
+    const newFlowTime = (state.timer.flowTime || 0) + 1;
     StateManager.updateTimerState({ flowTime: newFlowTime });
   }
 
@@ -142,21 +130,20 @@ class TimerService {
     const isWorkPhase = state.timer.currentPhase === "work";
 
     if (isWorkPhase) {
-      // Log completed work session
-      const durationSecs = state.settings.pomodoroWorkTime * 60;
-      StateManager.addSession({
-        type: "pomodoro",
-        durationSeconds: durationSecs,
-      });
+      const newSessionCount = (state.timer.pomodoroSessionCount || 0) + 1;
+      const interval = state.settings.longBreakInterval || 4;
 
-      const newSessionCount = state.timer.pomodoroSessionCount + 1;
-
-      // Every 4 pomodoros -> Long Break, otherwise -> Short Break
-      const nextPhase = newSessionCount % 4 === 0 ? "longBreak" : "shortBreak";
+      const isLongBreak = newSessionCount % interval === 0;
+      const nextPhase = isLongBreak ? "longBreak" : "shortBreak";
       const breakMinutes =
         nextPhase === "longBreak"
           ? state.settings.longBreakTime
           : state.settings.shortBreakTime;
+
+      StateManager.addSession({
+        type: "pomodoro",
+        durationSeconds: (state.settings.pomodoroWorkTime || 25) * 60,
+      });
 
       StateManager.updateTimerState({
         isRunning: false,
@@ -172,7 +159,7 @@ class TimerService {
       }
     } else {
       // Break phase completed -> return to Work phase
-      const workSecs = state.settings.pomodoroWorkTime * 60;
+      const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
       StateManager.updateTimerState({
         isRunning: false,
         isPaused: false,
@@ -194,7 +181,7 @@ class TimerService {
    * Manual completion trigger for Flow Mode
    */
   stopAndSaveFlowSession() {
-    if (state.activeMode !== "flow" || state.timer.flowTime < 10) {
+    if (state.activeMode !== "flow" || (state.timer.flowTime || 0) < 10) {
       this.reset();
       return;
     }

@@ -4,7 +4,6 @@ import { GlobalLoaderService } from "@/services/loader.service";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
 import { SettingsArchiveController } from "./settings-archive.controller.js";
-import { SettingsTagController } from "./settings-tag.controller.js";
 import { generateDynamicMockData } from "@/utils/seed-generator";
 
 export const SettingsResetController = {
@@ -57,8 +56,6 @@ export const SettingsResetController = {
         state.activeTab = "active";
         state.currentView = "times";
 
-        SettingsTagController.renderTagsList();
-
         setTimeout(() => {
           NotificationService.show({
             type: "success",
@@ -93,7 +90,6 @@ export const SettingsResetController = {
 
   resetSession() {
     StateManager.init();
-    SettingsTagController.renderTagsList();
   },
 
   closeResetModal() {
@@ -167,8 +163,6 @@ export const SettingsResetController = {
 
         renderTimeList([], state.activeTab);
 
-        SettingsTagController.renderTagsList();
-
         NotificationService.show({
           type: "error",
           message:
@@ -197,7 +191,6 @@ export const SettingsResetController = {
                   StateManager.getFilteredTimes(),
                   state.activeTab,
                 );
-                SettingsTagController.renderTagsList();
               } finally {
                 GlobalLoaderService.hide();
               }

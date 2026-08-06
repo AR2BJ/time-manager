@@ -92,7 +92,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-yellow-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-triangle-exclamation absolute -right-4 -bottom-6 text-[10rem] text-yellow-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-triangle-exclamation absolute -right-4 -bottom-6 text-[10rem] text-yellow-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -132,7 +132,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-layer-group absolute -right-4 -bottom-6 text-[10rem] text-purple-500 opacity-[0.04] dark:opacity-[0.06] rotate-20 pointer-events-none group-hover:scale-110 group-hover:rotate-10 transition-transform duration-500"
+            class="fa-regular fa-layer-group absolute -right-4 -bottom-6 text-[10rem] text-purple-500 opacity-[0.04] dark:opacity-[0.06] rotate-20 pointer-events-none group-hover:scale-110 group-hover:rotate-10 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -158,7 +158,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-emerald-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-circle-check absolute -right-4 -bottom-6 text-[10rem] text-emerald-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-circle-check absolute -right-4 -bottom-6 text-[10rem] text-emerald-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -189,7 +189,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-orange-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-alarm-exclamation absolute -right-4 -bottom-6 text-[10rem] text-orange-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-alarm-exclamation absolute -right-4 -bottom-6 text-[10rem] text-orange-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -228,7 +228,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-indigo-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-list-check absolute -right-4 -bottom-6 text-[10rem] text-indigo-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-list-check absolute -right-4 -bottom-6 text-[10rem] text-indigo-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -254,7 +254,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-blue-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-calendar-xmark absolute -right-4 -bottom-6 text-[10rem] text-blue-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-calendar-xmark absolute -right-4 -bottom-6 text-[10rem] text-blue-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -280,7 +280,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-red-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-ban absolute -right-4 -bottom-6 text-[10rem] text-red-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-ban absolute -right-4 -bottom-6 text-[10rem] text-red-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -315,7 +315,7 @@ export const DashboardComponent = {
           class="col-span-2 md:col-span-1 relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-brand/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-tags absolute -right-4 -bottom-6 text-[10rem] text-brand/80 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-regular fa-tags absolute -right-4 -bottom-6 text-[10rem] text-brand/80 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span

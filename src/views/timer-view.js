@@ -3,9 +3,9 @@ export const TimerView = {
     return `
       <section
         id="timer-view"
-        class="w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
+        class="hidden w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
             <div
               class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
@@ -62,7 +62,7 @@ export const TimerView = {
                 >
                   <i
                     id="sound-icon"
-                    class="fa-solid fa-play text-xs pointer-events-none"
+                    class="fa-regular fa-play text-xs pointer-events-none"
                   ></i>
                 </button>
               </div>
@@ -168,67 +168,8 @@ export const TimerView = {
           </div>
 
           <div class="lg:col-span-3 flex flex-col gap-6 order-3">
-            <div
-              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
-            >
-              <div
-                class="flex items-center justify-between mb-4 pb-3 border-b border-border"
-              >
-                <span
-                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
-                >
-                  <i class="fa-regular fa-bullseye-arrow text-brand"></i>
-                  Active Focus Task
-                </span>
-                <button
-                  id="btn-select-active-task"
-                  class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
-                >
-                  Change
-                </button>
-              </div>
-
-              <div class="p-3.5 rounded-2xl bg-surface-2 border border-border">
-                <p
-                  id="active-task-title"
-                  class="truncate text-sm font-semibold text-primary mb-1"
-                >
-                  Select or create task...
-                </p>
-                <p class="text-[11px] text-muted">
-                  Link sessions to monitor progress.
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
-            >
-              <span
-                class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2 mb-4"
-              >
-                <i class="fa-regular fa-chart-line text-brand"></i>
-                Today's Overview
-              </span>
-              <div class="grid grid-cols-2 gap-3">
-                <div
-                  class="p-3 rounded-2xl bg-surface-2 border border-border text-center"
-                >
-                  <span class="block text-xl font-black text-primary">0</span>
-                  <span class="text-[10px] font-medium text-muted"
-                    >Sessions Done</span
-                  >
-                </div>
-                <div
-                  class="p-3 rounded-2xl bg-surface-2 border border-border text-center"
-                >
-                  <span class="block text-xl font-black text-brand">0m</span>
-                  <span class="text-[10px] font-medium text-muted"
-                    >Total Focus</span
-                  >
-                </div>
-              </div>
-            </div>
+            <div id="active-task-container"></div>
+            <div id="today-overview-container"></div>
           </div>
         </div>
       </section>
