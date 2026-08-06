@@ -3,155 +3,233 @@ export const TimerView = {
     return `
       <section
         id="timer-view"
-        class="w-full min-w-0 flex flex-col items-center justify-center py-6 animate-fade-in"
+        class="w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
-        <div
-          class="relative flex-col w-full xs:flex-row xs:w-fit xs:justify-start mb-8 flex items-center justify-center gap-2 rounded-xl border border-border bg-surface p-1.5 shadow-sm"
-        >
-          <div
-            id="mode-indicator"
-            class="absolute rounded-lg bg-brand/80 transition-all duration-300 ease-in-out"
-          ></div>
-
-          <button
-            id="mode-pomodoro"
-            class="relative flex justify-center items-center gap-2 z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer text-center xs:w-30 xs:rounded-l-xl xs:rounded-tr-none"
-          >
-            <i class="fa-regular fa-stopwatch"></i>
-            Pomodoro
-          </button>
-
-          <button
-            id="mode-flow"
-            class="relative flex justify-center items-center gap-2 z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer text-center xs:w-30"
-          >
-            <i class="fa-regular fa-water"></i>
-            Flow Mode
-          </button>
-        </div>
-
-        <div class="mb-8 w-full max-w-md">
-          <div
-            class="flex items-center justify-between rounded-xl border border-border bg-surface p-3 shadow-xs"
-          >
-            <div class="flex items-center gap-3 min-w-0">
-              <span
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand"
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
+            <div
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
+            >
+              <div
+                class="flex items-center justify-between mb-4 pb-3 border-b border-border"
               >
-                <i class="fa-regular fa-bullseye-arrow"></i>
-              </span>
-              <div class="min-w-0 flex-col">
-                <p
-                  class="text-[11px] font-bold uppercase tracking-wider text-muted"
+                <span
+                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
                 >
+                  <i class="fa-regular fa-headphones text-brand"></i>
+                  Soundscape Player
+                </span>
+              </div>
+
+              <div class="mb-4">
+                <label
+                  class="block text-[11px] font-bold uppercase tracking-wider text-muted mb-2"
+                  >Select Sound</label
+                >
+                <div class="relative">
+                  <select
+                    id="sound-selector"
+                    class="w-full rounded-xl border border-border bg-surface-2 p-3 text-xs font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="rain-forest">Rain & Forest Stream</option>
+                    <option value="brown-noise">Pure Brown Noise</option>
+                    <option value="fireplace">Fireplace Crackle</option>
+                    <option value="cafe">Cozy Cafe Ambience</option>
+                  </select>
+                  <i
+                    class="fa-regular fa-chevron-down absolute right-3 top-3.5 text-xs text-muted pointer-events-none"
+                  ></i>
+                </div>
+              </div>
+
+              <div
+                id="sound-track-card"
+                class="p-3.5 rounded-2xl bg-surface-2 border border-border flex items-center justify-between"
+              >
+                <div class="flex flex-col min-w-0 pr-2">
+                  <span
+                    id="sound-track-title"
+                    class="text-xs font-bold text-primary truncate"
+                    >Rain & Forest Stream</span
+                  >
+                  <span class="text-[10px] text-muted">Ambient Background</span>
+                </div>
+
+                <button
+                  id="btn-toggle-sound"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-(--color-brand-hover) transition cursor-pointer shadow-sm active:scale-95"
+                  title="Play / Pause Audio"
+                >
+                  <i
+                    id="sound-icon"
+                    class="fa-solid fa-play text-xs pointer-events-none"
+                  ></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2"
+          >
+            <div
+              class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-8 w-full max-w-xs shadow-inner"
+            >
+              <div
+                id="mode-indicator"
+                class="absolute rounded-lg bg-brand/80 transition-all duration-300 ease-in-out"
+              ></div>
+
+              <button
+                id="mode-pomodoro"
+                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold text-(--color-btn-primary-text) transition cursor-pointer text-center"
+              >
+                <i class="fa-regular fa-stopwatch pointer-events-none"></i>
+                <span class="pointer-events-none">Pomodoro</span>
+              </button>
+
+              <button
+                id="mode-flow"
+                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold text-secondary transition cursor-pointer text-center"
+              >
+                <i class="fa-regular fa-water pointer-events-none"></i>
+                <span class="pointer-events-none">Flow Mode</span>
+              </button>
+            </div>
+
+            <div
+              class="relative my-2 flex items-center justify-center w-72 h-72 sm:w-88 sm:h-88"
+            >
+              <svg
+                id="timer-svg-container"
+                class="w-full h-full transform -rotate-90 origin-center relative z-0"
+                viewBox="0 0 280 280"
+              >
+                <circle
+                  cx="140"
+                  cy="140"
+                  r="120"
+                  class="stroke-surface-3"
+                  stroke-width="10"
+                  fill="transparent"
+                />
+
+                <circle
+                  id="timer-progress-ring"
+                  cx="140"
+                  cy="140"
+                  r="120"
+                  class="stroke-brand origin-center transition-all duration-300"
+                  stroke-width="10"
+                  stroke-linecap="round"
+                  fill="transparent"
+                  stroke-dasharray="753.98"
+                  stroke-dashoffset="753.98"
+                />
+              </svg>
+
+              <canvas
+                id="flow-comet-canvas"
+                width="280"
+                height="280"
+                class="absolute inset-0 w-full h-full pointer-events-none z-10 transition-opacity duration-300 opacity-0"
+              ></canvas>
+
+              <div
+                class="absolute flex flex-col items-center justify-center text-center pointer-events-none select-none z-20"
+              >
+                <span
+                  id="timer-phase-badge"
+                  class="mb-3 rounded-full bg-brand/10 px-4 py-1 text-xs font-bold text-brand uppercase tracking-widest border border-brand/20"
+                >
+                  Focus Phase
+                </span>
+
+                <span
+                  id="timer-display"
+                  class="font-mono text-5xl sm:text-7xl font-extrabold tracking-tighter text-primary my-1"
+                >
+                  25:00
+                </span>
+
+                <span
+                  id="timer-sub-info"
+                  class="mt-2 text-xs font-medium text-muted"
+                >
+                  Session #1 ready
+                </span>
+              </div>
+            </div>
+
+            <div
+              id="timer-controls-container"
+              class="mt-8 flex items-center gap-4 w-full justify-center min-h-14"
+            ></div>
+          </div>
+
+          <div class="lg:col-span-3 flex flex-col gap-6 order-3">
+            <div
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
+            >
+              <div
+                class="flex items-center justify-between mb-4 pb-3 border-b border-border"
+              >
+                <span
+                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
+                >
+                  <i class="fa-regular fa-bullseye-arrow text-brand"></i>
                   Active Focus Task
-                </p>
+                </span>
+                <button
+                  id="btn-select-active-task"
+                  class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+                >
+                  Change
+                </button>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-surface-2 border border-border">
                 <p
                   id="active-task-title"
-                  class="truncate text-sm font-semibold text-primary"
+                  class="truncate text-sm font-semibold text-primary mb-1"
                 >
                   Select or create task...
+                </p>
+                <p class="text-[11px] text-muted">
+                  Link sessions to monitor progress.
                 </p>
               </div>
             </div>
 
-            <button
-              id="btn-select-active-task"
-              class="shrink-0 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+            <div
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
             >
-              Change Task
-            </button>
-          </div>
-        </div>
-
-        <div class="relative my-4 flex items-center justify-center">
-          <div
-            class="relative flex h-72 w-72 sm:h-80 sm:w-80 items-center justify-center rounded-full border-4 border-surface-2 bg-surface shadow-inner"
-          >
-            <div class="flex flex-col items-center justify-center text-center">
               <span
-                id="timer-phase-badge"
-                class="mb-3 rounded-full bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand uppercase tracking-widest"
+                class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2 mb-4"
               >
-                Focus Phase
+                <i class="fa-regular fa-chart-line text-brand"></i>
+                Today's Overview
               </span>
-
-              <span
-                id="timer-display"
-                class="font-mono text-6xl sm:text-7xl font-extrabold tracking-tighter text-primary select-none"
-              >
-                25:00
-              </span>
-
-              <span
-                id="timer-sub-info"
-                class="mt-3 text-xs font-medium text-muted"
-              >
-                Session #1 ready
-              </span>
+              <div class="grid grid-cols-2 gap-3">
+                <div
+                  class="p-3 rounded-2xl bg-surface-2 border border-border text-center"
+                >
+                  <span class="block text-xl font-black text-primary">0</span>
+                  <span class="text-[10px] font-medium text-muted"
+                    >Sessions Done</span
+                  >
+                </div>
+                <div
+                  class="p-3 rounded-2xl bg-surface-2 border border-border text-center"
+                >
+                  <span class="block text-xl font-black text-brand">0m</span>
+                  <span class="text-[10px] font-medium text-muted"
+                    >Total Focus</span
+                  >
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div
-          class="mt-4 mb-8 flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-2 shadow-xs"
-        >
-          <i class="fa-regular fa-headphones text-brand text-sm"></i>
-          <span class="text-xs font-medium text-secondary"
-            >Background Sound:</span
-          >
-
-          <select
-            id="sound-selector"
-            class="bg-transparent text-xs font-semibold text-primary focus:outline-none cursor-pointer"
-          >
-            <option value="rain-forest">Rain & Forest Stream</option>
-            <option value="brown-noise">Pure Brown Noise</option>
-            <option value="fireplace">Fireplace Crackle</option>
-          </select>
-
-          <div class="h-3 w-px bg-border mx-1"></div>
-
-          <button
-            id="btn-toggle-sound"
-            class="text-secondary hover:text-brand transition cursor-pointer text-sm"
-            title="Toggle Audio"
-          >
-            <i
-              id="sound-icon"
-              class="fa-regular fa-volume-xmark"
-            ></i>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <button
-            id="btn-timer-reset"
-            class="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface text-secondary hover:text-primary hover:bg-surface-2 transition cursor-pointer shadow-xs"
-            title="Reset Timer"
-          >
-            <i class="fa-regular fa-rotate-left text-lg"></i>
-          </button>
-
-          <button
-            id="btn-timer-toggle"
-            class="flex h-14 min-w-50 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/20 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
-          >
-            <i
-              id="timer-toggle-icon"
-              class="fa-solid fa-play"
-            ></i>
-            <span id="timer-toggle-label">Start Focus</span>
-          </button>
-
-          <button
-            id="btn-timer-finish-flow"
-            class="hidden h-12 items-center justify-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-xs font-bold text-emerald-600 hover:bg-emerald-500/20 transition cursor-pointer"
-            title="Save Session"
-          >
-            <i class="fa-regular fa-check"></i>
-            Complete Session
-          </button>
         </div>
       </section>
     `;

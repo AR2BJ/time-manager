@@ -2,7 +2,6 @@ import { StateManager, state } from "@/models/state.model.js";
 
 import { AnalyticsView } from "@/views/analytics-view.js";
 import { DesktopNavComponent } from "@/components/layout/desktop-nav.component.js";
-import { GlobalLoaderService } from "@/services/loader.service";
 import { HeaderComponent } from "@/components/shared/header.component.js";
 import { InfoModalComponent } from "@/components/modals/info-modal.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
@@ -12,6 +11,10 @@ import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
 
 export const TimerController = {
+  animationFrameId: null,
+  flowStartTimestamp: null,
+  accumulatedFlowTime: 0,
+
   init() {
     StateManager.init();
     this.renderComponents();
@@ -49,48 +52,287 @@ export const TimerController = {
   },
 
   bindTimerEvents() {
-    const btnToggle = document.getElementById("btn-timer-toggle");
-    const btnReset = document.getElementById("btn-timer-reset");
-    const btnFinishFlow = document.getElementById("btn-timer-finish-flow");
     const btnPomodoro = document.getElementById("mode-pomodoro");
     const btnFlow = document.getElementById("mode-flow");
+    const controlsContainer = document.getElementById(
+      "timer-controls-container",
+    );
 
-    btnToggle?.addEventListener("click", () => {
-      if (state.timer.isRunning && !state.timer.isPaused) {
-        timerService.pause();
-      } else {
+    controlsContainer?.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (btn.id === "btn-timer-start" || btn.id === "btn-timer-continue") {
+        this.flowStartTimestamp = performance.now();
         timerService.start();
+      } else if (btn.id === "btn-timer-pause") {
+        if (this.flowStartTimestamp) {
+          this.accumulatedFlowTime +=
+            (performance.now() - this.flowStartTimestamp) / 1000;
+          this.flowStartTimestamp = null;
+        }
+        timerService.pause();
+      } else if (btn.id === "btn-timer-stop") {
+        this.flowStartTimestamp = null;
+        this.accumulatedFlowTime = 0;
+        timerService.stopAndTransition();
       }
     });
 
-    btnReset?.addEventListener("click", () => {
-      timerService.reset();
-    });
+    btnPomodoro?.addEventListener("click", () =>
+      this.handleModeSwitch("pomodoro"),
+    );
+    btnFlow?.addEventListener("click", () => this.handleModeSwitch("flow"));
+  },
 
-    btnFinishFlow?.addEventListener("click", () => {
-      timerService.stopAndSaveFlowSession();
-    });
+  startFlowAnimation() {
+    const canvas = document.getElementById("flow-comet-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const handleModeClick = (targetMode, loaderText) => {
-      if (state.activeMode === targetMode) return;
+    const computedStyle = getComputedStyle(document.documentElement);
+    const brandColorRaw =
+      computedStyle.getPropertyValue("--color-brand").trim() || "#00bba7";
 
-      GlobalLoaderService.show(loaderText);
+    let r = 16,
+      g = 185,
+      b = 129;
+    if (brandColorRaw.startsWith("#")) {
+      const hex = brandColorRaw.replace("#", "");
+      if (hex.length === 6) {
+        r = parseInt(hex.substring(0, 2), 16);
+        g = parseInt(hex.substring(2, 4), 16);
+        b = parseInt(hex.substring(4, 6), 16);
+      }
+    }
 
-      setTimeout(() => {
-        try {
-          this.handleModeSwitch(targetMode);
-        } finally {
-          GlobalLoaderService.hide();
+    if (
+      !this.flowStartTimestamp &&
+      state.timer.isRunning &&
+      !state.timer.isPaused
+    ) {
+      this.flowStartTimestamp = performance.now();
+    }
+
+    const render = (now) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (
+        state.activeMode === "flow" &&
+        (state.timer.isRunning || state.timer.isPaused)
+      ) {
+        const centerX = 140;
+        const centerY = 140;
+        const radius = 120;
+        const strokeWidth = 10;
+
+        let currentFlowSeconds = this.accumulatedFlowTime;
+        if (
+          state.timer.isRunning &&
+          !state.timer.isPaused &&
+          this.flowStartTimestamp
+        ) {
+          currentFlowSeconds += (now - this.flowStartTimestamp) / 1000;
         }
-      }, 30);
+
+        const startOriginAngle = -Math.PI / 2;
+        const totalDistanceAngle = (currentFlowSeconds / 60) * Math.PI * 2;
+        const headAngle = startOriginAngle + totalDistanceAngle;
+
+        const maxArcLength = Math.PI * 0.6;
+        const tailAngle = headAngle - maxArcLength;
+
+        const steps = 300;
+        const deltaAngle = maxArcLength / steps;
+
+        ctx.save();
+
+        if (totalDistanceAngle < Math.PI * 2) {
+          ctx.beginPath();
+          ctx.arc(
+            centerX,
+            centerY,
+            radius + strokeWidth,
+            startOriginAngle,
+            headAngle + 0.1,
+            false,
+          );
+          ctx.lineTo(centerX, centerY);
+          ctx.closePath();
+          ctx.clip();
+        }
+
+        ctx.lineCap = "round";
+
+        for (let i = 0; i < steps; i++) {
+          const currentStart = tailAngle + i * deltaAngle;
+          const currentEnd = currentStart + deltaAngle + 0.006;
+
+          const progress = i / (steps - 1);
+          const alpha = Math.pow(progress, 2);
+
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, currentStart, currentEnd);
+          ctx.lineWidth = strokeWidth;
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      if (state.timer.isRunning && !state.timer.isPaused) {
+        this.animationFrameId = requestAnimationFrame(render);
+      }
     };
 
-    btnPomodoro?.addEventListener("click", () =>
-      handleModeClick("pomodoro", "Switching to Pomodoro Timer..."),
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    if (state.timer.isRunning && !state.timer.isPaused) {
+      this.animationFrameId = requestAnimationFrame(render);
+    } else {
+      render(performance.now());
+    }
+  },
+
+  stopFlowAnimation() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
+    const canvas = document.getElementById("flow-comet-canvas");
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  },
+
+  updateTimerDisplay() {
+    const displayEl = document.getElementById("timer-display");
+    const phaseBadge = document.getElementById("timer-phase-badge");
+    const subInfo = document.getElementById("timer-sub-info");
+    const progressRing = document.getElementById("timer-progress-ring");
+    const flowCanvas = document.getElementById("flow-comet-canvas");
+    const controlsContainer = document.getElementById(
+      "timer-controls-container",
     );
-    btnFlow?.addEventListener("click", () =>
-      handleModeClick("flow", "Loading flow Timer..."),
-    );
+
+    if (!displayEl) return;
+
+    const CIRCUMFERENCE = 753.98;
+
+    if (state.activeMode === "pomodoro") {
+      this.stopFlowAnimation();
+      flowCanvas?.classList.add("opacity-0");
+      progressRing?.classList.remove("opacity-0");
+
+      const totalSeconds = state.timer.timeRemaining;
+      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const secs = String(totalSeconds % 60).padStart(2, "0");
+      displayEl.textContent = `${mins}:${secs}`;
+
+      if (progressRing) {
+        const totalDuration = state.timer.totalPhaseDuration || 1500;
+        const elapsedTime = totalDuration - totalSeconds;
+        const progressFraction = Math.min(
+          Math.max(elapsedTime / totalDuration, 0),
+          1,
+        );
+
+        progressRing.style.strokeDasharray = `${CIRCUMFERENCE}`;
+        const offset = CIRCUMFERENCE - progressFraction * CIRCUMFERENCE;
+        progressRing.style.strokeDashoffset = `${offset}`;
+      }
+
+      if (phaseBadge) {
+        const phaseNames = {
+          work: "Focus Phase",
+          shortBreak: "Short Break",
+          longBreak: "Long Break",
+        };
+        phaseBadge.textContent =
+          phaseNames[state.timer.currentPhase] || "Focus Phase";
+      }
+
+      if (subInfo) {
+        subInfo.textContent = `Completed Sessions: ${state.timer.pomodoroSessionCount}`;
+      }
+    } else if (state.activeMode === "flow") {
+      progressRing?.classList.add("opacity-0");
+
+      const totalSeconds = state.timer.flowTime;
+      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const secs = String(totalSeconds % 60).padStart(2, "0");
+      displayEl.textContent = `${mins}:${secs}`;
+
+      if (flowCanvas) {
+        if (state.timer.isRunning || state.timer.isPaused) {
+          flowCanvas.classList.remove("opacity-0");
+          this.startFlowAnimation();
+        } else {
+          flowCanvas.classList.add("opacity-0");
+          this.stopFlowAnimation();
+        }
+      }
+
+      if (phaseBadge) phaseBadge.textContent = "Flow Mode";
+      if (subInfo) subInfo.textContent = "Continuous Focus Duration";
+    }
+
+    if (controlsContainer) {
+      const { isRunning, isPaused } = state.timer;
+      const currentControlState =
+        isRunning && !isPaused ? "running" : isPaused ? "paused" : "idle";
+
+      if (controlsContainer.dataset.state !== currentControlState) {
+        controlsContainer.dataset.state = currentControlState;
+
+        if (currentControlState === "idle") {
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-start"
+              class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-solid fa-play pointer-events-none"></i>
+              <span class="pointer-events-none">Start Focus</span>
+            </button>
+          `;
+        } else if (currentControlState === "running") {
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-pause"
+              class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-amber-500 px-8 text-base font-bold text-white shadow-lg shadow-amber-500/25 hover:bg-amber-600 transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-solid fa-pause pointer-events-none"></i>
+              <span class="pointer-events-none">Pause</span>
+            </button>
+          `;
+        } else if (currentControlState === "paused") {
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-stop"
+              class="flex h-14 items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-6 text-sm font-bold text-rose-500 hover:bg-rose-500/20 transition cursor-pointer active:scale-95"
+              title="Stop & Reset"
+            >
+              <i class="fa-solid fa-square pointer-events-none"></i>
+              <span class="pointer-events-none">Stop</span>
+            </button>
+
+            <button
+              id="btn-timer-continue"
+              class="flex h-14 min-w-40 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-solid fa-play pointer-events-none"></i>
+              <span class="pointer-events-none">Continue</span>
+            </button>
+          `;
+        }
+      }
+    }
   },
 
   bindTimerShortcuts() {
@@ -109,12 +351,18 @@ export const TimerController = {
 
       if (event.code === "Space") {
         event.preventDefault();
-        document.getElementById("btn-timer-toggle")?.click();
-      }
-
-      if (event.key.toLowerCase() === "r" && !event.altKey && !event.ctrlKey) {
-        event.preventDefault();
-        document.getElementById("btn-timer-reset")?.click();
+        const { isRunning, isPaused } = state.timer;
+        if (!isRunning || isPaused) {
+          this.flowStartTimestamp = performance.now();
+          timerService.start();
+        } else {
+          if (this.flowStartTimestamp) {
+            this.accumulatedFlowTime +=
+              (performance.now() - this.flowStartTimestamp) / 1000;
+            this.flowStartTimestamp = null;
+          }
+          timerService.pause();
+        }
       }
     });
   },
@@ -127,14 +375,19 @@ export const TimerController = {
       const soundId = e.target.value;
       StateManager.setSoundTrack(soundId);
 
-      if (state.timer.isRunning && !state.timer.isPaused) {
-        const currentTrack = state.soundPlayer.trackList.find(
-          (t) => t.id === soundId,
-        );
-        if (currentTrack?.youtubeId) {
-          soundService.playTrack(currentTrack.youtubeId);
-          StateManager.setSoundPlaying(true);
-        }
+      const trackNames = {
+        "rain-forest": "Rain & Forest Stream",
+        "brown-noise": "Pure Brown Noise",
+        fireplace: "Fireplace Crackle",
+        cafe: "Cozy Cafe Ambience",
+      };
+
+      const titleEl = document.getElementById("sound-track-title");
+      if (titleEl)
+        titleEl.textContent = trackNames[soundId] || "Background Sound";
+
+      if (state.soundPlayer.isPlaying) {
+        soundService.playTrack(soundId);
       }
     });
 
@@ -143,15 +396,24 @@ export const TimerController = {
         soundService.pause();
         StateManager.setSoundPlaying(false);
       } else {
-        const currentTrack = state.soundPlayer.trackList.find(
-          (t) => t.id === state.soundPlayer.currentSoundId,
+        soundService.playTrack(
+          state.soundPlayer.currentSoundId || "rain-forest",
         );
-        if (currentTrack?.youtubeId) {
-          soundService.playTrack(currentTrack.youtubeId);
-          StateManager.setSoundPlaying(true);
-        }
+        StateManager.setSoundPlaying(true);
       }
+      this.updateAudioUI();
     });
+  },
+
+  updateAudioUI() {
+    const btnToggleSound = document.getElementById("btn-toggle-sound");
+    if (btnToggleSound) {
+      const iconClass = state.soundPlayer.isPlaying
+        ? "fa-regular fa-volume-high text-brand"
+        : "fa-regular fa-volume-xmark";
+
+      btnToggleSound.innerHTML = `<i id="sound-icon" class="${iconClass}"></i>`;
+    }
   },
 
   bindMenuToggle() {
@@ -236,72 +498,6 @@ export const TimerController = {
     this.refreshUI();
   },
 
-  updateTimerDisplay() {
-    const displayEl = document.getElementById("timer-display");
-    const btnToggle = document.getElementById("btn-timer-toggle");
-    const phaseBadge = document.getElementById("timer-phase-badge");
-    const subInfo = document.getElementById("timer-sub-info");
-    const btnFinishFlow = document.getElementById("btn-timer-finish-flow");
-
-    if (!displayEl) return;
-
-    if (state.activeMode === "pomodoro") {
-      const totalSeconds = state.timer.timeRemaining;
-      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.textContent = `${mins}:${secs}`;
-
-      if (phaseBadge) {
-        const phaseNames = {
-          work: "Focus Phase",
-          shortBreak: "Short Break",
-          longBreak: "Long Break",
-        };
-        phaseBadge.textContent =
-          phaseNames[state.timer.currentPhase] || "Focus Phase";
-      }
-
-      if (subInfo) {
-        subInfo.textContent = `Completed Sessions: ${state.timer.pomodoroSessionCount}`;
-      }
-
-      btnFinishFlow?.classList.add("hidden");
-    } else if (state.activeMode === "flow") {
-      const totalSeconds = state.timer.flowTime;
-      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.textContent = `${mins}:${secs}`;
-
-      if (phaseBadge) {
-        phaseBadge.textContent = "Flow Mode";
-      }
-
-      if (subInfo) {
-        subInfo.textContent = "Continuous Focus Duration";
-      }
-
-      if (state.timer.flowTime > 10) {
-        btnFinishFlow?.classList.remove("hidden");
-      } else {
-        btnFinishFlow?.classList.add("hidden");
-      }
-    }
-
-    if (btnToggle) {
-      const isRunning = state.timer.isRunning && !state.timer.isPaused;
-      const iconClass = isRunning ? "fa-solid fa-pause" : "fa-solid fa-play";
-      const labelText = isRunning
-        ? "Pause"
-        : state.timer.isPaused
-          ? "Resume"
-          : "Start Focus";
-
-      btnToggle.innerHTML = `
-        <i id="timer-toggle-icon" class="${iconClass}"></i>
-        <span id="timer-toggle-label">${labelText}</span>
-      `;
-    }
-  },
   updateModeStyles(mode) {
     const indicator = document.getElementById("mode-indicator");
     const pomodoroBtn = document.getElementById("mode-pomodoro");
@@ -331,16 +527,5 @@ export const TimerController = {
         btn.classList.add("text-secondary");
       }
     });
-  },
-
-  updateAudioUI() {
-    const btnToggleSound = document.getElementById("btn-toggle-sound");
-    if (btnToggleSound) {
-      const iconClass = state.soundPlayer.isPlaying
-        ? "fa-regular fa-volume-high text-brand"
-        : "fa-regular fa-volume-xmark";
-
-      btnToggleSound.innerHTML = `<i id="sound-icon" class="${iconClass}"></i>`;
-    }
   },
 };

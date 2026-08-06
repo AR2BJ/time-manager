@@ -52,6 +52,42 @@ class TimerService {
   }
 
   /**
+   * Stops active timer and handles transitions based on active mode
+   */
+  stopAndTransition() {
+    clearInterval(this.timerInterval);
+
+    if (state.activeMode === "flow") {
+      if (state.timer.flowTime >= 10) {
+        StateManager.addSession({
+          type: "flow",
+          durationSeconds: state.timer.flowTime,
+        });
+      }
+      this.reset();
+    } else if (state.activeMode === "pomodoro") {
+      const durationMap = {
+        work: (state.settings.pomodoroWorkTime || 25) * 60,
+        shortBreak: (state.settings.shortBreakTime || 5) * 60,
+        longBreak: (state.settings.longBreakTime || 15) * 60,
+      };
+
+      const currentPhaseDuration =
+        durationMap[state.timer.currentPhase] || 1500;
+
+      StateManager.updateTimerState({
+        isRunning: false,
+        isPaused: false,
+        timeRemaining: currentPhaseDuration,
+        totalPhaseDuration: currentPhaseDuration,
+      });
+
+      soundService.pause();
+      StateManager.setSoundPlaying(false);
+    }
+  }
+
+  /**
    * Resets timer back to default settings for current mode
    */
   reset() {
