@@ -58,6 +58,8 @@ export class NavigationController {
   static bindKeyboardShortcuts() {
     window.addEventListener("keydown", (event) => {
       const activeEl = document.activeElement;
+      const key = event.key.toLowerCase();
+
       if (
         activeEl &&
         (activeEl.tagName === "INPUT" ||
@@ -68,6 +70,13 @@ export class NavigationController {
         return;
       }
 
+      const dispatchAsyncClick = (elementId) => {
+        event.preventDefault();
+        setTimeout(() => {
+          document.getElementById(elementId)?.click();
+        }, 10);
+      };
+
       if (event.shiftKey) {
         const key = event.key.toLowerCase();
         const viewMap = { t: "timer", a: "analytics", s: "settings" };
@@ -75,6 +84,49 @@ export class NavigationController {
           event.preventDefault();
           StateManager.setView(viewMap[key]);
         }
+      }
+
+      if (event.altKey) {
+        if (key === "t") {
+          dispatchAsyncClick("theme-toggle");
+          return;
+        }
+        if (key === "n") {
+          dispatchAsyncClick("menu-toggle");
+          return;
+        }
+        if (key === "r") {
+          event.preventDefault();
+
+          GlobalLoaderService.show("Redirecting to purge terminal...");
+
+          setTimeout(() => {
+            try {
+              StateManager.setView("settings");
+              const resetBtn =
+                document.getElementById("trigger-reset-btn") ||
+                document.querySelector('[id*="reset"]');
+
+              setTimeout(() => resetBtn.click(), 10);
+            } finally {
+              GlobalLoaderService.hide();
+            }
+          }, 50);
+          return;
+        }
+        if (key === "p") {
+          dispatchAsyncClick("mode-pomodoro");
+          return;
+        }
+        if (key === "f") {
+          dispatchAsyncClick("mode-flow");
+          return;
+        }
+      }
+
+      if (event.key === "?") {
+        dispatchAsyncClick("help-toggle");
+        return;
       }
     });
   }

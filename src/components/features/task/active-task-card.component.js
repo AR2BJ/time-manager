@@ -1,8 +1,8 @@
-import { StateManager } from "@/models/state.model.js";
+import { TaskModel } from "@/models/task.model";
 
 export const ActiveTaskCardComponent = {
   render() {
-    const activeTask = StateManager.getActiveTask();
+    const activeTask = TaskModel.getActiveTask();
 
     if (!activeTask) {
       return `

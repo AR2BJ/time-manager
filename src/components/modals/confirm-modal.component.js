@@ -1,9 +1,9 @@
 export const ConfirmModalComponent = {
-  render() {
+  render({ title, message } = {}) {
     return `
       <div
         id="confirm-modal"
-        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       >
         <div
           id="confirm-modal-backdrop"
@@ -18,11 +18,11 @@ export const ConfirmModalComponent = {
           </div>
 
           <h3 id="confirm-modal-title" class="text-base font-bold text-primary mb-1">
-            Are you sure?
+            ${title || "Are you sure?"}
           </h3>
 
           <p id="confirm-modal-message" class="text-xs text-secondary mb-5 leading-relaxed">
-            This action cannot be undone.
+            ${message || "This action cannot be undone."}
           </p>
 
           <div class="grid grid-cols-2 gap-2.5">

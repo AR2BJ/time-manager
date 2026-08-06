@@ -3,29 +3,24 @@ const HELP_SHORTCUTS = [
     category: "Timer & Modes",
     items: [
       {
-        label: "Start / Pause Timer",
-        icon: "fa-play-pause",
-        keys: [["Space"]],
-      },
-      {
         label: "Switch to Pomodoro Mode",
         icon: "fa-stopwatch",
-        keys: [["Alt"], ["1"]],
+        keys: [["Alt"], ["P"]],
       },
       {
         label: "Switch to Flow Mode",
         icon: "fa-water",
-        keys: [["Alt"], ["2"]],
+        keys: [["Alt"], ["F"]],
       },
       {
-        label: "Reset Current Session",
-        icon: "fa-rotate-left",
-        keys: [["Alt"], ["R"]],
+        label: "Start / Pause Timer",
+        icon: "fa-play-pause",
+        keys: [["Space"]],
       },
     ],
   },
   {
-    category: "Navigation & Layout",
+    category: "Navigation",
     items: [
       {
         label: "Go to Timer View",
@@ -38,14 +33,39 @@ const HELP_SHORTCUTS = [
         keys: [["Shift"], ["A"]],
       },
       {
+        label: "Go to Setting View",
+        icon: "fa-cog",
+        keys: [["Shift"], ["S"]],
+      },
+    ],
+  },
+  {
+    category: "Quick Actions",
+    items: [
+      {
         label: "Toggle Dark/Light Theme",
         icon: "fa-circle-half-stroke",
         keys: [["Alt"], ["T"]],
       },
       {
-        label: "Close Open Modal",
+        label: "Toggle Navigation Menu",
+        icon: "fa-bars",
+        keys: [["Alt"], ["N"]],
+      },
+      {
+        label: "Open Reset Data Modal",
+        icon: "fa-arrow-rotate-left",
+        keys: [["Alt"], ["R"]],
+      },
+      {
+        label: "Close Active Modal / Blur Input",
         icon: "fa-xmark",
         keys: [["Esc"]],
+      },
+      {
+        label: "Toggle This Help Center",
+        icon: "fa-circle-question",
+        keys: [["?"]],
       },
     ],
   },

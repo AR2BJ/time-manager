@@ -22,41 +22,26 @@ export const defaultTrackList = [
 ];
 
 export const state = {
-  // Navigation Views: 'timer' | 'history' | 'analytics' | 'settings'
   currentView: "timer",
-
-  // Selected Active Task for Focus Session
   activeTaskId: null,
-
-  // Active Timer Mode: 'pomodoro' | 'flow'
   activeMode: "pomodoro",
-
-  // Core Timer State (Supports both Pomodoro & Flow Mode context isolation)
   timer: {
     isRunning: false,
     isPaused: false,
-    timeRemaining: 25 * 60, // seconds for Pomodoro
-    duration: 25 * 60, // total duration in seconds for progress ring/bar
-    flowTime: 0, // elapsed time in Flow Mode (seconds)
+    timeRemaining: 25 * 60,
+    duration: 25 * 60,
+    flowTime: 0,
     pomodoroSessionCount: 0,
-    currentPhase: "work", // 'work' | 'shortBreak' | 'longBreak'
+    currentPhase: "work",
   },
-
-  // Ambient Sound Streamer State
   soundPlayer: {
     isPlaying: false,
     currentSoundId: "rain-forest",
     volume: 50,
     trackList: [...defaultTrackList],
   },
-
-  // Lightweight Tasks List (Standalone Mode)
   tasks: [],
-
-  // Logged Focus Sessions History
   sessions: [],
-
-  // System Settings
   settings: {
     pomodoroWorkTime: 25,
     shortBreakTime: 5,
@@ -68,7 +53,6 @@ export const state = {
   },
 };
 
-// Internal listeners list for Observer pattern
 const listeners = new Set();
 
 export const StateManager = {
@@ -91,7 +75,6 @@ export const StateManager = {
       }
     }
 
-    // Auto-select first active task if available
     const firstTask = state.tasks.find((t) => t.status !== "done");
     if (firstTask) {
       state.activeTaskId = firstTask.id;
@@ -101,45 +84,28 @@ export const StateManager = {
     return state;
   },
 
-  // --- Observer Pattern ---
   subscribe(listener) {
     if (typeof listener === "function") {
       listeners.add(listener);
     }
-    return () => listeners.delete(listener); // Unsubscribe cleanup function
+    return () => listeners.delete(listener);
   },
 
   notify() {
     listeners.forEach((listener) => listener(state));
   },
 
-  // --- Views ---
   setView(view) {
     state.currentView = view;
     this.notify();
   },
 
-  // --- Mode ---
   setMode(mode) {
     if (state.activeMode === mode) return;
 
     state.activeMode = mode;
     this.save();
     this.notify();
-  },
-
-  // --- Task Management ---
-  setActiveTaskId(taskId) {
-    state.activeTaskId = taskId;
-    this.notify();
-  },
-
-  getActiveTask() {
-    return state.tasks.find((t) => t.id === state.activeTaskId) || null;
-  },
-
-  getTasks() {
-    return state.tasks;
   },
 
   getTodaySessions() {
@@ -155,12 +121,10 @@ export const StateManager = {
   getTodayOverview() {
     const todaySessions = this.getTodaySessions();
     const sessionsDone = todaySessions.length;
-
     const totalSeconds = todaySessions.reduce(
       (acc, s) => acc + (s.durationSeconds || 0),
       0,
     );
-
     const totalMinutes = Math.round(totalSeconds / 60);
 
     return {
@@ -169,38 +133,9 @@ export const StateManager = {
     };
   },
 
-  addTask(title, estimatedPomodoros = 1) {
-    if (!title || !title.trim()) return null;
-
-    const newTask = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      status: "todo",
-      estimatedPomodoros: Number(estimatedPomodoros) || 1,
-      completedPomodoros: 0,
-      createdAt: new Date().toISOString(),
-    };
-
-    state.tasks.unshift(newTask);
-    state.activeTaskId = newTask.id;
-    this.save();
-    this.notify();
-    return newTask;
-  },
-
-  toggleTaskStatus(taskId) {
-    const task = state.tasks.find((t) => t.id === taskId);
-    if (task) {
-      task.status = task.status === "done" ? "todo" : "done";
-      this.save();
-      this.notify();
-    }
-  },
-
-  // --- Timer State Controls ---
   updateTimerState(newTimerState) {
     state.timer = { ...state.timer, ...newTimerState };
-    this.save(); // Ensures state persistence on timer update ticks/actions
+    this.save();
     this.notify();
   },
 
@@ -224,9 +159,8 @@ export const StateManager = {
     this.notify();
   },
 
-  // --- Sessions Log ---
   addSession(sessionData = {}) {
-    const activeTask = this.getActiveTask();
+    const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
     const session = {
       id: crypto.randomUUID(),
       taskId: sessionData.taskId || state.activeTaskId || null,
@@ -251,7 +185,6 @@ export const StateManager = {
     this.notify();
   },
 
-  // --- Sound Player ---
   setSoundPlaying(isPlaying) {
     state.soundPlayer.isPlaying = isPlaying;
     this.notify();
@@ -271,7 +204,6 @@ export const StateManager = {
     this.notify();
   },
 
-  // --- Persistence ---
   save() {
     saveToStorage({
       activeMode: state.activeMode,

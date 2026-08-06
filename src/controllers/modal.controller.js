@@ -1,17 +1,18 @@
 import { ConfirmModalComponent } from "@/components/modals/confirm-modal.component.js";
 import { InfoModalComponent } from "@/components/modals/info-modal.component";
-import { StateManager } from "@/models/state.model.js";
 import { TaskModalComponent } from "@/components/modals/task-modal.component.js";
+import { TaskModel } from "@/models/task.model";
 
 export const ModalController = {
   confirmCallback: null,
 
   init() {
     this.bindGlobalTriggers();
+    this.bindKeyboardShortcuts();
   },
 
   bindGlobalTriggers() {
-    // 1. Task Modal Trigger from UI
+    // Task Modal & Help Modal Triggers from UI
     document.addEventListener("click", (e) => {
       const btnChange = e.target.closest("#btn-change-task");
       const boxEmpty = e.target.closest("#box-empty-task");
@@ -28,6 +29,70 @@ export const ModalController = {
   },
 
   // ==========================================
+  // KEYBOARD SHORTCUTS ENGINE
+  // ==========================================
+  bindKeyboardShortcuts() {
+    document.addEventListener("keydown", (e) => {
+      const isConfirmOpen = Boolean(
+        document.getElementById("confirm-modal-wrapper"),
+      );
+      const isTaskOpen = Boolean(document.getElementById("task-modal-wrapper"));
+      const isHelpOpen = Boolean(document.getElementById("help-modal-wrapper"));
+
+      // 1. ESC KEY: Blur Active Element & Close Modals
+      if (e.key === "Escape") {
+        if (
+          document.activeElement &&
+          typeof document.activeElement.blur === "function"
+        ) {
+          document.activeElement.blur();
+        }
+
+        if (isConfirmOpen) {
+          e.preventDefault();
+          this.closeConfirmModal();
+          return;
+        }
+
+        if (isTaskOpen) {
+          e.preventDefault();
+          this.closeTaskModal();
+          return;
+        }
+
+        if (isHelpOpen) {
+          e.preventDefault();
+          this.closeHelpModal();
+          return;
+        }
+      }
+
+      // 2. CTRL/CMD + ENTER: Submit / Confirm Action
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        if (isConfirmOpen) {
+          e.preventDefault();
+          if (typeof this.confirmCallback === "function") {
+            this.confirmCallback();
+          }
+          this.closeConfirmModal();
+          return;
+        }
+
+        if (isTaskOpen) {
+          e.preventDefault();
+          const taskForm = document.querySelector(
+            "#task-modal-wrapper #form-create-task",
+          );
+          if (taskForm) {
+            taskForm.requestSubmit();
+          }
+          return;
+        }
+      }
+    });
+  },
+
+  // ==========================================
   // TASK MODAL LOGIC (Dynamic Body Injection)
   // ==========================================
   openTaskModal() {
@@ -37,6 +102,12 @@ export const ModalController = {
     modalWrapper.id = "task-modal-wrapper";
     modalWrapper.innerHTML = TaskModalComponent.render();
     document.body.appendChild(modalWrapper);
+
+    // Auto Focus on Title Input for Seamless UX
+    const titleInput = modalWrapper.querySelector("#input-task-title");
+    if (titleInput) {
+      setTimeout(() => titleInput.focus(), 50);
+    }
 
     this.bindTaskModalEvents(modalWrapper);
   },
@@ -90,16 +161,16 @@ export const ModalController = {
         e.stopPropagation();
 
         const taskId = btnDelete.dataset.deleteTaskId;
-        const currentActiveTask = StateManager.getActiveTask();
+        const currentActiveTask = TaskModel.getActiveTask();
 
         if (
           currentActiveTask &&
           String(currentActiveTask.id) === String(taskId)
         ) {
-          StateManager.setActiveTaskId(null);
+          TaskModel.setActiveTaskId(null);
         }
 
-        StateManager.deleteTask(taskId);
+        TaskModel.deleteTask(taskId);
 
         this.openTaskModal();
         return;
@@ -109,7 +180,7 @@ export const ModalController = {
       const taskRow = e.target.closest(".task-item-row");
       if (taskRow) {
         const taskId = taskRow.dataset.taskId;
-        StateManager.setActiveTaskId(taskId);
+        TaskModel.setActiveTaskId(taskId);
         this.closeTaskModal();
       }
     });
@@ -123,12 +194,9 @@ export const ModalController = {
         const pomoVal = Number(pomoInput?.value) || 1;
 
         if (titleInput && titleInput.value.trim()) {
-          const newTask = StateManager.addTask(
-            titleInput.value.trim(),
-            pomoVal,
-          );
+          const newTask = TaskModel.addTask(titleInput.value.trim(), pomoVal);
           if (newTask) {
-            StateManager.setActiveTaskId(newTask.id);
+            TaskModel.setActiveTaskId(newTask.id);
           }
           this.closeTaskModal();
         }
@@ -230,14 +298,22 @@ export const ModalController = {
 
   bindConfirmModalEvents(wrapper) {
     wrapper.addEventListener("click", (e) => {
+      // Cancel / Backdrop click
       if (
         e.target.closest("#btn-cancel-confirm") ||
         e.target.closest("#confirm-modal-backdrop")
       ) {
+        e.preventDefault();
+        e.stopPropagation();
         this.closeConfirmModal();
+        return;
       }
 
+      // Action Confirm click
       if (e.target.closest("#btn-action-confirm")) {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (typeof this.confirmCallback === "function") {
           this.confirmCallback();
         }
