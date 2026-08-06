@@ -1,57 +1,57 @@
-/**
- * Ambient Sound Streamer Service using YouTube IFrame Player API
- */
+// src/services/sound.service.js
+import { SoundModel } from "@/models/sound.model.js";
+
 class SoundService {
   constructor() {
-    this.player = null;
-    this.isReady = false;
-    this.currentTrackId = null;
-    this.currentVolume = 50;
-    this.pendingTrackId = null;
+    this.ytPlayer = null;
+    this.aparatFrame = null;
+    this.audioElement = null;
+    this.isYtReady = false;
+    this.currentTrack = null;
+    this.pendingTrack = null;
   }
 
-  /**
-   * Initializes YouTube Iframe API and creates hidden container
-   */
   init() {
+    this._initAudioElement();
+    this._initYouTubeAPI();
+    this._initAparatContainer();
+  }
+
+  _initAudioElement() {
+    if (!this.audioElement) {
+      this.audioElement = new Audio();
+      this.audioElement.loop = true;
+    }
+  }
+
+  _initYouTubeAPI() {
     if (window.YT && window.YT.Player) {
-      this._createPlayer();
+      this._createYtPlayer();
       return;
     }
-
-    // Inject YouTube IFrame API script dynamically
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName("script")[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript?.parentNode?.insertBefore(tag, firstScript);
 
-    // Global callback required by YouTube API
     window.onYouTubeIframeAPIReady = () => {
-      this._createPlayer();
+      this._createYtPlayer();
     };
   }
 
-  /**
-   * Creates hidden DOM element and initializes YT Player
-   * @private
-   */
-  _createPlayer() {
+  _createYtPlayer() {
     let container = document.getElementById("yt-sound-player-container");
     if (!container) {
       container = document.createElement("div");
       container.id = "yt-sound-player-container";
-      // Hide the player visually but leave it in DOM to allow streaming
-      container.style.position = "absolute";
-      container.style.top = "-9999px";
-      container.style.left = "-9999px";
-      container.style.width = "1px";
-      container.style.height = "1px";
-      container.style.opacity = "0";
-      container.style.pointerEvents = "none";
+      container.className =
+        "absolute -top-[9999px] -left-[9999px] w-1 h-1 opacity-0 pointer-events-none";
       document.body.appendChild(container);
     }
 
-    this.player = new window.YT.Player("yt-sound-player-container", {
+    // src/services/sound.service.js
+
+    this.ytPlayer = new window.YT.Player("yt-sound-player-container", {
       height: "1",
       width: "1",
       playerVars: {
@@ -59,70 +59,106 @@ class SoundService {
         controls: 0,
         disablekb: 1,
         fs: 0,
+        rel: 0,
         modestbranding: 1,
-        playsinline: 1,
+        origin: window.location.origin,
       },
       events: {
         onReady: () => {
-          this.isReady = true;
-          this.setVolume(this.currentVolume);
-          if (this.pendingTrackId) {
-            this.playTrack(this.pendingTrackId);
-            this.pendingTrackId = null;
+          this.isYtReady = true;
+          if (this.pendingTrack && this.pendingTrack.type === "youtube") {
+            this.playTrack(this.pendingTrack);
+            this.pendingTrack = null;
           }
         },
-        onError: (e) => {
-          console.error("Sound Streamer Player Error:", e);
+        onError: (event) => {
+          console.warn("YouTube Player Warning/Error code:", event.data);
         },
       },
     });
   }
 
-  /**
-   * Plays a specific YouTube sound track by video ID
-   * @param {string} youtubeId
-   */
-  playTrack(youtubeId) {
-    if (!youtubeId) return;
-
-    if (!this.isReady) {
-      this.pendingTrackId = youtubeId;
-      return;
+  _initAparatContainer() {
+    let iframe = document.getElementById("aparat-sound-player-frame");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.id = "aparat-sound-player-frame";
+      iframe.className =
+        "absolute -top-[9999px] -left-[9999px] w-1 h-1 opacity-0 pointer-events-none";
+      iframe.setAttribute("allow", "autoplay");
+      document.body.appendChild(iframe);
     }
-
-    if (this.currentTrackId === youtubeId) {
-      this.player.playVideo();
-    } else {
-      this.currentTrackId = youtubeId;
-      this.player.loadVideoById(youtubeId);
-    }
+    this.aparatFrame = iframe;
   }
 
-  /**
-   * Pauses ambient audio
-   */
+  playTrack(track) {
+    if (!track) return;
+    this.stopAll();
+
+    this.currentTrack = track;
+
+    if (track.type === "youtube") {
+      if (!this.isYtReady) {
+        this.pendingTrack = track;
+        return;
+      }
+      this.ytPlayer.loadVideoById(track.sourceId);
+      this.ytPlayer.setVolume(
+        SoundModel.getCurrentTrack() ? SoundModel.soundState?.volume || 50 : 50,
+      );
+      this.ytPlayer.playVideo();
+    } else if (track.type === "aparat") {
+      const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?autoplay=true`;
+      this.aparatFrame.src = aparatUrl;
+    } else if (track.type === "audio") {
+      this.audioElement.src = track.sourceId;
+      this.audioElement.volume = (SoundModel.soundState?.volume || 50) / 100;
+      this.audioElement.play();
+    }
+
+    SoundModel.setPlaying(true);
+  }
+
   pause() {
+    if (!this.currentTrack) return;
+
     if (
-      this.isReady &&
-      this.player &&
-      typeof this.player.pauseVideo === "function"
+      this.currentTrack.type === "youtube" &&
+      this.isYtReady &&
+      this.ytPlayer.pauseVideo
     ) {
-      this.player.pauseVideo();
+      this.ytPlayer.pauseVideo();
+    } else if (this.currentTrack.type === "aparat") {
+      this.aparatFrame.src = "";
+    } else if (this.currentTrack.type === "audio") {
+      this.audioElement.pause();
     }
+
+    SoundModel.setPlaying(false);
   }
 
-  /**
-   * Adjusts volume (0 to 100)
-   * @param {number} volume
-   */
+  stopAll() {
+    if (this.isYtReady && this.ytPlayer?.stopVideo) {
+      this.ytPlayer.stopVideo();
+    }
+    if (this.aparatFrame) {
+      this.aparatFrame.src = "";
+    }
+    if (this.audioElement) {
+      this.audioElement.pause();
+      this.audioElement.currentTime = 0;
+    }
+    SoundModel.setPlaying(false);
+  }
+
   setVolume(volume) {
-    this.currentVolume = Math.max(0, Math.min(100, volume));
-    if (
-      this.isReady &&
-      this.player &&
-      typeof this.player.setVolume === "function"
-    ) {
-      this.player.setVolume(this.currentVolume);
+    const normalizedVol = Math.max(0, Math.min(100, volume));
+
+    if (this.isYtReady && this.ytPlayer?.setVolume) {
+      this.ytPlayer.setVolume(normalizedVol);
+    }
+    if (this.audioElement) {
+      this.audioElement.volume = normalizedVol / 100;
     }
   }
 }

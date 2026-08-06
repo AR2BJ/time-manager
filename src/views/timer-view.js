@@ -1,80 +1,63 @@
-export const TimerView = {
+import { SoundPlayerComponent } from "@/components/features/sound/sound-player.component.js";
+import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
+import { StateManager } from "@/models/state.model.js";
+import { formatTime } from "@/utils/helpers.js";
+
+export class TimerView {
+  constructor() {
+    this.container = null;
+    this.soundPlayer = new SoundPlayerComponent();
+    this.soundSelector = new SoundSelectorComponent();
+    this.unsubscribe = null;
+  }
+
   render() {
-    return `
+    this.container = document.getElementById("timer-view-container");
+    if (!this.container) return;
+
+    // Build base HTML structure inside host container
+    this.mountLayout();
+
+    // Hydrate state and sub-components
+    this.update();
+
+    // Subscribe to state changes if not already subscribed
+    if (!this.unsubscribe) {
+      this.unsubscribe = StateManager.subscribe(() => this.update());
+    }
+
+    return this.container;
+  }
+
+  mountLayout() {
+    this.container.innerHTML = `
       <section
         id="timer-view"
-        class="hidden w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
+        class="w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Left Column: Soundscape Player Sub-system -->
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
-            <div
-              class="bg-surface border border-border rounded-3xl p-5 shadow-xs"
-            >
-              <div
-                class="flex items-center justify-between mb-4 pb-3 border-b border-border"
-              >
-                <span
-                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
-                >
+            <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-4">
+              <div class="flex items-center justify-between pb-3 border-b border-border">
+                <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
                   <i class="fa-regular fa-headphones text-brand"></i>
                   Soundscape Player
                 </span>
               </div>
 
-              <div class="mb-4">
-                <label
-                  class="block text-[11px] font-bold uppercase tracking-wider text-muted mb-2"
-                  >Select Sound</label
-                >
-                <div class="relative">
-                  <select
-                    id="sound-selector"
-                    class="w-full rounded-xl border border-border bg-surface-2 p-3 text-xs font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-brand/40 cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="rain-forest">Rain & Forest Stream</option>
-                    <option value="brown-noise">Pure Brown Noise</option>
-                    <option value="fireplace">Fireplace Crackle</option>
-                    <option value="cafe">Cozy Cafe Ambience</option>
-                  </select>
-                  <i
-                    class="fa-regular fa-chevron-down absolute right-3 top-3.5 text-xs text-muted pointer-events-none"
-                  ></i>
-                </div>
-              </div>
-
-              <div
-                id="sound-track-card"
-                class="p-3.5 rounded-2xl bg-surface-2 border border-border flex items-center justify-between"
-              >
-                <div class="flex flex-col min-w-0 pr-2">
-                  <span
-                    id="sound-track-title"
-                    class="text-xs font-bold text-primary truncate"
-                    >Rain & Forest Stream</span
-                  >
-                  <span class="text-[10px] text-muted">Ambient Background</span>
-                </div>
-
-                <button
-                  id="btn-toggle-sound"
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-(--color-brand-hover) transition cursor-pointer shadow-sm active:scale-95"
-                  title="Play / Pause Audio"
-                >
-                  <i
-                    id="sound-icon"
-                    class="fa-regular fa-play text-xs pointer-events-none"
-                  ></i>
-                </button>
-              </div>
+              <!-- Sound Slots -->
+              <div id="sound-selector-slot"></div>
+              <div id="sound-player-slot"></div>
             </div>
           </div>
 
-          <div
-            class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2"
-          >
-            <div
-              class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner"
-            >
+          <!-- Center Column: Main Timer Visualizer Engine -->
+          <div class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2">
+            
+            <!-- Mode Switcher -->
+            <div class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner">
               <div
                 id="mode-indicator"
                 class="absolute rounded-lg bg-brand/80 transition-all duration-300 ease-in-out"
@@ -82,7 +65,8 @@ export const TimerView = {
 
               <button
                 id="mode-pomodoro"
-                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold text-(--color-btn-primary-text) transition cursor-pointer text-center"
+                data-mode="pomodoro"
+                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold transition cursor-pointer text-center"
               >
                 <i class="fa-regular fa-stopwatch pointer-events-none"></i>
                 <span class="pointer-events-none">Pomodoro</span>
@@ -90,16 +74,16 @@ export const TimerView = {
 
               <button
                 id="mode-flow"
-                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold text-secondary transition cursor-pointer text-center"
+                data-mode="flow"
+                class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold transition cursor-pointer text-center"
               >
                 <i class="fa-regular fa-water pointer-events-none"></i>
                 <span class="pointer-events-none">Flow Mode</span>
               </button>
             </div>
 
-            <div
-              class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110"
-            >
+            <!-- Timer SVG Ring & Canvas Container -->
+            <div class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110">
               <svg
                 id="timer-svg-container"
                 class="w-full h-full transform -rotate-90 origin-center relative z-0"
@@ -113,7 +97,6 @@ export const TimerView = {
                   stroke-width="10"
                   fill="transparent"
                 />
-
                 <circle
                   id="timer-progress-ring"
                   cx="160"
@@ -135,9 +118,7 @@ export const TimerView = {
                 class="absolute inset-0 w-full h-full pointer-events-none z-10 transition-opacity duration-300 opacity-0"
               ></canvas>
 
-              <div
-                class="absolute flex flex-col items-center justify-center text-center pointer-events-none select-none z-20"
-              >
+              <div class="absolute flex flex-col items-center justify-center text-center pointer-events-none select-none z-20">
                 <span
                   id="timer-phase-badge"
                   class="mb-3 rounded-full bg-brand/10 px-4 py-1 text-xs font-bold text-brand uppercase tracking-widest border border-brand/20"
@@ -156,23 +137,124 @@ export const TimerView = {
                   id="timer-sub-info"
                   class="mt-2 text-xs font-medium text-muted"
                 >
-                  Session #1 ready
+                  Session Ready
                 </span>
               </div>
             </div>
 
+            <!-- Action Controls Container -->
             <div
               id="timer-controls-container"
               class="mt-6 flex items-center gap-4 w-full justify-center min-h-14"
-            ></div>
+            >
+              <button
+                type="button"
+                id="timer-start-toggle-btn"
+                class="px-8 py-3.5 rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold text-base shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
+              >
+                Start
+              </button>
+              
+              <button
+                type="button"
+                id="timer-reset-btn"
+                class="px-5 py-3.5 rounded-xl bg-surface-2 hover:bg-surface-3 text-secondary font-medium text-base transition-all duration-200 active:scale-95 cursor-pointer border border-border"
+              >
+                Reset
+              </button>
+            </div>
           </div>
 
+          <!-- Right Column: Sidebar Widgets -->
           <div class="lg:col-span-3 flex flex-col gap-6 order-3">
             <div id="active-task-container"></div>
             <div id="today-overview-container"></div>
           </div>
+
         </div>
       </section>
     `;
-  },
-};
+
+    // Mount nested sub-components safely
+    const selectorSlot = this.container.querySelector("#sound-selector-slot");
+    if (selectorSlot) {
+      selectorSlot.appendChild(this.soundSelector.render());
+    }
+
+    const playerSlot = this.container.querySelector("#sound-player-slot");
+    if (playerSlot) {
+      playerSlot.appendChild(this.soundPlayer.render());
+    }
+
+    this.bindEvents();
+  }
+
+  update() {
+    if (!this.container) return;
+
+    const state = StateManager.init();
+    const { activeMode, timer } = state;
+
+    const isPomodoro = activeMode === "pomodoro";
+    const displayTime = isPomodoro
+      ? formatTime(timer.timeRemaining)
+      : formatTime(timer.flowTime);
+
+    const timerDisplayEl = this.container.querySelector("#timer-display");
+    if (timerDisplayEl) {
+      timerDisplayEl.textContent = displayTime;
+    }
+
+    const startBtn = this.container.querySelector("#timer-start-toggle-btn");
+    if (startBtn) {
+      startBtn.textContent = timer.isRunning ? "Pause" : "Start";
+    }
+
+    const progressRing = this.container.querySelector("#timer-progress-ring");
+    if (progressRing && isPomodoro) {
+      const circumference = 879.64;
+      const progress = timer.timeRemaining / (timer.duration || 1500);
+      const offset = circumference - progress * circumference;
+      progressRing.style.strokeDashoffset = `${offset}`;
+    }
+
+    const phaseBadge = this.container.querySelector("#timer-phase-badge");
+    if (phaseBadge) {
+      phaseBadge.textContent = isPomodoro
+        ? timer.currentPhase === "work"
+          ? "Focus Phase"
+          : "Break Phase"
+        : "Flow Mode";
+    }
+  }
+
+  bindEvents() {
+    this.container.addEventListener("click", (e) => {
+      const modeBtn = e.target.closest("[data-mode]");
+      if (modeBtn) {
+        const mode = modeBtn.dataset.mode;
+        StateManager.setMode(mode);
+        return;
+      }
+
+      const startBtn = e.target.closest("#timer-start-toggle-btn");
+      if (startBtn) {
+        const { timer } = StateManager.init();
+        StateManager.updateTimerState({ isRunning: !timer.isRunning });
+        return;
+      }
+
+      const resetBtn = e.target.closest("#timer-reset-btn");
+      if (resetBtn) {
+        StateManager.resetTimer();
+        return;
+      }
+    });
+  }
+
+  destroy() {
+    if (this.unsubscribe) this.unsubscribe();
+    if (this.soundPlayer) this.soundPlayer.destroy();
+    if (this.soundSelector) this.soundSelector.destroy();
+  }
+}

@@ -1,25 +1,6 @@
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
-export const defaultTrackList = [
-  {
-    id: "rain-forest",
-    title: "Rain & Forest Stream (10 Hours)",
-    type: "youtube",
-    youtubeId: "mPZkdNFkNps",
-  },
-  {
-    id: "brown-noise",
-    title: "Pure Brown Noise (No Loop)",
-    type: "youtube",
-    youtubeId: "RqzGzwTY-6w",
-  },
-  {
-    id: "fireplace",
-    title: "Fireplace Crackle",
-    type: "youtube",
-    youtubeId: "L_LUpnjgPso",
-  },
-];
+import { SoundModel } from "./sound.model.js";
 
 export const state = {
   currentView: "timer",
@@ -33,12 +14,6 @@ export const state = {
     flowTime: 0,
     pomodoroSessionCount: 0,
     currentPhase: "work",
-  },
-  soundPlayer: {
-    isPlaying: false,
-    currentSoundId: "rain-forest",
-    volume: 50,
-    trackList: [...defaultTrackList],
   },
   tasks: [],
   sessions: [],
@@ -65,14 +40,13 @@ export const StateManager = {
 
       if (saved.settings) {
         state.settings = { ...state.settings, ...saved.settings };
-        state.soundPlayer.volume = saved.settings.volume ?? 50;
-        state.soundPlayer.currentSoundId =
-          saved.settings.lastSelectedSoundId || "rain-forest";
+        SoundModel.init(saved.settings);
       }
-
       if (saved.timer) {
         state.timer = { ...state.timer, ...saved.timer };
       }
+    } else {
+      SoundModel.init({});
     }
 
     const firstTask = state.tasks.find((t) => t.status !== "done");
@@ -102,7 +76,6 @@ export const StateManager = {
 
   setMode(mode) {
     if (state.activeMode === mode) return;
-
     state.activeMode = mode;
     this.save();
     this.notify();
@@ -127,10 +100,7 @@ export const StateManager = {
     );
     const totalMinutes = Math.round(totalSeconds / 60);
 
-    return {
-      sessionsDone,
-      totalMinutes,
-    };
+    return { sessionsDone, totalMinutes };
   },
 
   updateTimerState(newTimerState) {
@@ -140,18 +110,15 @@ export const StateManager = {
   },
 
   resetTimer() {
-    const isPomodoro = state.activeMode === "pomodoro";
     const defaultSecs = state.settings.pomodoroWorkTime * 60;
+    state.timer.isRunning = false;
+    state.timer.isPaused = false;
 
-    if (isPomodoro) {
-      state.timer.isRunning = false;
-      state.timer.isPaused = false;
+    if (state.activeMode === "pomodoro") {
       state.timer.timeRemaining = defaultSecs;
       state.timer.duration = defaultSecs;
       state.timer.currentPhase = "work";
     } else {
-      state.timer.isRunning = false;
-      state.timer.isPaused = false;
       state.timer.flowTime = 0;
     }
 
@@ -185,32 +152,17 @@ export const StateManager = {
     this.notify();
   },
 
-  setSoundPlaying(isPlaying) {
-    state.soundPlayer.isPlaying = isPlaying;
-    this.notify();
-  },
-
-  setSoundTrack(soundId) {
-    state.soundPlayer.currentSoundId = soundId;
-    state.settings.lastSelectedSoundId = soundId;
-    this.save();
-    this.notify();
-  },
-
-  setVolume(volume) {
-    state.soundPlayer.volume = volume;
-    state.settings.volume = volume;
-    this.save();
-    this.notify();
-  },
-
   save() {
+    const soundData = SoundModel.getCurrentTrack();
     saveToStorage({
       activeMode: state.activeMode,
       tasks: state.tasks,
       sessions: state.sessions,
       timer: state.timer,
-      settings: state.settings,
+      settings: {
+        ...state.settings,
+        lastSelectedSoundId: soundData ? soundData.id : "rain-forest",
+      },
     });
   },
 };

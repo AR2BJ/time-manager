@@ -1,7 +1,7 @@
 import { formatDate, generateId } from "@/utils/helpers.js";
 
 export const STORAGE_KEY = "time_manager_data";
-export const STORAGE_VERSION = 2; // Incremented version for enhanced timer persistence schema
+export const STORAGE_VERSION = 1;
 
 /**
  * Normalizes a lightweight task entity for Standalone mode
@@ -70,6 +70,7 @@ function migrateData(data) {
       notificationSound: settings.notificationSound !== false,
       lastSelectedSoundId: settings.lastSelectedSoundId || "rain-forest",
       volume: Number(settings.volume) ?? 50,
+      isMuted: Boolean(settings.isMuted),
     },
   };
 }

@@ -65,6 +65,23 @@ export function mapTagIdsToObjects(tagIds = [], globalTags = []) {
     .filter(Boolean);
 }
 
+export function formatTime(totalSeconds = 0) {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const paddedMins = String(mins).padStart(2, "0");
+  const paddedSecs = String(secs).padStart(2, "0");
+
+  if (hrs > 0) {
+    const paddedHrs = String(hrs).padStart(2, "0");
+    return `${paddedHrs}:${paddedMins}:${paddedSecs}`;
+  }
+
+  return `${paddedMins}:${paddedSecs}`;
+}
+
 export function formatDate(date) {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     date = new Date();
