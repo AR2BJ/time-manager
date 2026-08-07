@@ -85,16 +85,17 @@ export class SoundPlayerComponent {
           </div>
         </div>
 
-        <div class="flex flex-col gap-1 mt-1">
+        <div class="flex flex-col gap-1 mt-2">
           <input
             type="range"
             id="audio-progress-bar"
             min="0"
             max="100"
             value="0"
-            class="w-full h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand transition-all"
+            class="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-brand transition-all dir-ltr"
+            style="background: linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-surface-3, #334155) 0%);"
           />
-          <div class="flex items-center justify-between text-[11px] font-mono text-tertiary">
+          <div class="flex items-center justify-between text-[11px] font-mono text-tertiary dir-ltr pt-1">
             <span id="player-current-time">0:00</span>
             <span id="player-total-time">-0:00</span>
           </div>
@@ -104,11 +105,11 @@ export class SoundPlayerComponent {
           <button
             type="button"
             id="btn-player-play-toggle"
-            class="w-10 h-10 rounded-full bg-brand hover:bg-brand/90 text-white flex items-center justify-center shadow-md shadow-brand/20 transition cursor-pointer active:scale-95"
+            class="w-11 h-11 rounded-full bg-brand hover:bg-brand/90 text-white flex items-center justify-center shadow-md shadow-brand/20 transition cursor-pointer active:scale-95"
             title="Play"
           >
             <span id="btn-play-icon-slot" class="flex items-center justify-center">
-              <i class="fa-solid fa-play ms-0.5 text-sm"></i>
+              <i class="fa-solid fa-play ms-0.5 text-base"></i>
             </span>
           </button>
         </div>
@@ -129,7 +130,7 @@ export class SoundPlayerComponent {
     const isMuted = state.isMuted;
     const volume = state.volume;
 
-    // 1. Metadata
+    // Track Metadata
     const titleEl = this.container.querySelector("#player-track-title");
     const creatorEl = this.container.querySelector("#player-track-creator");
     const typeEl = this.container.querySelector("#player-track-type");
@@ -150,22 +151,22 @@ export class SoundPlayerComponent {
       }"></i>`;
     }
 
-    // 2. Play/Pause Button
+    // Play/Pause State
     const playSlot = this.container.querySelector("#btn-play-icon-slot");
     if (playSlot) {
       playSlot.innerHTML = isPlaying
-        ? `<i class="fa-solid fa-pause text-sm"></i>`
-        : `<i class="fa-solid fa-play ms-0.5 text-sm"></i>`;
+        ? `<i class="fa-solid fa-pause text-base"></i>`
+        : `<i class="fa-solid fa-play ms-0.5 text-base"></i>`;
     }
 
-    // 3. Volume Popover Visibility
+    // Volume Popover State
     const volPopover = this.container.querySelector("#volume-popover");
     if (volPopover) {
       volPopover.classList.toggle("flex", this.isVolumeOpen);
       volPopover.classList.toggle("hidden", !this.isVolumeOpen);
     }
 
-    // 4. Volume Icons & Controls Sync
+    // Volume Icons
     const volSlot = this.container.querySelector("#player-volume-icon-slot");
     const popoverMuteSlot = this.container.querySelector(
       "#popover-mute-icon-slot",
@@ -189,10 +190,11 @@ export class SoundPlayerComponent {
 
     if (volSlider) volSlider.value = isMuted ? 0 : volume;
     if (volText) volText.textContent = `${isMuted ? 0 : volume}%`;
+
+    this.updateProgressBarFill();
   }
 
   bindEvents() {
-    // Popover Toggle
     const volToggleBtn = this.container.querySelector(
       "#btn-volume-popover-toggle",
     );
@@ -209,14 +211,12 @@ export class SoundPlayerComponent {
       soundService.setVolume();
     });
 
-    // Mute Toggle Button
     const muteBtn = this.container.querySelector("#btn-toggle-mute");
     muteBtn?.addEventListener("click", () => {
       SoundModel.toggleMute();
       soundService.setVolume();
     });
 
-    // Play/Pause Toggle
     const playBtn = this.container.querySelector("#btn-player-play-toggle");
     playBtn?.addEventListener("click", async () => {
       const state = SoundModel.getState();
@@ -235,6 +235,7 @@ export class SoundPlayerComponent {
       const targetTime = Number(e.target.value);
       const currEl = this.container?.querySelector("#player-current-time");
       if (currEl) currEl.textContent = this.formatDuration(targetTime);
+      this.updateProgressBarFill();
     });
 
     progressBar?.addEventListener("change", (e) => {
@@ -242,9 +243,9 @@ export class SoundPlayerComponent {
       this.currentTime = targetTime;
       soundService.seekTo(targetTime);
       this.isUserSeeking = false;
+      this.updateProgressBarFill();
     });
 
-    // Close volume dropdown when clicking outside
     this.onDocumentClick = (e) => {
       if (this.isVolumeOpen && !this.container.contains(e.target)) {
         this.isVolumeOpen = false;
@@ -252,6 +253,18 @@ export class SoundPlayerComponent {
       }
     };
     document.addEventListener("click", this.onDocumentClick);
+  }
+
+  updateProgressBarFill() {
+    const bar = this.container?.querySelector("#audio-progress-bar");
+    if (!bar) return;
+
+    const max = Number(bar.max) || 100;
+    const val = Number(bar.value) || 0;
+    const percentage = max > 0 ? (val / max) * 100 : 0;
+
+    // Applies filled track color dynamically matching the thumb position
+    bar.style.background = `linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-brand, #14b8a6) ${percentage}%, var(--color-surface-3, #334155) ${percentage}%, var(--color-surface-3, #334155) 100%)`;
   }
 
   startProgressTracker() {
@@ -271,9 +284,11 @@ export class SoundPlayerComponent {
         if (currEl) currEl.textContent = this.formatDuration(this.currentTime);
         if (totEl)
           totEl.textContent = `-${this.formatDuration(Math.max(0, this.duration - this.currentTime))}`;
+
         if (bar) {
           bar.max = this.duration || 100;
           bar.value = this.currentTime || 0;
+          this.updateProgressBarFill();
         }
       }
     }, 500);
