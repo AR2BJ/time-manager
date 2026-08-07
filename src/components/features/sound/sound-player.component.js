@@ -1,4 +1,3 @@
-// src/components/features/sound/sound-player.component.js
 import { SoundModel } from "@/models/sound.model.js";
 import { soundService } from "@/services/sound.service.js";
 
@@ -7,11 +6,7 @@ export class SoundPlayerComponent {
     this.container = null;
     this.unsubscribe = null;
     this.isVolumeOpen = false;
-    this.currentTime = 0;
-    this.duration = 0;
     this.progressInterval = null;
-    this.isUserSeeking = false;
-    this.seekDebounceTimeout = null;
   }
 
   render() {
@@ -30,121 +25,101 @@ export class SoundPlayerComponent {
   mount() {
     this.container.innerHTML = `
       <div
-        class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300"
+        class="relative w-full bg-surface-2 border border-border rounded-2xl p-3 shadow-sm flex items-center justify-between gap-3 transition-all duration-300"
       >
-        <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <div
-              id="player-music-icon-wrapper"
-              class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand"
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div class="relative w-14 h-14 rounded-xl overflow-hidden bg-surface-3 border border-border shrink-0 group">
+            <img 
+              id="player-cover-image" 
+              src="" 
+              alt="Cover" 
+              class="w-full h-full object-cover hidden"
+            />
+            <div 
+              id="player-cover-fallback" 
+              class="w-full h-full flex items-center justify-center text-brand bg-brand/10"
             >
               <i class="fa-solid fa-music text-lg"></i>
             </div>
-            <div class="flex flex-col min-w-0">
-              <h4
-                id="player-track-title"
-                class="text-sm font-bold text-primary truncate"
-              >
-                --
-              </h4>
-              <div
-                class="flex items-center gap-2 text-xs text-secondary truncate"
-              >
-                <span id="player-track-creator">--</span>
-                <span
-                  class="inline-block w-1 h-1 rounded-full bg-border"
-                ></span>
-                <span
-                  id="player-track-type"
-                  class="px-1.5 py-0.5 rounded bg-surface-3 text-[10px] font-semibold text-brand tracking-wider"
-                >
-                  AUDIO
-                </span>
+
+            <button
+              type="button"
+              id="btn-player-play-toggle"
+              class="absolute inset-0 bg-black/40 hover:bg-black/55 text-white flex items-center justify-center transition cursor-pointer"
+              title="Play / Pause"
+            >
+              <span id="btn-play-icon-slot" class="flex items-center justify-center">
+                <i class="fa-solid fa-play ms-0.5 text-base"></i>
+              </span>
+            </button>
+          </div>
+
+          <div class="flex flex-col min-w-0 gap-1">
+            <h4
+              id="player-track-title"
+              class="text-sm font-bold text-primary truncate"
+            >
+              --
+            </h4>
+            
+            <div class="flex items-center gap-2 text-xs text-secondary truncate">
+              <span id="player-track-creator" class="truncate">--</span>
+              <span class="inline-block w-1 h-1 rounded-full bg-border shrink-0"></span>
+              
+              <div class="font-mono text-[11px] text-tertiary dir-ltr flex items-center gap-1 shrink-0">
+                <span id="player-current-time">0:00</span>
+                <span>/</span>
+                <span id="player-total-time">0:00</span>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="relative">
+        <div class="relative shrink-0">
+          <button
+            type="button"
+            id="btn-volume-popover-toggle"
+            class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
+            title="Volume Control"
+          >
+            <span
+              id="player-volume-icon-slot"
+              class="pointer-events-none flex items-center justify-center"
+            >
+              <i class="fa-solid fa-volume-high"></i>
+            </span>
+          </button>
+
+          <div
+            id="volume-popover"
+            class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
+          >
+            <span
+              id="volume-text-val"
+              class="text-[10px] font-bold text-secondary"
+            >50%</span>
+            <input
+              type="range"
+              id="volume-slider"
+              min="0"
+              max="100"
+              value="50"
+              class="w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
+            />
             <button
               type="button"
-              id="btn-volume-popover-toggle"
-              class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
-              title="Volume Control"
+              id="btn-toggle-mute"
+              class="text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
+              title="Toggle Mute"
             >
               <span
-                id="player-volume-icon-slot"
-                class="pointer-events-none flex items-center justify-center"
+                id="popover-mute-icon-slot"
+                class="flex items-center justify-center"
               >
                 <i class="fa-solid fa-volume-high"></i>
               </span>
             </button>
-
-            <div
-              id="volume-popover"
-              class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
-            >
-              <span
-                id="volume-text-val"
-                class="text-[10px] font-bold text-secondary"
-                >50%</span
-              >
-              <input
-                type="range"
-                id="volume-slider"
-                min="0"
-                max="100"
-                value="50"
-                class="w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
-              />
-              <button
-                type="button"
-                id="btn-toggle-mute"
-                class="text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
-                title="Toggle Mute"
-              >
-                <span
-                  id="popover-mute-icon-slot"
-                  class="flex items-center justify-center"
-                >
-                  <i class="fa-solid fa-volume-high"></i>
-                </span>
-              </button>
-            </div>
           </div>
-        </div>
-
-        <div class="flex flex-col gap-1 mt-2">
-          <input
-            type="range"
-            id="audio-progress-bar"
-            min="0"
-            max="100"
-            value="0"
-            class="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-brand transition-all dir-ltr"
-            style="background: linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-surface-3, #334155) 0%);"
-          />
-          <div
-            class="flex items-center justify-between text-[11px] font-mono text-tertiary dir-ltr pt-1"
-          >
-            <span id="player-current-time">0:00</span>
-            <span id="player-total-time">0:00</span>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-center gap-4 pt-1">
-          <button
-            type="button"
-            id="btn-player-play-toggle"
-            class="w-11 h-11 rounded-full bg-brand hover:bg-brand/90 text-white flex items-center justify-center shadow-md shadow-brand/20 transition cursor-pointer active:scale-95"
-            title="Play"
-          >
-            <span
-              id="btn-play-icon-slot"
-              class="flex items-center justify-center"
-            >
-              <i class="fa-solid fa-play ms-0.5 text-base"></i>
-            </span>
-          </button>
         </div>
       </div>
     `;
@@ -165,25 +140,34 @@ export class SoundPlayerComponent {
     // Track Metadata
     const titleEl = this.container.querySelector("#player-track-title");
     const creatorEl = this.container.querySelector("#player-track-creator");
-    const typeEl = this.container.querySelector("#player-track-type");
-    const iconWrapper = this.container.querySelector(
-      "#player-music-icon-wrapper",
-    );
 
     if (titleEl)
       titleEl.textContent = currentTrack?.title || "No track selected";
     if (creatorEl)
       creatorEl.textContent = currentTrack?.creator || "Unknown Source";
-    if (typeEl)
-      typeEl.textContent = (currentTrack?.type || "Audio").toUpperCase();
 
-    if (iconWrapper) {
-      iconWrapper.innerHTML = `<i class="fa-solid fa-music text-lg ${
-        isPlaying ? "animate-pulse" : ""
-      }"></i>`;
+    const coverImg = this.container.querySelector("#player-cover-image");
+    const coverFallback = this.container.querySelector(
+      "#player-cover-fallback",
+    );
+
+    if (currentTrack?.coverUrl) {
+      if (coverImg) {
+        coverImg.src = currentTrack.coverUrl;
+        coverImg.onload = () => {
+          coverImg.classList.remove("hidden");
+          coverFallback?.classList.add("hidden");
+        };
+        coverImg.onerror = () => {
+          coverImg.classList.add("hidden");
+          coverFallback?.classList.remove("hidden");
+        };
+      }
+    } else {
+      coverImg?.classList.add("hidden");
+      coverFallback?.classList.remove("hidden");
     }
 
-    // Play/Pause State
     const playSlot = this.container.querySelector("#btn-play-icon-slot");
     if (playSlot) {
       playSlot.innerHTML = isPlaying
@@ -222,11 +206,20 @@ export class SoundPlayerComponent {
 
     if (volSlider) volSlider.value = isMuted ? 0 : volume;
     if (volText) volText.textContent = `${isMuted ? 0 : volume}%`;
-
-    this.updateProgressBarFill();
   }
 
   bindEvents() {
+    const playBtn = this.container.querySelector("#btn-player-play-toggle");
+    playBtn?.addEventListener("click", async () => {
+      const state = SoundModel.getState();
+      if (state.isPlaying) {
+        await soundService.pause();
+      } else {
+        const currentTrack = SoundModel.getCurrentTrack();
+        await soundService.playTrack(currentTrack);
+      }
+    });
+
     const volToggleBtn = this.container.querySelector(
       "#btn-volume-popover-toggle",
     );
@@ -249,48 +242,6 @@ export class SoundPlayerComponent {
       soundService.setVolume();
     });
 
-    const playBtn = this.container.querySelector("#btn-player-play-toggle");
-    playBtn?.addEventListener("click", async () => {
-      const state = SoundModel.getState();
-      if (state.isPlaying) {
-        await soundService.pause();
-      } else {
-        const currentTrack = SoundModel.getCurrentTrack();
-        await soundService.playTrack(currentTrack);
-      }
-    });
-
-    const progressBar = this.container.querySelector("#audio-progress-bar");
-
-    progressBar?.addEventListener("mousedown", () => {
-      this.isUserSeeking = true;
-    });
-
-    progressBar?.addEventListener("touchstart", () => {
-      this.isUserSeeking = true;
-    });
-
-    progressBar?.addEventListener("input", (e) => {
-      this.isUserSeeking = true;
-      const targetTime = Number(e.target.value);
-      const currEl = this.container?.querySelector("#player-current-time");
-      if (currEl) currEl.textContent = this.formatDuration(targetTime);
-      this.updateProgressBarFill();
-    });
-
-    progressBar?.addEventListener("change", (e) => {
-      const targetTime = Number(e.target.value);
-      this.currentTime = targetTime;
-      soundService.seekTo(targetTime);
-
-      if (this.seekDebounceTimeout) clearTimeout(this.seekDebounceTimeout);
-      this.seekDebounceTimeout = setTimeout(() => {
-        this.isUserSeeking = false;
-      }, 300);
-
-      this.updateProgressBarFill();
-    });
-
     this.onDocumentClick = (e) => {
       if (this.isVolumeOpen && !this.container.contains(e.target)) {
         this.isVolumeOpen = false;
@@ -300,40 +251,19 @@ export class SoundPlayerComponent {
     document.addEventListener("click", this.onDocumentClick);
   }
 
-  updateProgressBarFill() {
-    const bar = this.container?.querySelector("#audio-progress-bar");
-    if (!bar) return;
-
-    const max = Number(bar.max) || 100;
-    const val = Number(bar.value) || 0;
-    const percentage = max > 0 ? (val / max) * 100 : 0;
-
-    // Applies filled track color dynamically matching the thumb position
-    bar.style.background = `linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-brand, #14b8a6) ${percentage}%, var(--color-surface-3, #334155) ${percentage}%, var(--color-surface-3, #334155) 100%)`;
-  }
-
   startProgressTracker() {
     if (this.progressInterval) clearInterval(this.progressInterval);
 
     this.progressInterval = setInterval(() => {
       const state = SoundModel.getState();
-      if (state.isPlaying && !this.isUserSeeking) {
+      if (state.isPlaying) {
         const timeData = soundService.getCurrentTimeData();
-        this.currentTime = timeData.currentTime || 0;
-        this.duration = timeData.duration || 0;
-
         const currEl = this.container?.querySelector("#player-current-time");
         const totEl = this.container?.querySelector("#player-total-time");
-        const bar = this.container?.querySelector("#audio-progress-bar");
 
-        if (currEl) currEl.textContent = this.formatDuration(this.currentTime);
-        if (totEl) totEl.textContent = this.formatDuration(this.duration);
-
-        if (bar) {
-          bar.max = this.duration || 100;
-          bar.value = this.currentTime || 0;
-          this.updateProgressBarFill();
-        }
+        if (currEl)
+          currEl.textContent = this.formatDuration(timeData.currentTime);
+        if (totEl) totEl.textContent = this.formatDuration(timeData.duration);
       }
     }, 500);
   }
@@ -348,7 +278,6 @@ export class SoundPlayerComponent {
   destroy() {
     if (this.unsubscribe) this.unsubscribe();
     if (this.progressInterval) clearInterval(this.progressInterval);
-    if (this.seekDebounceTimeout) clearTimeout(this.seekDebounceTimeout);
     document.removeEventListener("click", this.onDocumentClick);
   }
 }

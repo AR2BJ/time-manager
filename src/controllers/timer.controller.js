@@ -585,8 +585,6 @@ export const TimerController = {
     this.renderTaskWidgets();
   },
 
-  // src/controllers/timer.controller.js
-
   handleModeSwitch(targetMode) {
     if (state.activeMode === targetMode) return;
 

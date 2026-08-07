@@ -1,32 +1,6 @@
-// src/models/sound.model.js
-export const defaultTrackList = [
-  {
-    id: "rain-stream",
-    title: "صدای باران و جنگل",
-    creator: "Ambient Sound",
-    duration: "پیوسته",
-    type: "audio",
-    sourceId:
-      "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=rain-and-thunder-113217.mp3",
-  },
-  {
-    id: "brown-noise",
-    title: "نویز قهوه‌ای (Brown Noise)",
-    creator: "Focus Audio",
-    duration: "پیوسته",
-    type: "audio",
-    sourceId:
-      "https://cdn.pixabay.com/download/audio/2021/08/09/audio_a405ef7d22.mp3?filename=relaxing-mountains-rivers-streams-running-water-18178.mp3",
-  },
-  {
-    id: "aparat-relaxing-rain",
-    title: "صدای باران و طبیعت (آپارات)",
-    creator: "Relax channel",
-    duration: "۲ ساعت",
-    type: "aparat",
-    sourceId: "v83x9n0",
-  },
-];
+import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
+
+const defaultTrackList = DEFAULT_TRACK_LIST;
 
 export const soundState = {
   isPlaying: false,
