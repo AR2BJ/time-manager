@@ -1,6 +1,17 @@
+// src/models/state.model.js
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
 import { SoundModel } from "./sound.model.js";
+
+const DEFAULT_SETTINGS = {
+  pomodoroWorkTime: 25,
+  shortBreakTime: 5,
+  longBreakTime: 15,
+  longBreakInterval: 4,
+  autoStartBreaks: false,
+  autoStartPomodoros: false,
+  notificationSound: true,
+};
 
 export const state = {
   currentView: "timer",
@@ -17,15 +28,7 @@ export const state = {
   },
   tasks: [],
   sessions: [],
-  settings: {
-    pomodoroWorkTime: 25,
-    shortBreakTime: 5,
-    longBreakTime: 15,
-    longBreakInterval: 4,
-    autoStartBreaks: false,
-    autoStartPomodoros: false,
-    notificationSound: true,
-  },
+  settings: { ...DEFAULT_SETTINGS },
 };
 
 const listeners = new Set();
@@ -42,9 +45,18 @@ export const StateManager = {
       state.sessions = saved.sessions || [];
 
       if (saved.settings) {
-        state.settings = { ...state.settings, ...saved.settings };
+        state.settings = {
+          ...DEFAULT_SETTINGS,
+          ...saved.settings,
+          longBreakInterval:
+            Number(saved.settings.longBreakInterval) ||
+            DEFAULT_SETTINGS.longBreakInterval,
+        };
         SoundModel.init(saved.settings);
+      } else {
+        SoundModel.init({});
       }
+
       if (saved.timer) {
         state.timer = { ...state.timer, ...saved.timer };
       }
@@ -61,7 +73,6 @@ export const StateManager = {
     return state;
   },
 
-  // Safe State Getter method without triggering notifications
   getState() {
     return state;
   },
@@ -117,8 +128,32 @@ export const StateManager = {
     this.notify();
   },
 
+  updateSettings(newSettings = {}) {
+    state.settings = {
+      ...state.settings,
+      ...newSettings,
+      longBreakInterval:
+        Number(newSettings.longBreakInterval) ||
+        state.settings.longBreakInterval ||
+        4,
+    };
+
+    if (
+      !state.timer.isRunning &&
+      !state.timer.isPaused &&
+      state.timer.currentPhase === "work"
+    ) {
+      const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
+      state.timer.timeRemaining = workSecs;
+      state.timer.duration = workSecs;
+    }
+
+    this.save();
+    this.notify();
+  },
+
   resetTimer() {
-    const defaultSecs = state.settings.pomodoroWorkTime * 60;
+    const defaultSecs = (state.settings.pomodoroWorkTime || 25) * 60;
     state.timer.isRunning = false;
     state.timer.isPaused = false;
 
@@ -152,7 +187,7 @@ export const StateManager = {
     if (session.taskId) {
       const task = state.tasks.find((t) => t.id === session.taskId);
       if (task) {
-        task.completedPomodoros += 1;
+        task.completedPomodoros = (task.completedPomodoros || 0) + 1;
       }
     }
 
@@ -169,6 +204,7 @@ export const StateManager = {
       timer: state.timer,
       settings: {
         ...state.settings,
+        longBreakInterval: Number(state.settings.longBreakInterval) || 4,
         lastSelectedSoundId: soundData ? soundData.id : "track-1",
       },
     });

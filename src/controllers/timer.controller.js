@@ -469,42 +469,26 @@ export const TimerController = {
   },
 
   bindSoundEvents() {
-    const soundSelector = document.getElementById("sound-selector");
     const btnToggleSound = document.getElementById("btn-toggle-sound");
 
-    soundSelector?.addEventListener("change", (e) => {
-      const soundId = e.target.value;
-      StateManager.setSoundTrack(soundId);
-
-      const trackNames = {
-        "track-1": "",
-      };
-
-      const titleEl = document.getElementById("sound-track-title");
-      if (titleEl)
-        titleEl.textContent = trackNames[soundId] || "Background Sound";
-
-      if (state.soundPlayer.isPlaying) {
-        soundService.playTrack(soundId);
-      }
-    });
-
     btnToggleSound?.addEventListener("click", () => {
-      if (state.soundPlayer.isPlaying) {
+      const soundState = SoundModel.getState();
+      if (soundState.isPlaying) {
         soundService.pause();
-        StateManager.setSoundPlaying(false);
       } else {
-        soundService.playTrack(state.soundPlayer.currentSoundId || "track-1");
-        StateManager.setSoundPlaying(true);
+        const currentTrack = SoundModel.getCurrentTrack();
+        if (currentTrack) {
+          soundService.playTrack(currentTrack);
+        }
       }
-      this.updateAudioUI();
     });
   },
 
   updateAudioUI() {
     const btnToggleSound = document.getElementById("btn-toggle-sound");
     if (btnToggleSound) {
-      const iconClass = state.soundPlayer.isPlaying
+      const soundState = SoundModel.getState();
+      const iconClass = soundState.isPlaying
         ? "fa-regular fa-volume-high text-brand"
         : "fa-regular fa-volume-xmark";
 

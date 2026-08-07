@@ -8,22 +8,21 @@ class TimerService {
     this.timerInterval = null;
   }
 
-  /**
-   * Safe initialization from stored state
-   */
   initFromSavedState() {
     if (state.timer?.isRunning && !state.timer?.isPaused) {
       StateManager.updateTimerState({ isPaused: true, isRunning: false });
     }
   }
 
-  /**
-   * Starts or resumes the timer based on the active mode (Pomodoro or Flow)
-   */
   start() {
     if (state.timer.isRunning && !state.timer.isPaused) return;
 
     StateManager.updateTimerState({ isRunning: true, isPaused: false });
+
+    const currentTrack = SoundModel.getCurrentTrack();
+    if (currentTrack) {
+      soundService.playTrack(currentTrack);
+    }
 
     clearInterval(this.timerInterval);
     this.timerInterval = setInterval(() => {
@@ -31,20 +30,13 @@ class TimerService {
     }, 1000);
   }
 
-  /**
-   * Pauses the active timer
-   */
   pause() {
     clearInterval(this.timerInterval);
     StateManager.updateTimerState({ isRunning: false, isPaused: true });
 
     soundService.pause();
-    SoundModel.setPlaying(false);
   }
 
-  /**
-   * Stops active timer and handles transitions based on active mode
-   */
   stopAndTransition() {
     clearInterval(this.timerInterval);
 
@@ -73,23 +65,14 @@ class TimerService {
     }
 
     soundService.pause();
-    SoundModel.setPlaying(false);
   }
 
-  /**
-   * Resets timer back to default settings for current mode
-   */
   reset() {
     clearInterval(this.timerInterval);
     StateManager.resetTimer();
     soundService.pause();
-    StateManager.setSoundPlaying(false);
   }
 
-  /**
-   * Internal tick handler called every second
-   * @private
-   */
   _tick() {
     if (state.activeMode === "pomodoro") {
       this._handlePomodoroTick();
@@ -98,10 +81,6 @@ class TimerService {
     }
   }
 
-  /**
-   * Handles 1-second decrement for Pomodoro
-   * @private
-   */
   _handlePomodoroTick() {
     const newTime = state.timer.timeRemaining - 1;
 
@@ -112,19 +91,12 @@ class TimerService {
     }
   }
 
-  /**
-   * Handles 1-second increment for Flow Mode
-   * @private
-   */
+
   _handleFlowTick() {
     const newFlowTime = (state.timer.flowTime || 0) + 1;
     StateManager.updateTimerState({ flowTime: newFlowTime });
   }
 
-  /**
-   * Triggered when a Pomodoro phase ends
-   * @private
-   */
   _onPomodoroComplete() {
     clearInterval(this.timerInterval);
 
@@ -157,6 +129,8 @@ class TimerService {
 
       if (state.settings.autoStartBreaks) {
         this.start();
+      } else {
+        soundService.pause();
       }
     } else {
       // Break phase completed -> return to Work phase
@@ -171,11 +145,10 @@ class TimerService {
 
       if (state.settings.autoStartPomodoros) {
         this.start();
+      } else {
+        soundService.pause();
       }
     }
-
-    soundService.pause();
-    StateManager.setSoundPlaying(false);
   }
 
   /**
