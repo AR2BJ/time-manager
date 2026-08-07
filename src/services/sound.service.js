@@ -223,16 +223,17 @@ class SoundService {
   }
 
   seekTo(seconds) {
+    const target = Number(seconds);
+    if (isNaN(target) || !isFinite(target)) return;
+
     if (this.currentTrack?.type === "audio" && this.audioElement) {
-      if (!isNaN(seconds) && isFinite(seconds)) {
-        this.audioElement.currentTime = seconds;
-      }
+      this.audioElement.currentTime = target;
     } else if (
       this.currentTrack?.type === "youtube" &&
       this.isYtReady &&
       this.ytPlayer?.seekTo
     ) {
-      this.ytPlayer.seekTo(seconds, true);
+      this.ytPlayer.seekTo(target, true);
     }
   }
 

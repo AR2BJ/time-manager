@@ -1,3 +1,4 @@
+// src/components/features/sound/sound-player.component.js
 import { SoundModel } from "@/models/sound.model.js";
 import { soundService } from "@/services/sound.service.js";
 
@@ -10,6 +11,7 @@ export class SoundPlayerComponent {
     this.duration = 0;
     this.progressInterval = null;
     this.isUserSeeking = false;
+    this.seekDebounceTimeout = null;
   }
 
   render() {
@@ -27,27 +29,41 @@ export class SoundPlayerComponent {
 
   mount() {
     this.container.innerHTML = `
-      <div class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300">
-        
-        <!-- Header Controls -->
+      <div
+        class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300"
+      >
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 overflow-hidden">
-            <div id="player-music-icon-wrapper" class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand">
+            <div
+              id="player-music-icon-wrapper"
+              class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand"
+            >
               <i class="fa-solid fa-music text-lg"></i>
             </div>
             <div class="flex flex-col min-w-0">
-              <h4 id="player-track-title" class="text-sm font-bold text-primary truncate">--</h4>
-              <div class="flex items-center gap-2 text-xs text-secondary truncate">
+              <h4
+                id="player-track-title"
+                class="text-sm font-bold text-primary truncate"
+              >
+                --
+              </h4>
+              <div
+                class="flex items-center gap-2 text-xs text-secondary truncate"
+              >
                 <span id="player-track-creator">--</span>
-                <span class="inline-block w-1 h-1 rounded-full bg-border"></span>
-                <span id="player-track-type" class="px-1.5 py-0.5 rounded bg-surface-3 text-[10px] font-semibold text-brand tracking-wider">
+                <span
+                  class="inline-block w-1 h-1 rounded-full bg-border"
+                ></span>
+                <span
+                  id="player-track-type"
+                  class="px-1.5 py-0.5 rounded bg-surface-3 text-[10px] font-semibold text-brand tracking-wider"
+                >
                   AUDIO
                 </span>
               </div>
             </div>
           </div>
 
-          <!-- Volume Controls -->
           <div class="relative">
             <button
               type="button"
@@ -55,7 +71,10 @@ export class SoundPlayerComponent {
               class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
               title="Volume Control"
             >
-              <span id="player-volume-icon-slot" class="pointer-events-none flex items-center justify-center">
+              <span
+                id="player-volume-icon-slot"
+                class="pointer-events-none flex items-center justify-center"
+              >
                 <i class="fa-solid fa-volume-high"></i>
               </span>
             </button>
@@ -64,7 +83,11 @@ export class SoundPlayerComponent {
               id="volume-popover"
               class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
             >
-              <span id="volume-text-val" class="text-[10px] font-bold text-secondary">50%</span>
+              <span
+                id="volume-text-val"
+                class="text-[10px] font-bold text-secondary"
+                >50%</span
+              >
               <input
                 type="range"
                 id="volume-slider"
@@ -79,7 +102,10 @@ export class SoundPlayerComponent {
                 class="text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
                 title="Toggle Mute"
               >
-                <span id="popover-mute-icon-slot" class="flex items-center justify-center">
+                <span
+                  id="popover-mute-icon-slot"
+                  class="flex items-center justify-center"
+                >
                   <i class="fa-solid fa-volume-high"></i>
                 </span>
               </button>
@@ -87,7 +113,6 @@ export class SoundPlayerComponent {
           </div>
         </div>
 
-        <!-- Progress & Timeline Slider -->
         <div class="flex flex-col gap-1 mt-2">
           <input
             type="range"
@@ -98,14 +123,14 @@ export class SoundPlayerComponent {
             class="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-brand transition-all dir-ltr"
             style="background: linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-surface-3, #334155) 0%);"
           />
-          <!-- Time Display (LTR layout for standard audio players) -->
-          <div class="flex items-center justify-between text-[11px] font-mono text-tertiary dir-ltr pt-1">
+          <div
+            class="flex items-center justify-between text-[11px] font-mono text-tertiary dir-ltr pt-1"
+          >
             <span id="player-current-time">0:00</span>
             <span id="player-total-time">0:00</span>
           </div>
         </div>
 
-        <!-- Action Controls -->
         <div class="flex items-center justify-center gap-4 pt-1">
           <button
             type="button"
@@ -113,12 +138,14 @@ export class SoundPlayerComponent {
             class="w-11 h-11 rounded-full bg-brand hover:bg-brand/90 text-white flex items-center justify-center shadow-md shadow-brand/20 transition cursor-pointer active:scale-95"
             title="Play"
           >
-            <span id="btn-play-icon-slot" class="flex items-center justify-center">
+            <span
+              id="btn-play-icon-slot"
+              class="flex items-center justify-center"
+            >
               <i class="fa-solid fa-play ms-0.5 text-base"></i>
             </span>
           </button>
         </div>
-
       </div>
     `;
 
@@ -235,6 +262,14 @@ export class SoundPlayerComponent {
 
     const progressBar = this.container.querySelector("#audio-progress-bar");
 
+    progressBar?.addEventListener("mousedown", () => {
+      this.isUserSeeking = true;
+    });
+
+    progressBar?.addEventListener("touchstart", () => {
+      this.isUserSeeking = true;
+    });
+
     progressBar?.addEventListener("input", (e) => {
       this.isUserSeeking = true;
       const targetTime = Number(e.target.value);
@@ -247,7 +282,12 @@ export class SoundPlayerComponent {
       const targetTime = Number(e.target.value);
       this.currentTime = targetTime;
       soundService.seekTo(targetTime);
-      this.isUserSeeking = false;
+
+      if (this.seekDebounceTimeout) clearTimeout(this.seekDebounceTimeout);
+      this.seekDebounceTimeout = setTimeout(() => {
+        this.isUserSeeking = false;
+      }, 300);
+
       this.updateProgressBarFill();
     });
 
@@ -308,6 +348,7 @@ export class SoundPlayerComponent {
   destroy() {
     if (this.unsubscribe) this.unsubscribe();
     if (this.progressInterval) clearInterval(this.progressInterval);
+    if (this.seekDebounceTimeout) clearTimeout(this.seekDebounceTimeout);
     document.removeEventListener("click", this.onDocumentClick);
   }
 }
