@@ -1,4 +1,5 @@
-import { SoundModel } from "@/models/sound.model.js";
+import { SoundModel, soundState } from "@/models/sound.model.js";
+
 import { soundService } from "@/services/sound.service.js";
 
 export class SoundPlayerComponent {
@@ -9,6 +10,7 @@ export class SoundPlayerComponent {
     this.currentTime = 0;
     this.duration = 0;
     this.progressInterval = null;
+    this.isUserSeeking = false;
   }
 
   render() {
@@ -28,7 +30,6 @@ export class SoundPlayerComponent {
     this.container.innerHTML = `
       <div class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300">
         
-        <!-- Top Track Info & Volume Action -->
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 overflow-hidden">
             <div id="player-music-icon-wrapper" class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand">
@@ -46,7 +47,6 @@ export class SoundPlayerComponent {
             </div>
           </div>
 
-          <!-- Volume Control Dropdown Trigger -->
           <div class="relative">
             <button
               type="button"
@@ -59,7 +59,6 @@ export class SoundPlayerComponent {
               </span>
             </button>
 
-            <!-- Volume Popover Slider -->
             <div
               id="volume-popover"
               class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
@@ -87,7 +86,6 @@ export class SoundPlayerComponent {
           </div>
         </div>
 
-        <!-- Audio Progress Bar & Seek -->
         <div class="flex flex-col gap-1 mt-1">
           <input
             type="range"
@@ -103,7 +101,6 @@ export class SoundPlayerComponent {
           </div>
         </div>
 
-        <!-- Player Main Playback Controls -->
         <div class="flex items-center justify-center gap-4 pt-1">
           <button
             type="button"
@@ -128,12 +125,11 @@ export class SoundPlayerComponent {
     if (!this.container) return;
 
     const currentTrack = SoundModel.getCurrentTrack();
-    const soundState = SoundModel.soundState || {};
-    const isPlaying = soundState.isPlaying;
-    const isMuted = soundState.isMuted;
-    const volume = soundState.volume ?? 50;
+    const isPlaying = soundState?.isPlaying ?? false;
+    const isMuted = soundState?.isMuted ?? false;
+    const volume = soundState?.volume ?? 50;
 
-    // 1. Track Metadata Updating
+    // 1. Track Metadata
     const titleEl = this.container.querySelector("#player-track-title");
     const creatorEl = this.container.querySelector("#player-track-creator");
     const typeEl = this.container.querySelector("#player-track-type");
@@ -152,7 +148,7 @@ export class SoundPlayerComponent {
       iconWrapper.innerHTML = `<i class="fa-solid fa-music text-lg ${isPlaying ? "animate-pulse" : ""}"></i>`;
     }
 
-    // 2. Play/Pause Button In-HTML Injection
+    // 2. Play/Pause Button
     const playSlot = this.container.querySelector("#btn-play-icon-slot");
     if (playSlot) {
       playSlot.innerHTML = isPlaying
@@ -160,14 +156,14 @@ export class SoundPlayerComponent {
         : `<i class="fa-solid fa-play ms-0.5 text-sm"></i>`;
     }
 
-    // 3. Volume Dropdown State
+    // 3. Volume Dropdown Toggle Visibility
     const volPopover = this.container.querySelector("#volume-popover");
     if (volPopover) {
       volPopover.classList.toggle("flex", this.isVolumeOpen);
       volPopover.classList.toggle("hidden", !this.isVolumeOpen);
     }
 
-    // 4. Volume Icon & Slider In-HTML Injection
+    // 4. Volume Icon & Slider UI Update
     const volSlot = this.container.querySelector("#player-volume-icon-slot");
     const popoverMuteSlot = this.container.querySelector(
       "#popover-mute-icon-slot",
@@ -204,7 +200,6 @@ export class SoundPlayerComponent {
       this.updateUI();
     });
 
-    // Volume Slider Input
     const volSlider = this.container.querySelector("#volume-slider");
     volSlider?.addEventListener("input", (e) => {
       const vol = Number(e.target.value);
@@ -216,14 +211,13 @@ export class SoundPlayerComponent {
     const muteBtn = this.container.querySelector("#btn-toggle-mute");
     muteBtn?.addEventListener("click", () => {
       SoundModel.toggleMute();
-      const soundState = SoundModel.soundState;
       soundService.setVolume(soundState.isMuted ? 0 : soundState.volume);
     });
 
     // Play/Pause Toggle
     const playBtn = this.container.querySelector("#btn-player-play-toggle");
     playBtn?.addEventListener("click", async () => {
-      if (SoundModel.soundState?.isPlaying) {
+      if (soundState?.isPlaying) {
         await soundService.pause();
       } else {
         const currentTrack = SoundModel.getCurrentTrack();
@@ -231,12 +225,20 @@ export class SoundPlayerComponent {
       }
     });
 
-    // Progress Bar Seek Event
     const progressBar = this.container.querySelector("#audio-progress-bar");
+
+    progressBar?.addEventListener("input", (e) => {
+      this.isUserSeeking = true;
+      const targetTime = Number(e.target.value);
+      const currEl = this.container?.querySelector("#player-current-time");
+      if (currEl) currEl.textContent = this.formatDuration(targetTime);
+    });
+
     progressBar?.addEventListener("change", (e) => {
       const targetTime = Number(e.target.value);
       this.currentTime = targetTime;
       soundService.seekTo(targetTime);
+      this.isUserSeeking = false;
     });
 
     // Close volume dropdown when clicking outside
@@ -253,7 +255,7 @@ export class SoundPlayerComponent {
     if (this.progressInterval) clearInterval(this.progressInterval);
 
     this.progressInterval = setInterval(() => {
-      if (SoundModel.soundState?.isPlaying) {
+      if (soundState?.isPlaying && !this.isUserSeeking) {
         const timeData = soundService.getCurrentTimeData();
         this.currentTime = timeData.currentTime || 0;
         this.duration = timeData.duration || 0;

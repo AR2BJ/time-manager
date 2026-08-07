@@ -22,9 +22,20 @@ class SoundService {
       this.audioElement = new Audio();
       this.audioElement.loop = true;
 
-      // Sync events directly to model if audio stops/ends
       this.audioElement.addEventListener("ended", () => {
         SoundModel.setPlaying(false);
+      });
+
+      this.audioElement.addEventListener("pause", () => {
+        if (this.currentTrack?.type === "audio") {
+          SoundModel.setPlaying(false);
+        }
+      });
+
+      this.audioElement.addEventListener("play", () => {
+        if (this.currentTrack?.type === "audio") {
+          SoundModel.setPlaying(true);
+        }
       });
     }
   }
@@ -74,6 +85,18 @@ class SoundService {
             this.pendingTrack = null;
           }
         },
+        onStateChange: (event) => {
+          if (window.YT && window.YT.PlayerState) {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              SoundModel.setPlaying(true);
+            } else if (
+              event.data === window.YT.PlayerState.PAUSED ||
+              event.data === window.YT.PlayerState.ENDED
+            ) {
+              SoundModel.setPlaying(false);
+            }
+          }
+        },
       },
     });
   }
@@ -94,7 +117,6 @@ class SoundService {
   async playTrack(track) {
     if (!track) return;
 
-    // Safely stop previous playback promises
     await this.stopAll();
 
     this.currentTrack = track;
@@ -110,11 +132,13 @@ class SoundService {
       this.ytPlayer.loadVideoById(track.sourceId);
       this.ytPlayer.setVolume(currentVol);
       this.ytPlayer.playVideo();
+      SoundModel.setPlaying(true);
     } else if (track.type === "aparat") {
       const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?autoplay=true`;
       if (this.aparatFrame) {
         this.aparatFrame.src = aparatUrl;
       }
+      SoundModel.setPlaying(true);
     } else if (track.type === "audio") {
       if (!this.audioElement) this._initAudioElement();
       this.audioElement.src = track.sourceId;
@@ -123,6 +147,7 @@ class SoundService {
       try {
         this.playPromise = this.audioElement.play();
         await this.playPromise;
+        SoundModel.setPlaying(true);
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("Audio playback error:", err);
@@ -131,8 +156,6 @@ class SoundService {
         this.playPromise = null;
       }
     }
-
-    SoundModel.setPlaying(true);
   }
 
   async pause() {

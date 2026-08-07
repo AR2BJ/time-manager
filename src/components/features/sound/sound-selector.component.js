@@ -36,8 +36,8 @@ export class SoundSelectorComponent {
     }));
 
     this.autocomplete = new AutocompleteComponent(this.container, items, {
-      label: "انتخاب صوت پس‌زمینه",
-      placeholder: "جستجو و انتخاب صوت...",
+      label: "Background sound",
+      placeholder: "Search and select sound....",
       itemTitle: "title",
       itemValue: "value",
       itemIcon: "icon",
