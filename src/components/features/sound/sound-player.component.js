@@ -1,4 +1,5 @@
-import { SoundModel } from "@/models/sound.model.js";
+import { SoundModel, soundState } from "@/models/sound.model.js";
+
 import { VolumeDropdownComponent } from "./volume-dropdown.component.js";
 import { soundService } from "@/services/sound.service.js";
 
@@ -25,7 +26,7 @@ export class SoundPlayerComponent {
     if (!this.container) return;
 
     const track = SoundModel.getCurrentTrack();
-    const { isPlaying } = SoundModel.soundState;
+    const { isPlaying } = soundState;
 
     this.container.innerHTML = `
       <div class="flex items-center justify-between gap-4 dir-rtl">
@@ -74,7 +75,7 @@ export class SoundPlayerComponent {
     this.container.addEventListener("click", (e) => {
       const playBtn = e.target.closest("#sound-play-toggle-btn");
       if (playBtn) {
-        const { isPlaying } = SoundModel.soundState;
+        const { isPlaying } = soundState;
         if (isPlaying) {
           soundService.pause();
         } else {

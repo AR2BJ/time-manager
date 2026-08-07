@@ -36,28 +36,32 @@ export class TimerView {
         class="w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          <!-- Left Column: Soundscape Player Sub-system -->
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
-            <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-4">
-              <div class="flex items-center justify-between pb-3 border-b border-border">
-                <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
+            <div
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-4"
+            >
+              <div
+                class="flex items-center justify-between pb-3 border-b border-border"
+              >
+                <span
+                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
+                >
                   <i class="fa-regular fa-headphones text-brand"></i>
                   Soundscape Player
                 </span>
               </div>
 
-              <!-- Sound Slots -->
               <div id="sound-selector-slot"></div>
               <div id="sound-player-slot"></div>
             </div>
           </div>
 
-          <!-- Center Column: Main Timer Visualizer Engine -->
-          <div class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2">
-            
-            <!-- Mode Switcher -->
-            <div class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner">
+          <div
+            class="lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2"
+          >
+            <div
+              class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner"
+            >
               <div
                 id="mode-indicator"
                 class="absolute rounded-lg bg-brand/80 transition-all duration-300 ease-in-out"
@@ -82,8 +86,9 @@ export class TimerView {
               </button>
             </div>
 
-            <!-- Timer SVG Ring & Canvas Container -->
-            <div class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110">
+            <div
+              class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110"
+            >
               <svg
                 id="timer-svg-container"
                 class="w-full h-full transform -rotate-90 origin-center relative z-0"
@@ -118,7 +123,9 @@ export class TimerView {
                 class="absolute inset-0 w-full h-full pointer-events-none z-10 transition-opacity duration-300 opacity-0"
               ></canvas>
 
-              <div class="absolute flex flex-col items-center justify-center text-center pointer-events-none select-none z-20">
+              <div
+                class="absolute flex flex-col items-center justify-center text-center pointer-events-none select-none z-20"
+              >
                 <span
                   id="timer-phase-badge"
                   class="mb-3 rounded-full bg-brand/10 px-4 py-1 text-xs font-bold text-brand uppercase tracking-widest border border-brand/20"
@@ -142,7 +149,6 @@ export class TimerView {
               </div>
             </div>
 
-            <!-- Action Controls Container -->
             <div
               id="timer-controls-container"
               class="mt-6 flex items-center gap-4 w-full justify-center min-h-14"
@@ -154,7 +160,7 @@ export class TimerView {
               >
                 Start
               </button>
-              
+
               <button
                 type="button"
                 id="timer-reset-btn"
@@ -165,12 +171,10 @@ export class TimerView {
             </div>
           </div>
 
-          <!-- Right Column: Sidebar Widgets -->
           <div class="lg:col-span-3 flex flex-col gap-6 order-3">
             <div id="active-task-container"></div>
             <div id="today-overview-container"></div>
           </div>
-
         </div>
       </section>
     `;
@@ -192,7 +196,8 @@ export class TimerView {
   update() {
     if (!this.container) return;
 
-    const state = StateManager.init();
+    // Use getState() to avoid side-effects and re-initializations
+    const state = StateManager.getState();
     const { activeMode, timer } = state;
 
     const isPomodoro = activeMode === "pomodoro";
@@ -203,11 +208,6 @@ export class TimerView {
     const timerDisplayEl = this.container.querySelector("#timer-display");
     if (timerDisplayEl) {
       timerDisplayEl.textContent = displayTime;
-    }
-
-    const startBtn = this.container.querySelector("#timer-start-toggle-btn");
-    if (startBtn) {
-      startBtn.textContent = timer.isRunning ? "Pause" : "Start";
     }
 
     const progressRing = this.container.querySelector("#timer-progress-ring");
@@ -234,19 +234,6 @@ export class TimerView {
       if (modeBtn) {
         const mode = modeBtn.dataset.mode;
         StateManager.setMode(mode);
-        return;
-      }
-
-      const startBtn = e.target.closest("#timer-start-toggle-btn");
-      if (startBtn) {
-        const { timer } = StateManager.init();
-        StateManager.updateTimerState({ isRunning: !timer.isRunning });
-        return;
-      }
-
-      const resetBtn = e.target.closest("#timer-reset-btn");
-      if (resetBtn) {
-        StateManager.resetTimer();
         return;
       }
     });

@@ -1,4 +1,5 @@
-import { SoundModel } from "@/models/sound.model.js";
+import { SoundModel, soundState } from "@/models/sound.model.js";
+
 import { soundService } from "@/services/sound.service.js";
 
 export class VolumeDropdownComponent {
@@ -22,7 +23,7 @@ export class VolumeDropdownComponent {
   update() {
     if (!this.container) return;
 
-    const { volume, isMuted } = SoundModel.soundState;
+    const { volume, isMuted } = soundState;
 
     let iconSvg = "";
     let buttonColorClass = "text-slate-400 hover:text-slate-200";

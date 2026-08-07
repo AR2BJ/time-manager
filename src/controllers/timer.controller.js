@@ -17,6 +17,7 @@ export const TimerController = {
   animationFrameId: null,
   flowStartTimestamp: null,
   accumulatedFlowTime: 0,
+  timerViewInstance: null,
 
   init() {
     StateManager.init();
@@ -35,30 +36,28 @@ export const TimerController = {
 
     this.refreshUI();
 
-    StateManager.subscribe((state) => {
-      if (state.timer.isRunning && !this.timerInterval) {
-        this.startTick();
-      } else if (!state.timer.isRunning && this.timerInterval) {
-        this.stopTick();
-      }
-
+    StateManager.subscribe(() => {
       this.refreshUI();
     });
   },
 
   renderComponents() {
-    const renderMap = {
+    // 1. Instantiate & Render Class-based Stateful Views
+    if (!this.timerViewInstance) {
+      this.timerViewInstance = new TimerView();
+    }
+    this.timerViewInstance.render();
+
+    // 2. Render Functional Static Template Components (Returning Strings)
+    const staticRenderMap = {
       "header-container": HeaderComponent.render,
       "desktop-nav-container": DesktopNavComponent.render,
       "mobile-nav-container": MobileNavComponent.render,
-      "timer-view-container": TimerView.render,
-      "active-task-container": ActiveTaskCardComponent.render,
-      "today-overview-container": TodayOverviewComponent.render,
       "analytics-view-container": AnalyticsView.render,
       "settings-view-container": SettingsViewComponent.render,
     };
 
-    Object.entries(renderMap).forEach(([id, renderFn]) => {
+    Object.entries(staticRenderMap).forEach(([id, renderFn]) => {
       const container = document.getElementById(id);
       if (container && typeof renderFn === "function") {
         container.innerHTML = renderFn();
@@ -99,10 +98,17 @@ export const TimerController = {
       }
     });
 
-    btnPomodoro?.addEventListener("click", () =>
-      this.handleModeSwitch("pomodoro"),
-    );
-    btnFlow?.addEventListener("click", () => this.handleModeSwitch("flow"));
+    btnPomodoro?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.handleModeSwitch("pomodoro");
+    });
+
+    btnFlow?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.handleModeSwitch("flow");
+    });
   },
 
   startFlowAnimation() {
@@ -579,6 +585,8 @@ export const TimerController = {
     this.renderTaskWidgets();
   },
 
+  // src/controllers/timer.controller.js
+
   handleModeSwitch(targetMode) {
     if (state.activeMode === targetMode) return;
 
@@ -588,9 +596,11 @@ export const TimerController = {
         message: `Timer is currently active. Are you sure you want to stop it and switch to ${targetMode.toUpperCase()} mode?`,
         onConfirm: () => {
           timerService.stopAndTransition();
+          this.flowStartTimestamp = null;
+          this.accumulatedFlowTime = 0;
+
           StateManager.setMode(targetMode);
           StateManager.resetTimer();
-          this.updateModeStyles(targetMode);
           this.refreshUI();
         },
       });
@@ -599,7 +609,6 @@ export const TimerController = {
 
     StateManager.setMode(targetMode);
     StateManager.resetTimer();
-    this.updateModeStyles(targetMode);
     this.refreshUI();
   },
 

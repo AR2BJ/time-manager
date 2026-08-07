@@ -1,5 +1,6 @@
 import { StateManager, state } from "@/models/state.model.js";
 
+import { SoundModel } from "@/models/sound.model.js";
 import { soundService } from "./sound.service.js";
 
 class TimerService {
@@ -35,10 +36,10 @@ class TimerService {
    */
   pause() {
     clearInterval(this.timerInterval);
-    StateManager.updateTimerState({ isPaused: true });
+    StateManager.updateTimerState({ isRunning: false, isPaused: true });
 
     soundService.pause();
-    StateManager.setSoundPlaying(false);
+    SoundModel.setPlaying(false);
   }
 
   /**
@@ -72,7 +73,7 @@ class TimerService {
     }
 
     soundService.pause();
-    StateManager.setSoundPlaying(false);
+    SoundModel.setPlaying(false);
   }
 
   /**

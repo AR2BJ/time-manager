@@ -29,9 +29,12 @@ export const state = {
 };
 
 const listeners = new Set();
+let isInitialized = false;
 
 export const StateManager = {
   init() {
+    if (isInitialized) return state;
+
     const saved = loadFromStorage();
     if (saved) {
       state.activeMode = saved.activeMode || "pomodoro";
@@ -54,7 +57,12 @@ export const StateManager = {
       state.activeTaskId = firstTask.id;
     }
 
-    this.notify();
+    isInitialized = true;
+    return state;
+  },
+
+  // Safe State Getter method without triggering notifications
+  getState() {
     return state;
   },
 

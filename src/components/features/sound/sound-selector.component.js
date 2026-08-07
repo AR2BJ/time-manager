@@ -1,6 +1,6 @@
-// src/components/features/sound/sound-selector.component.js
-import { SoundModel } from "../../../models/sound.model.js";
-import { soundService } from "../../../services/sound.service.js";
+import { SoundModel, soundState } from "@/models/sound.model.js";
+
+import { soundService } from "@/services/sound.service.js";
 
 export class SoundSelectorComponent {
   constructor() {
@@ -13,15 +13,31 @@ export class SoundSelectorComponent {
     this.container.className = "w-full relative dir-rtl";
 
     this.update();
-    this.unsubscribe = SoundModel.subscribe(() => this.update());
+
+    if (typeof SoundModel.subscribe === "function") {
+      this.unsubscribe = SoundModel.subscribe(() => this.update());
+    }
+
     return this.container;
   }
 
   update() {
     if (!this.container) return;
 
-    const currentTrack = SoundModel.getCurrentTrack();
-    const trackList = SoundModel.soundState.trackList;
+    // Defensive State Retrieval & Encapsulation API Check
+    const currentTrack =
+      typeof SoundModel.getCurrentTrack === "function"
+        ? SoundModel.getCurrentTrack()
+        : null;
+
+    // Access trackList safely via Model API or optional chaining fallback
+    const trackList =
+      SoundModel.getTrackList?.() ||
+      SoundModel.soundState?.trackList ||
+      SoundModel.state?.trackList ||
+      [];
+
+    const currentTrackId = currentTrack?.id || "";
 
     this.container.innerHTML = `
       <div class="flex flex-col gap-1.5">
@@ -30,15 +46,19 @@ export class SoundSelectorComponent {
           id="sound-select-input"
           class="w-full bg-slate-800/80 border border-slate-700/70 text-slate-100 text-sm rounded-xl p-3 focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
         >
-          ${trackList
-            .map(
-              (track) => `
-            <option value="${track.id}" ${track.id === currentTrack.id ? "selected" : ""}>
-              ${track.title} — ${track.creator} (${track.duration}) [${track.type.toUpperCase()}]
-            </option>
-          `,
-            )
-            .join("")}
+          ${
+            trackList.length > 0
+              ? trackList
+                  .map(
+                    (track) => `
+                <option value="${track.id}" ${track.id === currentTrackId ? "selected" : ""}>
+                  ${track.title} — ${track.creator} (${track.duration}) [${track.type ? track.type.toUpperCase() : "AUDIO"}]
+                </option>
+              `,
+                  )
+                  .join("")
+              : `<option value="" disabled selected>No tracks available</option>`
+          }
         </select>
       </div>
     `;
@@ -48,24 +68,31 @@ export class SoundSelectorComponent {
 
   bindEvents() {
     const selectEl = this.container.querySelector("#sound-select-input");
-    if (selectEl) {
-      selectEl.addEventListener("change", (e) => {
-        const selectedId = e.target.value;
-        const track = SoundModel.soundState.trackList.find(
-          (t) => t.id === selectedId,
-        );
+    if (!selectEl) return;
 
-        if (track) {
+    selectEl.addEventListener("change", (e) => {
+      const selectedId = e.target.value;
+      const trackList =
+        SoundModel.getTrackList?.() || SoundModel.soundState?.trackList || [];
+
+      const track = trackList.find((t) => t.id === selectedId);
+
+      if (track) {
+        if (typeof SoundModel.setSoundTrack === "function") {
           SoundModel.setSoundTrack(selectedId);
-          if (SoundModel.soundState.isPlaying) {
-            soundService.playTrack(track);
-          }
         }
-      });
-    }
+
+        const isPlaying = soundState.isPlaying
+        if (isPlaying && soundService?.playTrack) {
+          soundService.playTrack(track);
+        }
+      }
+    });
   }
 
   destroy() {
-    if (this.unsubscribe) this.unsubscribe();
+    if (typeof this.unsubscribe === "function") {
+      this.unsubscribe();
+    }
   }
 }
