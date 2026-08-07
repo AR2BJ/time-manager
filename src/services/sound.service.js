@@ -2,15 +2,14 @@ import { SoundModel } from "@/models/sound.model.js";
 
 class SoundService {
   constructor() {
-    this.aparatFrame = null;
     this.audioElement = null;
     this.currentTrack = null;
     this.playPromise = null;
+    this.aparatUrlCache = new Map();
   }
 
   init() {
     this._initAudioElement();
-    this._initAparatContainer();
   }
 
   _initAudioElement() {
@@ -23,80 +22,92 @@ class SoundService {
       });
 
       this.audioElement.addEventListener("pause", () => {
-        if (this.currentTrack?.type === "audio") {
-          SoundModel.setPlaying(false);
-        }
+        SoundModel.setPlaying(false);
       });
 
       this.audioElement.addEventListener("play", () => {
-        if (this.currentTrack?.type === "audio") {
-          SoundModel.setPlaying(true);
-        }
+        SoundModel.setPlaying(true);
+      });
+
+      this.audioElement.addEventListener("error", (e) => {
+        console.error("Audio playback error:", e);
+        SoundModel.setPlaying(false);
       });
     }
   }
 
-  _initAparatContainer() {
-    let iframe = document.getElementById("aparat-sound-player-frame");
-    if (!iframe) {
-      iframe = document.createElement("iframe");
-      iframe.id = "aparat-sound-player-frame";
-      iframe.className =
-        "absolute -top-[9999px] -left-[9999px] w-1 h-1 opacity-0 pointer-events-none";
-      iframe.setAttribute("allow", "autoplay");
-      document.body.appendChild(iframe);
+  async _getAparatDirectUrl(hash) {
+    if (this.aparatUrlCache.has(hash)) {
+      return this.aparatUrlCache.get(hash);
     }
-    this.aparatFrame = iframe;
+
+    try {
+      const response = await fetch(
+        `/aparat-api/api/fa/v1/video/video/show/videohash/${hash}`,
+      );
+      if (!response.ok)
+        throw new Error("Failed to fetch Aparat video metadata");
+
+      const data = await response.json();
+      const fileLinks = data?.data?.attributes?.file_link_all;
+
+      if (!fileLinks || !Array.isArray(fileLinks) || fileLinks.length === 0) {
+        throw new Error("No media links found in Aparat response");
+      }
+
+      const directUrl = fileLinks[0]?.urls?.[0];
+
+      if (!directUrl) throw new Error("Direct stream URL is invalid");
+
+      this.aparatUrlCache.set(hash, directUrl);
+      return directUrl;
+    } catch (err) {
+      console.error("Aparat URL Extraction Error:", err);
+      return null;
+    }
   }
 
   async playTrack(track) {
     if (!track) return;
 
+    this._initAudioElement();
     const isSameTrack = this.currentTrack?.id === track.id;
     const currentVol = SoundModel.getEffectiveVolume();
 
+    let mediaSourceUrl = track.sourceId;
+
     if (track.type === "aparat") {
-      if (!isSameTrack) {
-        await this.stopAll();
-        this.currentTrack = track;
-        const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?titleShow=false&autoplay=true`;
-        if (this.aparatFrame) {
-          this.aparatFrame.src = aparatUrl;
-        }
+      const directUrl = await this._getAparatDirectUrl(track.sourceId);
+      if (!directUrl) {
+        console.error("Could not resolve Aparat direct audio stream.");
+        return;
       }
+      mediaSourceUrl = directUrl;
+    }
+
+    if (!isSameTrack || this.audioElement.src !== mediaSourceUrl) {
+      await this.stopAll();
+      this.currentTrack = track;
+      this.audioElement.src = mediaSourceUrl;
+    }
+
+    this.audioElement.volume = currentVol / 100;
+
+    try {
+      this.playPromise = this.audioElement.play();
+      await this.playPromise;
       SoundModel.setPlaying(true);
-    } else if (track.type === "audio") {
-      if (!this.audioElement) this._initAudioElement();
-
-      // Only re-set src and reset position if switching to a new track
-      if (!isSameTrack || !this.audioElement.src) {
-        await this.stopAll();
-        this.currentTrack = track;
-        this.audioElement.src = track.sourceId;
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Playback execution failed:", err);
       }
-
-      this.audioElement.volume = currentVol / 100;
-
-      try {
-        this.playPromise = this.audioElement.play();
-        await this.playPromise;
-        SoundModel.setPlaying(true);
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Audio playback error:", err);
-        }
-      } finally {
-        this.playPromise = null;
-      }
+    } finally {
+      this.playPromise = null;
     }
   }
 
   async pause() {
-    if (!this.currentTrack) return;
-
-    if (this.currentTrack.type === "aparat") {
-      if (this.aparatFrame) this.aparatFrame.src = "";
-    } else if (this.currentTrack.type === "audio" && this.audioElement) {
+    if (this.audioElement) {
       if (this.playPromise) {
         try {
           await this.playPromise;
@@ -104,14 +115,10 @@ class SoundService {
       }
       this.audioElement.pause();
     }
-
     SoundModel.setPlaying(false);
   }
 
   async stopAll() {
-    if (this.aparatFrame) {
-      this.aparatFrame.src = "";
-    }
     if (this.audioElement) {
       if (this.playPromise) {
         try {
@@ -126,14 +133,13 @@ class SoundService {
 
   setVolume() {
     const effectiveVol = SoundModel.getEffectiveVolume();
-
     if (this.audioElement) {
       this.audioElement.volume = effectiveVol / 100;
     }
   }
 
   getCurrentTimeData() {
-    if (this.currentTrack?.type === "audio" && this.audioElement) {
+    if (this.audioElement) {
       return {
         currentTime: this.audioElement.currentTime || 0,
         duration: this.audioElement.duration || 0,

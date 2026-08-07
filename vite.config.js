@@ -11,4 +11,13 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  server: {
+    proxy: {
+      "/aparat-api": {
+        target: "https://www.aparat.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/aparat-api/, ""),
+      },
+    },
+  },
 });

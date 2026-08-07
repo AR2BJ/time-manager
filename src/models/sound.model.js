@@ -4,8 +4,9 @@ const defaultTrackList = DEFAULT_TRACK_LIST;
 
 export const soundState = {
   isPlaying: false,
+  isLoading: false,
   isMuted: false,
-  currentSoundId: "rain-stream",
+  currentSoundId: "track-1",
   volume: 50,
   previousVolume: 50,
   trackList: [...defaultTrackList],
@@ -16,6 +17,7 @@ const listeners = new Set();
 export const SoundModel = {
   init(savedSettings = {}) {
     soundState.isPlaying = false;
+    soundState.isLoading = false;
     soundState.isMuted = false;
 
     soundState.volume =
@@ -64,6 +66,11 @@ export const SoundModel = {
 
   setPlaying(isPlaying) {
     soundState.isPlaying = Boolean(isPlaying);
+    this.notify();
+  },
+
+  setLoading(isLoading) {
+    soundState.isLoading = Boolean(isLoading);
     this.notify();
   },
 
