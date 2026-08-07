@@ -71,7 +71,18 @@ class SoundService {
         throw new Error("No media links found in Aparat response");
       }
 
-      const streamUrl = fileLinks[0]?.urls?.[0];
+      const selectedFileLink =
+        fileLinks.find(
+          (link) =>
+            String(link?.profile ?? "")
+              .trim()
+              .toLowerCase() === "720p",
+        ) ?? fileLinks[fileLinks.length - 1];
+
+      console.log(selectedFileLink?.profile);
+
+      const streamUrl = selectedFileLink?.urls?.[0];
+
       const coverUrl =
         attributes?.big_poster || attributes?.small_poster || null;
 
