@@ -477,10 +477,7 @@ export const TimerController = {
       StateManager.setSoundTrack(soundId);
 
       const trackNames = {
-        "rain-forest": "Rain & Forest Stream",
-        "brown-noise": "Pure Brown Noise",
-        fireplace: "Fireplace Crackle",
-        cafe: "Cozy Cafe Ambience",
+        "track-1": "",
       };
 
       const titleEl = document.getElementById("sound-track-title");
@@ -497,9 +494,7 @@ export const TimerController = {
         soundService.pause();
         StateManager.setSoundPlaying(false);
       } else {
-        soundService.playTrack(
-          state.soundPlayer.currentSoundId || "rain-forest",
-        );
+        soundService.playTrack(state.soundPlayer.currentSoundId || "track-1");
         StateManager.setSoundPlaying(true);
       }
       this.updateAudioUI();

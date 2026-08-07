@@ -33,7 +33,7 @@ export class TimerView {
     this.container.innerHTML = `
       <section
         id="timer-view"
-        class="w-full max-w-375 mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
+        class="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">

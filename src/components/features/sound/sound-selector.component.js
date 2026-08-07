@@ -7,7 +7,7 @@ export class SoundSelectorComponent {
     this.container = null;
     this.autocomplete = null;
     this.unsubscribe = null;
-    this.isInitialMount = true; // Guard flag to prevent autoplay on initialization
+    this.isInitialMount = true;
   }
 
   render() {
@@ -46,20 +46,21 @@ export class SoundSelectorComponent {
       onChange: async (val) => {
         if (!val) return;
 
-        // Prevent trigger on programmatic initial value assignment
         if (this.isInitialMount) {
           return;
         }
 
         const selectedId = Array.isArray(val) ? val[0] : val;
 
-        // 1. Update track state in model
         SoundModel.setSoundTrack(selectedId);
         const updatedTrack = SoundModel.getCurrentTrack();
 
-        // 2. Play immediately on explicit user selection
         if (updatedTrack) {
-          await soundService.playTrack(updatedTrack);
+          await soundService.fetchCoverOnly(updatedTrack);
+
+          if (SoundModel.getState().isPlaying) {
+            await soundService.playTrack(updatedTrack);
+          }
         }
       },
     });
@@ -68,7 +69,6 @@ export class SoundSelectorComponent {
       this.autocomplete.setValue(currentTrack.id);
     }
 
-    // Unblock the guard flag after initialization completes
     setTimeout(() => {
       this.isInitialMount = false;
     }, 0);

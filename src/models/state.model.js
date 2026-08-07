@@ -169,7 +169,7 @@ export const StateManager = {
       timer: state.timer,
       settings: {
         ...state.settings,
-        lastSelectedSoundId: soundData ? soundData.id : "rain-forest",
+        lastSelectedSoundId: soundData ? soundData.id : "track-1",
       },
     });
   },

@@ -153,11 +153,22 @@ export class SoundPlayerComponent {
 
     if (currentTrack?.coverUrl) {
       if (coverImg) {
+        coverImg.classList.add(
+          "transition-opacity",
+          "duration-500",
+          "opacity-0",
+        );
         coverImg.src = currentTrack.coverUrl;
+
         coverImg.onload = () => {
           coverImg.classList.remove("hidden");
+          requestAnimationFrame(() => {
+            coverImg.classList.remove("opacity-0");
+            coverImg.classList.add("opacity-100");
+          });
           coverFallback?.classList.add("hidden");
         };
+
         coverImg.onerror = () => {
           coverImg.classList.add("hidden");
           coverFallback?.classList.remove("hidden");

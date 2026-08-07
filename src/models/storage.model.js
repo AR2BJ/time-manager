@@ -68,7 +68,7 @@ function migrateData(data) {
       autoStartBreaks: Boolean(settings.autoStartBreaks),
       autoStartPomodoros: Boolean(settings.autoStartPomodoros),
       notificationSound: settings.notificationSound !== false,
-      lastSelectedSoundId: settings.lastSelectedSoundId || "rain-forest",
+      lastSelectedSoundId: settings.lastSelectedSoundId || "track-1",
       volume: Number(settings.volume) ?? 50,
       isMuted: Boolean(settings.isMuted),
     },

@@ -10,6 +10,11 @@ class SoundService {
 
   init() {
     this._initAudioElement();
+
+    const currentTrack = SoundModel.getCurrentTrack();
+    if (currentTrack) {
+      this.fetchCoverOnly(currentTrack);
+    }
   }
 
   _initAudioElement() {
@@ -67,7 +72,6 @@ class SoundService {
       }
 
       const streamUrl = fileLinks[0]?.urls?.[0];
-
       const coverUrl =
         attributes?.big_poster || attributes?.small_poster || null;
 
@@ -79,6 +83,16 @@ class SoundService {
     } catch (err) {
       console.error("Aparat Metadata Extraction Error:", err);
       return null;
+    }
+  }
+
+  async fetchCoverOnly(track) {
+    if (!track || track.coverUrl || track.type !== "aparat") return;
+
+    const metaData = await this._getAparatMetaData(track.sourceId);
+    if (metaData?.coverUrl) {
+      track.coverUrl = metaData.coverUrl;
+      SoundModel.notify();
     }
   }
 
