@@ -7,6 +7,7 @@ export class SoundSelectorComponent {
     this.container = null;
     this.autocomplete = null;
     this.unsubscribe = null;
+    this.isInitialMount = true; // Guard flag to prevent autoplay on initialization
   }
 
   render() {
@@ -23,8 +24,7 @@ export class SoundSelectorComponent {
   }
 
   mountAutocomplete() {
-    const trackList =
-      SoundModel.getTrackList?.() || SoundModel.soundState?.trackList || [];
+    const trackList = SoundModel.getTrackList();
     const currentTrack = SoundModel.getCurrentTrack();
 
     const items = trackList.map((track) => ({
@@ -43,15 +43,23 @@ export class SoundSelectorComponent {
       itemIcon: "icon",
       clearable: false,
       isRow: false,
-      onChange: (val) => {
+      onChange: async (val) => {
         if (!val) return;
+
+        // Prevent trigger on programmatic initial value assignment
+        if (this.isInitialMount) {
+          return;
+        }
+
         const selectedId = Array.isArray(val) ? val[0] : val;
 
+        // 1. Update track state in model
         SoundModel.setSoundTrack(selectedId);
         const updatedTrack = SoundModel.getCurrentTrack();
 
-        if (SoundModel.soundState?.isPlaying) {
-          soundService.playTrack(updatedTrack);
+        // 2. Play immediately on explicit user selection
+        if (updatedTrack) {
+          await soundService.playTrack(updatedTrack);
         }
       },
     });
@@ -59,6 +67,11 @@ export class SoundSelectorComponent {
     if (currentTrack?.id) {
       this.autocomplete.setValue(currentTrack.id);
     }
+
+    // Unblock the guard flag after initialization completes
+    setTimeout(() => {
+      this.isInitialMount = false;
+    }, 0);
   }
 
   syncSelectedTrack() {

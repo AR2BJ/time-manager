@@ -1,5 +1,4 @@
-import { SoundModel, soundState } from "@/models/sound.model.js";
-
+import { SoundModel } from "@/models/sound.model.js";
 import { soundService } from "@/services/sound.service.js";
 
 export class SoundPlayerComponent {
@@ -55,7 +54,7 @@ export class SoundPlayerComponent {
               title="Volume Control"
             >
               <span id="player-volume-icon-slot" class="pointer-events-none flex items-center justify-center">
-                <i class="fa-regular fa-volume-high"></i>
+                <i class="fa-solid fa-volume-high"></i>
               </span>
             </button>
 
@@ -79,7 +78,7 @@ export class SoundPlayerComponent {
                 title="Toggle Mute"
               >
                 <span id="popover-mute-icon-slot" class="flex items-center justify-center">
-                  <i class="fa-regular fa-volume-high"></i>
+                  <i class="fa-solid fa-volume-high"></i>
                 </span>
               </button>
             </div>
@@ -124,12 +123,13 @@ export class SoundPlayerComponent {
   updateUI() {
     if (!this.container) return;
 
+    const state = SoundModel.getState();
     const currentTrack = SoundModel.getCurrentTrack();
-    const isPlaying = soundState?.isPlaying ?? false;
-    const isMuted = soundState?.isMuted ?? false;
-    const volume = soundState?.volume ?? 50;
+    const isPlaying = state.isPlaying;
+    const isMuted = state.isMuted;
+    const volume = state.volume;
 
-    // 1. Track Metadata
+    // 1. Metadata
     const titleEl = this.container.querySelector("#player-track-title");
     const creatorEl = this.container.querySelector("#player-track-creator");
     const typeEl = this.container.querySelector("#player-track-type");
@@ -145,7 +145,9 @@ export class SoundPlayerComponent {
       typeEl.textContent = (currentTrack?.type || "Audio").toUpperCase();
 
     if (iconWrapper) {
-      iconWrapper.innerHTML = `<i class="fa-solid fa-music text-lg ${isPlaying ? "animate-pulse" : ""}"></i>`;
+      iconWrapper.innerHTML = `<i class="fa-solid fa-music text-lg ${
+        isPlaying ? "animate-pulse" : ""
+      }"></i>`;
     }
 
     // 2. Play/Pause Button
@@ -156,14 +158,14 @@ export class SoundPlayerComponent {
         : `<i class="fa-solid fa-play ms-0.5 text-sm"></i>`;
     }
 
-    // 3. Volume Dropdown Toggle Visibility
+    // 3. Volume Popover Visibility
     const volPopover = this.container.querySelector("#volume-popover");
     if (volPopover) {
       volPopover.classList.toggle("flex", this.isVolumeOpen);
       volPopover.classList.toggle("hidden", !this.isVolumeOpen);
     }
 
-    // 4. Volume Icon & Slider UI Update
+    // 4. Volume Icons & Controls Sync
     const volSlot = this.container.querySelector("#player-volume-icon-slot");
     const popoverMuteSlot = this.container.querySelector(
       "#popover-mute-icon-slot",
@@ -171,18 +173,18 @@ export class SoundPlayerComponent {
     const volSlider = this.container.querySelector("#volume-slider");
     const volText = this.container.querySelector("#volume-text-val");
 
-    let volumeIconHtml = `<i class="fa-regular fa-volume-high"></i>`;
+    let volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
     if (isMuted || volume === 0) {
-      volumeIconHtml = `<i class="fa-regular fa-volume-xmark text-rose-500"></i>`;
+      volumeIconHtml = `<i class="fa-solid fa-volume-xmark text-rose-500"></i>`;
     } else if (volume < 50) {
-      volumeIconHtml = `<i class="fa-regular fa-volume-low"></i>`;
+      volumeIconHtml = `<i class="fa-solid fa-volume-low"></i>`;
     }
 
     if (volSlot) volSlot.innerHTML = volumeIconHtml;
     if (popoverMuteSlot) {
       popoverMuteSlot.innerHTML = isMuted
-        ? `<i class="fa-regular fa-volume-xmark text-rose-500"></i>`
-        : `<i class="fa-regular fa-volume-high"></i>`;
+        ? `<i class="fa-solid fa-volume-xmark text-rose-500"></i>`
+        : `<i class="fa-solid fa-volume-high"></i>`;
     }
 
     if (volSlider) volSlider.value = isMuted ? 0 : volume;
@@ -204,20 +206,21 @@ export class SoundPlayerComponent {
     volSlider?.addEventListener("input", (e) => {
       const vol = Number(e.target.value);
       SoundModel.setVolume(vol);
-      soundService.setVolume(vol);
+      soundService.setVolume();
     });
 
     // Mute Toggle Button
     const muteBtn = this.container.querySelector("#btn-toggle-mute");
     muteBtn?.addEventListener("click", () => {
       SoundModel.toggleMute();
-      soundService.setVolume(soundState.isMuted ? 0 : soundState.volume);
+      soundService.setVolume();
     });
 
     // Play/Pause Toggle
     const playBtn = this.container.querySelector("#btn-player-play-toggle");
     playBtn?.addEventListener("click", async () => {
-      if (soundState?.isPlaying) {
+      const state = SoundModel.getState();
+      if (state.isPlaying) {
         await soundService.pause();
       } else {
         const currentTrack = SoundModel.getCurrentTrack();
@@ -255,7 +258,8 @@ export class SoundPlayerComponent {
     if (this.progressInterval) clearInterval(this.progressInterval);
 
     this.progressInterval = setInterval(() => {
-      if (soundState?.isPlaying && !this.isUserSeeking) {
+      const state = SoundModel.getState();
+      if (state.isPlaying && !this.isUserSeeking) {
         const timeData = soundService.getCurrentTimeData();
         this.currentTime = timeData.currentTime || 0;
         this.duration = timeData.duration || 0;

@@ -41,16 +41,24 @@ const listeners = new Set();
 
 export const SoundModel = {
   init(savedSettings = {}) {
+    soundState.isPlaying = false;
+    soundState.isMuted = false;
+
+    soundState.volume =
+      typeof savedSettings.volume === "number" && savedSettings.volume > 0
+        ? savedSettings.volume
+        : 50;
+    soundState.previousVolume = soundState.volume;
+
     if (savedSettings.lastSelectedSoundId) {
       soundState.currentSoundId = savedSettings.lastSelectedSoundId;
     }
-    if (typeof savedSettings.volume === "number") {
-      soundState.volume = savedSettings.volume;
-      soundState.previousVolume = savedSettings.volume;
-    }
-    if (typeof savedSettings.isMuted === "boolean") {
-      soundState.isMuted = savedSettings.isMuted;
-    }
+
+    this.notify();
+    return soundState;
+  },
+
+  getState() {
     return soundState;
   },
 
@@ -74,6 +82,10 @@ export const SoundModel = {
 
   getTrackList() {
     return soundState.trackList;
+  },
+
+  getEffectiveVolume() {
+    return soundState.isMuted ? 0 : soundState.volume;
   },
 
   setPlaying(isPlaying) {
@@ -103,9 +115,9 @@ export const SoundModel = {
       soundState.isMuted = false;
       soundState.volume = soundState.previousVolume || 50;
     } else {
-      soundState.previousVolume = soundState.volume;
+      soundState.previousVolume =
+        soundState.volume > 0 ? soundState.volume : 50;
       soundState.isMuted = true;
-      soundState.volume = 0;
     }
     this.notify();
   },

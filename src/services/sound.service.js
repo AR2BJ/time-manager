@@ -120,9 +120,7 @@ class SoundService {
     await this.stopAll();
 
     this.currentTrack = track;
-    const currentVol = SoundModel.soundState?.isMuted
-      ? 0
-      : (SoundModel.soundState?.volume ?? 50);
+    const currentVol = SoundModel.getEffectiveVolume();
 
     if (track.type === "youtube") {
       if (!this.isYtReady) {
@@ -200,14 +198,14 @@ class SoundService {
     SoundModel.setPlaying(false);
   }
 
-  setVolume(volume) {
-    const normalizedVol = Math.max(0, Math.min(100, Number(volume)));
+  setVolume() {
+    const effectiveVol = SoundModel.getEffectiveVolume();
 
     if (this.isYtReady && this.ytPlayer?.setVolume) {
-      this.ytPlayer.setVolume(normalizedVol);
+      this.ytPlayer.setVolume(effectiveVol);
     }
     if (this.audioElement) {
-      this.audioElement.volume = normalizedVol / 100;
+      this.audioElement.volume = effectiveVol / 100;
     }
   }
 
