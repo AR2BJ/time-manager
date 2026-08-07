@@ -7,6 +7,7 @@ export class VolumeDropdownComponent {
     this.container = null;
     this.isOpen = false;
     this.unsubscribe = null;
+    this.onOutsideClick = this.onOutsideClick.bind(this);
   }
 
   render() {
@@ -16,14 +17,18 @@ export class VolumeDropdownComponent {
     this.update();
     this.bindEvents();
 
-    this.unsubscribe = SoundModel.subscribe(() => this.update());
+    if (typeof SoundModel.subscribe === "function") {
+      this.unsubscribe = SoundModel.subscribe(() => this.update());
+    }
+
     return this.container;
   }
 
   update() {
     if (!this.container) return;
 
-    const { volume, isMuted } = soundState;
+    const volume = soundState?.volume ?? 50;
+    const isMuted = soundState?.isMuted ?? false;
 
     let iconSvg = "";
     let buttonColorClass = "text-slate-400 hover:text-slate-200";
@@ -54,7 +59,7 @@ export class VolumeDropdownComponent {
       <button 
         type="button" 
         id="vol-toggle-btn"
-        class="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 transition-colors duration-200 ${buttonColorClass} focus:outline-none"
+        class="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 transition-colors duration-200 ${buttonColorClass} focus:outline-none cursor-pointer"
         title="${isMuted ? "Sound is muted" : `Volume: ${volume}%`}"
       >
         ${iconSvg}
@@ -62,7 +67,7 @@ export class VolumeDropdownComponent {
 
       <div 
         id="vol-dropdown-panel"
-        class="absolute bottom-full left-0 mb-2 w-36 p-3 bg-slate-900/95 border border-slate-700/80 rounded-xl shadow-xl backdrop-blur-md transition-all duration-200 transform origin-bottom-left ${
+        class="absolute bottom-full left-0 mb-2 w-36 p-3 bg-slate-900/95 border border-slate-700/80 rounded-xl shadow-xl backdrop-blur-md transition-all duration-200 transform origin-bottom-left z-50 ${
           this.isOpen
             ? "opacity-100 scale-100 pointer-events-auto"
             : "opacity-0 scale-95 pointer-events-none"
@@ -86,7 +91,7 @@ export class VolumeDropdownComponent {
           <button 
             type="button" 
             id="vol-mute-btn"
-            class="mt-1 text-xs py-1 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+            class="mt-1 text-xs py-1 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
           >
             ${isMuted ? "Unmute" : "Mute"}
           </button>
@@ -106,8 +111,12 @@ export class VolumeDropdownComponent {
 
       const muteBtn = e.target.closest("#vol-mute-btn");
       if (muteBtn) {
-        SoundModel.toggleMute();
-        soundService.setVolume(SoundModel.soundState.volume);
+        if (typeof SoundModel.toggleMute === "function") {
+          SoundModel.toggleMute();
+        }
+        if (typeof soundService?.setVolume === "function") {
+          soundService.setVolume(soundState.isMuted ? 0 : soundState.volume);
+        }
         return;
       }
     });
@@ -115,20 +124,30 @@ export class VolumeDropdownComponent {
     this.container.addEventListener("input", (e) => {
       if (e.target.id === "vol-range-input") {
         const val = Number(e.target.value);
-        SoundModel.setVolume(val);
-        soundService.setVolume(val);
+        if (typeof SoundModel.setVolume === "function") {
+          SoundModel.setVolume(val);
+        }
+        if (typeof soundService?.setVolume === "function") {
+          soundService.setVolume(val);
+        }
       }
     });
 
-    document.addEventListener("click", (e) => {
-      if (this.isOpen && !this.container.contains(e.target)) {
-        this.isOpen = false;
-        this.update();
-      }
-    });
+    document.removeEventListener("click", this.onOutsideClick);
+    document.addEventListener("click", this.onOutsideClick);
+  }
+
+  onOutsideClick(e) {
+    if (this.isOpen && this.container && !this.container.contains(e.target)) {
+      this.isOpen = false;
+      this.update();
+    }
   }
 
   destroy() {
-    if (this.unsubscribe) this.unsubscribe();
+    if (typeof this.unsubscribe === "function") {
+      this.unsubscribe();
+    }
+    document.removeEventListener("click", this.onOutsideClick);
   }
 }

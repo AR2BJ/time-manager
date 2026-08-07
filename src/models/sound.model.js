@@ -1,3 +1,4 @@
+// src/models/sound.model.js
 export const defaultTrackList = [
   {
     id: "rain-stream",
@@ -30,7 +31,7 @@ export const defaultTrackList = [
 export const soundState = {
   isPlaying: false,
   isMuted: false,
-  currentSoundId: "rain-forest",
+  currentSoundId: "rain-stream",
   volume: 50,
   previousVolume: 50,
   trackList: [...defaultTrackList],
@@ -71,8 +72,12 @@ export const SoundModel = {
     );
   },
 
+  getTrackList() {
+    return soundState.trackList;
+  },
+
   setPlaying(isPlaying) {
-    soundState.isPlaying = isPlaying;
+    soundState.isPlaying = Boolean(isPlaying);
     this.notify();
   },
 

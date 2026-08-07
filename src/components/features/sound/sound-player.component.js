@@ -1,92 +1,288 @@
-import { SoundModel, soundState } from "@/models/sound.model.js";
-
-import { VolumeDropdownComponent } from "./volume-dropdown.component.js";
+import { SoundModel } from "@/models/sound.model.js";
 import { soundService } from "@/services/sound.service.js";
 
 export class SoundPlayerComponent {
   constructor() {
     this.container = null;
-    this.volumeDropdown = new VolumeDropdownComponent();
     this.unsubscribe = null;
+    this.isVolumeOpen = false;
+    this.currentTime = 0;
+    this.duration = 0;
+    this.progressInterval = null;
   }
 
   render() {
     this.container = document.createElement("div");
-    this.container.className =
-      "w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 backdrop-blur-sm";
+    this.container.className = "w-full";
+    this.mount();
 
-    this.update();
-    this.bindEvents();
+    if (!this.unsubscribe) {
+      this.unsubscribe = SoundModel.subscribe(() => this.updateUI());
+    }
 
-    this.unsubscribe = SoundModel.subscribe(() => this.update());
+    this.startProgressTracker();
     return this.container;
   }
 
-  update() {
-    if (!this.container) return;
-
-    const track = SoundModel.getCurrentTrack();
-    const { isPlaying } = soundState;
-
+  mount() {
     this.container.innerHTML = `
-      <div class="flex items-center justify-between gap-4 dir-rtl">
-        <div class="flex items-center gap-3 min-w-0">
-          <button 
-            type="button"
-            id="sound-play-toggle-btn"
-            class="shrink-0 w-11 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/20 transition-all duration-200 active:scale-95"
-            title="${isPlaying ? "Stop" : "Play"}"
-          >
-            ${
-              isPlaying
-                ? `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`
-                : `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`
-            }
-          </button>
+      <div class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300">
+        
+        <!-- Top Track Info & Volume Action -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div id="player-music-icon-wrapper" class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand">
+              <i class="fa-solid fa-music text-lg"></i>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <h4 id="player-track-title" class="text-sm font-bold text-primary truncate">--</h4>
+              <div class="flex items-center gap-2 text-xs text-secondary truncate">
+                <span id="player-track-creator">--</span>
+                <span class="inline-block w-1 h-1 rounded-full bg-border"></span>
+                <span id="player-track-type" class="px-1.5 py-0.5 rounded bg-surface-3 text-[10px] font-semibold text-brand tracking-wider">
+                  AUDIO
+                </span>
+              </div>
+            </div>
+          </div>
 
-          <div class="flex flex-col min-w-0 text-right">
-            <span class="text-sm font-semibold text-slate-100 truncate">
-              ${track.title}
-            </span>
-            <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-              <span class="truncate">${track.creator}</span>
-              <span>•</span>
-              <span class="px-1.5 py-0.5 rounded bg-slate-700/60 text-[10px] text-slate-300 font-mono">
-                ${track.duration}
+          <!-- Volume Control Dropdown Trigger -->
+          <div class="relative">
+            <button
+              type="button"
+              id="btn-volume-popover-toggle"
+              class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
+              title="Volume Control"
+            >
+              <span id="player-volume-icon-slot" class="pointer-events-none flex items-center justify-center">
+                <i class="fa-regular fa-volume-high"></i>
               </span>
-              <span class="px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-300 text-[10px] uppercase tracking-wider font-semibold">
-                ${track.type}
-              </span>
+            </button>
+
+            <!-- Volume Popover Slider -->
+            <div
+              id="volume-popover"
+              class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
+            >
+              <span id="volume-text-val" class="text-[10px] font-bold text-secondary">50%</span>
+              <input
+                type="range"
+                id="volume-slider"
+                min="0"
+                max="100"
+                value="50"
+                class="w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
+              />
+              <button
+                type="button"
+                id="btn-toggle-mute"
+                class="text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
+                title="Toggle Mute"
+              >
+                <span id="popover-mute-icon-slot" class="flex items-center justify-center">
+                  <i class="fa-regular fa-volume-high"></i>
+                </span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div id="volume-dropdown-slot" class="shrink-0"></div>
+        <!-- Audio Progress Bar & Seek -->
+        <div class="flex flex-col gap-1 mt-1">
+          <input
+            type="range"
+            id="audio-progress-bar"
+            min="0"
+            max="100"
+            value="0"
+            class="w-full h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand transition-all"
+          />
+          <div class="flex items-center justify-between text-[11px] font-mono text-tertiary">
+            <span id="player-current-time">0:00</span>
+            <span id="player-total-time">-0:00</span>
+          </div>
+        </div>
+
+        <!-- Player Main Playback Controls -->
+        <div class="flex items-center justify-center gap-4 pt-1">
+          <button
+            type="button"
+            id="btn-player-play-toggle"
+            class="w-10 h-10 rounded-full bg-brand hover:bg-brand/90 text-white flex items-center justify-center shadow-md shadow-brand/20 transition cursor-pointer active:scale-95"
+            title="Play"
+          >
+            <span id="btn-play-icon-slot" class="flex items-center justify-center">
+              <i class="fa-solid fa-play ms-0.5 text-sm"></i>
+            </span>
+          </button>
+        </div>
+
       </div>
     `;
 
-    const slot = this.container.querySelector("#volume-dropdown-slot");
-    if (slot) {
-      slot.appendChild(this.volumeDropdown.render());
+    this.bindEvents();
+    this.updateUI();
+  }
+
+  updateUI() {
+    if (!this.container) return;
+
+    const currentTrack = SoundModel.getCurrentTrack();
+    const soundState = SoundModel.soundState || {};
+    const isPlaying = soundState.isPlaying;
+    const isMuted = soundState.isMuted;
+    const volume = soundState.volume ?? 50;
+
+    // 1. Track Metadata Updating
+    const titleEl = this.container.querySelector("#player-track-title");
+    const creatorEl = this.container.querySelector("#player-track-creator");
+    const typeEl = this.container.querySelector("#player-track-type");
+    const iconWrapper = this.container.querySelector(
+      "#player-music-icon-wrapper",
+    );
+
+    if (titleEl)
+      titleEl.textContent = currentTrack?.title || "No track selected";
+    if (creatorEl)
+      creatorEl.textContent = currentTrack?.creator || "Unknown Source";
+    if (typeEl)
+      typeEl.textContent = (currentTrack?.type || "Audio").toUpperCase();
+
+    if (iconWrapper) {
+      iconWrapper.innerHTML = `<i class="fa-solid fa-music text-lg ${isPlaying ? "animate-pulse" : ""}"></i>`;
     }
+
+    // 2. Play/Pause Button In-HTML Injection
+    const playSlot = this.container.querySelector("#btn-play-icon-slot");
+    if (playSlot) {
+      playSlot.innerHTML = isPlaying
+        ? `<i class="fa-solid fa-pause text-sm"></i>`
+        : `<i class="fa-solid fa-play ms-0.5 text-sm"></i>`;
+    }
+
+    // 3. Volume Dropdown State
+    const volPopover = this.container.querySelector("#volume-popover");
+    if (volPopover) {
+      volPopover.classList.toggle("flex", this.isVolumeOpen);
+      volPopover.classList.toggle("hidden", !this.isVolumeOpen);
+    }
+
+    // 4. Volume Icon & Slider In-HTML Injection
+    const volSlot = this.container.querySelector("#player-volume-icon-slot");
+    const popoverMuteSlot = this.container.querySelector(
+      "#popover-mute-icon-slot",
+    );
+    const volSlider = this.container.querySelector("#volume-slider");
+    const volText = this.container.querySelector("#volume-text-val");
+
+    let volumeIconHtml = `<i class="fa-regular fa-volume-high"></i>`;
+    if (isMuted || volume === 0) {
+      volumeIconHtml = `<i class="fa-regular fa-volume-xmark text-rose-500"></i>`;
+    } else if (volume < 50) {
+      volumeIconHtml = `<i class="fa-regular fa-volume-low"></i>`;
+    }
+
+    if (volSlot) volSlot.innerHTML = volumeIconHtml;
+    if (popoverMuteSlot) {
+      popoverMuteSlot.innerHTML = isMuted
+        ? `<i class="fa-regular fa-volume-xmark text-rose-500"></i>`
+        : `<i class="fa-regular fa-volume-high"></i>`;
+    }
+
+    if (volSlider) volSlider.value = isMuted ? 0 : volume;
+    if (volText) volText.textContent = `${isMuted ? 0 : volume}%`;
   }
 
   bindEvents() {
-    this.container.addEventListener("click", (e) => {
-      const playBtn = e.target.closest("#sound-play-toggle-btn");
-      if (playBtn) {
-        const { isPlaying } = soundState;
-        if (isPlaying) {
-          soundService.pause();
-        } else {
-          soundService.playTrack(SoundModel.getCurrentTrack());
-        }
+    // Popover Toggle
+    const volToggleBtn = this.container.querySelector(
+      "#btn-volume-popover-toggle",
+    );
+    volToggleBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.isVolumeOpen = !this.isVolumeOpen;
+      this.updateUI();
+    });
+
+    // Volume Slider Input
+    const volSlider = this.container.querySelector("#volume-slider");
+    volSlider?.addEventListener("input", (e) => {
+      const vol = Number(e.target.value);
+      SoundModel.setVolume(vol);
+      soundService.setVolume(vol);
+    });
+
+    // Mute Toggle Button
+    const muteBtn = this.container.querySelector("#btn-toggle-mute");
+    muteBtn?.addEventListener("click", () => {
+      SoundModel.toggleMute();
+      const soundState = SoundModel.soundState;
+      soundService.setVolume(soundState.isMuted ? 0 : soundState.volume);
+    });
+
+    // Play/Pause Toggle
+    const playBtn = this.container.querySelector("#btn-player-play-toggle");
+    playBtn?.addEventListener("click", async () => {
+      if (SoundModel.soundState?.isPlaying) {
+        await soundService.pause();
+      } else {
+        const currentTrack = SoundModel.getCurrentTrack();
+        await soundService.playTrack(currentTrack);
       }
     });
+
+    // Progress Bar Seek Event
+    const progressBar = this.container.querySelector("#audio-progress-bar");
+    progressBar?.addEventListener("change", (e) => {
+      const targetTime = Number(e.target.value);
+      this.currentTime = targetTime;
+      soundService.seekTo(targetTime);
+    });
+
+    // Close volume dropdown when clicking outside
+    this.onDocumentClick = (e) => {
+      if (this.isVolumeOpen && !this.container.contains(e.target)) {
+        this.isVolumeOpen = false;
+        this.updateUI();
+      }
+    };
+    document.addEventListener("click", this.onDocumentClick);
+  }
+
+  startProgressTracker() {
+    if (this.progressInterval) clearInterval(this.progressInterval);
+
+    this.progressInterval = setInterval(() => {
+      if (SoundModel.soundState?.isPlaying) {
+        const timeData = soundService.getCurrentTimeData();
+        this.currentTime = timeData.currentTime || 0;
+        this.duration = timeData.duration || 0;
+
+        const currEl = this.container?.querySelector("#player-current-time");
+        const totEl = this.container?.querySelector("#player-total-time");
+        const bar = this.container?.querySelector("#audio-progress-bar");
+
+        if (currEl) currEl.textContent = this.formatDuration(this.currentTime);
+        if (totEl)
+          totEl.textContent = `-${this.formatDuration(Math.max(0, this.duration - this.currentTime))}`;
+        if (bar) {
+          bar.max = this.duration || 100;
+          bar.value = this.currentTime || 0;
+        }
+      }
+    }, 500);
+  }
+
+  formatDuration(seconds) {
+    if (!seconds || isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   }
 
   destroy() {
     if (this.unsubscribe) this.unsubscribe();
-    if (this.volumeDropdown) this.volumeDropdown.destroy();
+    if (this.progressInterval) clearInterval(this.progressInterval);
+    document.removeEventListener("click", this.onDocumentClick);
   }
 }

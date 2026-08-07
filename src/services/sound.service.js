@@ -1,4 +1,3 @@
-// src/services/sound.service.js
 import { SoundModel } from "@/models/sound.model.js";
 
 class SoundService {
@@ -9,6 +8,7 @@ class SoundService {
     this.isYtReady = false;
     this.currentTrack = null;
     this.pendingTrack = null;
+    this.playPromise = null;
   }
 
   init() {
@@ -21,6 +21,11 @@ class SoundService {
     if (!this.audioElement) {
       this.audioElement = new Audio();
       this.audioElement.loop = true;
+
+      // Sync events directly to model if audio stops/ends
+      this.audioElement.addEventListener("ended", () => {
+        SoundModel.setPlaying(false);
+      });
     }
   }
 
@@ -49,8 +54,6 @@ class SoundService {
       document.body.appendChild(container);
     }
 
-    // src/services/sound.service.js
-
     this.ytPlayer = new window.YT.Player("yt-sound-player-container", {
       height: "1",
       width: "1",
@@ -71,9 +74,6 @@ class SoundService {
             this.pendingTrack = null;
           }
         },
-        onError: (event) => {
-          console.warn("YouTube Player Warning/Error code:", event.data);
-        },
       },
     });
   }
@@ -91,11 +91,16 @@ class SoundService {
     this.aparatFrame = iframe;
   }
 
-  playTrack(track) {
+  async playTrack(track) {
     if (!track) return;
-    this.stopAll();
+
+    // Safely stop previous playback promises
+    await this.stopAll();
 
     this.currentTrack = track;
+    const currentVol = SoundModel.soundState?.isMuted
+      ? 0
+      : (SoundModel.soundState?.volume ?? 50);
 
     if (track.type === "youtube") {
       if (!this.isYtReady) {
@@ -103,41 +108,57 @@ class SoundService {
         return;
       }
       this.ytPlayer.loadVideoById(track.sourceId);
-      this.ytPlayer.setVolume(
-        SoundModel.getCurrentTrack() ? SoundModel.soundState?.volume || 50 : 50,
-      );
+      this.ytPlayer.setVolume(currentVol);
       this.ytPlayer.playVideo();
     } else if (track.type === "aparat") {
       const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?autoplay=true`;
-      this.aparatFrame.src = aparatUrl;
+      if (this.aparatFrame) {
+        this.aparatFrame.src = aparatUrl;
+      }
     } else if (track.type === "audio") {
+      if (!this.audioElement) this._initAudioElement();
       this.audioElement.src = track.sourceId;
-      this.audioElement.volume = (SoundModel.soundState?.volume || 50) / 100;
-      this.audioElement.play();
+      this.audioElement.volume = currentVol / 100;
+
+      try {
+        this.playPromise = this.audioElement.play();
+        await this.playPromise;
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Audio playback error:", err);
+        }
+      } finally {
+        this.playPromise = null;
+      }
     }
 
     SoundModel.setPlaying(true);
   }
 
-  pause() {
+  async pause() {
     if (!this.currentTrack) return;
 
     if (
       this.currentTrack.type === "youtube" &&
       this.isYtReady &&
-      this.ytPlayer.pauseVideo
+      this.ytPlayer?.pauseVideo
     ) {
       this.ytPlayer.pauseVideo();
     } else if (this.currentTrack.type === "aparat") {
-      this.aparatFrame.src = "";
-    } else if (this.currentTrack.type === "audio") {
+      if (this.aparatFrame) this.aparatFrame.src = "";
+    } else if (this.currentTrack.type === "audio" && this.audioElement) {
+      if (this.playPromise) {
+        try {
+          await this.playPromise;
+        } catch (_) {}
+      }
       this.audioElement.pause();
     }
 
     SoundModel.setPlaying(false);
   }
 
-  stopAll() {
+  async stopAll() {
     if (this.isYtReady && this.ytPlayer?.stopVideo) {
       this.ytPlayer.stopVideo();
     }
@@ -145,6 +166,11 @@ class SoundService {
       this.aparatFrame.src = "";
     }
     if (this.audioElement) {
+      if (this.playPromise) {
+        try {
+          await this.playPromise;
+        } catch (_) {}
+      }
       this.audioElement.pause();
       this.audioElement.currentTime = 0;
     }
@@ -152,7 +178,7 @@ class SoundService {
   }
 
   setVolume(volume) {
-    const normalizedVol = Math.max(0, Math.min(100, volume));
+    const normalizedVol = Math.max(0, Math.min(100, Number(volume)));
 
     if (this.isYtReady && this.ytPlayer?.setVolume) {
       this.ytPlayer.setVolume(normalizedVol);
@@ -160,6 +186,37 @@ class SoundService {
     if (this.audioElement) {
       this.audioElement.volume = normalizedVol / 100;
     }
+  }
+
+  seekTo(seconds) {
+    if (this.currentTrack?.type === "audio" && this.audioElement) {
+      this.audioElement.currentTime = seconds;
+    } else if (
+      this.currentTrack?.type === "youtube" &&
+      this.isYtReady &&
+      this.ytPlayer?.seekTo
+    ) {
+      this.ytPlayer.seekTo(seconds, true);
+    }
+  }
+
+  getCurrentTimeData() {
+    if (this.currentTrack?.type === "audio" && this.audioElement) {
+      return {
+        currentTime: this.audioElement.currentTime || 0,
+        duration: this.audioElement.duration || 0,
+      };
+    } else if (
+      this.currentTrack?.type === "youtube" &&
+      this.isYtReady &&
+      this.ytPlayer?.getCurrentTime
+    ) {
+      return {
+        currentTime: this.ytPlayer.getCurrentTime() || 0,
+        duration: this.ytPlayer.getDuration() || 0,
+      };
+    }
+    return { currentTime: 0, duration: 0 };
   }
 }
 
