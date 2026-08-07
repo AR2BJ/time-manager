@@ -205,7 +205,7 @@ export const StateManager = {
       settings: {
         ...state.settings,
         longBreakInterval: Number(state.settings.longBreakInterval) || 4,
-        lastSelectedSoundId: soundData ? soundData.id : "track-1",
+        lastSelectedSoundId: soundData ? soundData.id : "none",
       },
     });
   },

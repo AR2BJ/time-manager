@@ -7,7 +7,7 @@ export class SoundSelectorComponent {
     this.container = null;
     this.autocomplete = null;
     this.unsubscribe = null;
-    this.isInitialMount = true;
+    this.isSilentUpdating = false;
   }
 
   render() {
@@ -24,16 +24,25 @@ export class SoundSelectorComponent {
   }
 
   mountAutocomplete() {
-    const trackList = SoundModel.getTrackList();
-    const currentTrack = SoundModel.getCurrentTrack();
+    const trackList = SoundModel.getTrackList() || [];
+    const currentSoundId = SoundModel.getCurrentSoundId();
 
-    const items = trackList.map((track) => ({
+    const noneOption = {
+      title: "None (No Sound)",
+      value: "none",
+      icon: "fa-solid fa-volume-xmark",
+      raw: { id: "none", title: "None" },
+    };
+
+    const mappedTracks = trackList.map((track) => ({
       title: `${track.title} (${track.creator})`,
       value: track.id,
       icon:
         track.type === "youtube" ? "fa-brands fa-youtube" : "fa-solid fa-music",
       raw: track,
     }));
+
+    const items = [noneOption, ...mappedTracks];
 
     this.autocomplete = new AutocompleteComponent(this.container, items, {
       label: "Background sound",
@@ -43,42 +52,59 @@ export class SoundSelectorComponent {
       itemIcon: "icon",
       clearable: false,
       isRow: false,
-      onChange: async (val) => {
-        if (!val) return;
+      onChange: async (payload) => {
+        if (this.isSilentUpdating) return;
 
-        if (this.isInitialMount) {
+        const selectedId = this.extractValue(payload);
+
+        if (!selectedId || selectedId === "none") {
+          SoundModel.setSoundTrack("none");
+          await soundService.stopAll();
           return;
         }
 
-        const selectedId = Array.isArray(val) ? val[0] : val;
-
         SoundModel.setSoundTrack(selectedId);
-        const updatedTrack = SoundModel.getCurrentTrack();
+        const activeTrack = SoundModel.getCurrentTrack();
 
-        if (updatedTrack) {
-          await soundService.fetchCoverOnly(updatedTrack);
+        if (activeTrack) {
+          await soundService.fetchCoverOnly(activeTrack);
 
           if (SoundModel.getState().isPlaying) {
-            await soundService.playTrack(updatedTrack);
+            await soundService.playTrack(activeTrack);
           }
         }
       },
     });
 
-    if (currentTrack?.id) {
-      this.autocomplete.setValue(currentTrack.id);
-    }
+    this.setValueSilently(currentSoundId);
+  }
 
-    setTimeout(() => {
-      this.isInitialMount = false;
-    }, 0);
+  extractValue(payload) {
+    if (!payload) return null;
+    if (typeof payload === "string") return payload;
+    if (Array.isArray(payload)) {
+      const item = payload[0];
+      return typeof item === "object" && item !== null
+        ? item.value || item.id
+        : item;
+    }
+    if (typeof payload === "object") return payload.value || payload.id || null;
+    return null;
+  }
+
+  setValueSilently(value) {
+    if (!this.autocomplete) return;
+    this.isSilentUpdating = true;
+    this.autocomplete.setValue(value);
+    this.isSilentUpdating = false;
   }
 
   syncSelectedTrack() {
     if (!this.autocomplete) return;
-    const currentTrack = SoundModel.getCurrentTrack();
-    if (currentTrack?.id && this.autocomplete.getValue() !== currentTrack.id) {
-      this.autocomplete.setValue(currentTrack.id);
+    const currentSoundId = SoundModel.getCurrentSoundId();
+
+    if (this.autocomplete.getValue() !== currentSoundId) {
+      this.setValueSilently(currentSoundId);
     }
   }
 

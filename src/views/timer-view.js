@@ -1,3 +1,5 @@
+import { SoundModel } from "@/models/sound.model.js";
+// src/views/timer-view.js
 import { SoundPlayerComponent } from "@/components/features/sound/sound-player.component.js";
 import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
 import { StateManager } from "@/models/state.model.js";
@@ -8,7 +10,8 @@ export class TimerView {
     this.container = null;
     this.soundPlayer = new SoundPlayerComponent();
     this.soundSelector = new SoundSelectorComponent();
-    this.unsubscribe = null;
+    this.unsubscribeState = null;
+    this.unsubscribeSound = null;
   }
 
   render() {
@@ -21,9 +24,16 @@ export class TimerView {
     // Hydrate state and sub-components
     this.update();
 
-    // Subscribe to state changes if not already subscribed
-    if (!this.unsubscribe) {
-      this.unsubscribe = StateManager.subscribe(() => this.update());
+    // Subscribe to StateManager changes
+    if (!this.unsubscribeState) {
+      this.unsubscribeState = StateManager.subscribe(() => this.update());
+    }
+
+    // Subscribe to SoundModel changes for reactive player visibility
+    if (!this.unsubscribeSound) {
+      this.unsubscribeSound = SoundModel.subscribe(() => {
+        this.updateSoundPlayerVisibility();
+      });
     }
 
     return this.container;
@@ -38,7 +48,7 @@ export class TimerView {
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
             <div
-              class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-4"
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col justify-between gap-4"
             >
               <div
                 class="flex items-center justify-between pb-3 border-b border-border"
@@ -190,13 +200,31 @@ export class TimerView {
       playerSlot.appendChild(this.soundPlayer.render());
     }
 
+    this.updateSoundPlayerVisibility();
     this.bindEvents();
+  }
+
+  updateSoundPlayerVisibility() {
+    const playerSlot = this.container?.querySelector("#sound-player-slot");
+    if (!playerSlot) return;
+
+    const currentSoundId =
+      typeof SoundModel.getCurrentSoundId === "function"
+        ? SoundModel.getCurrentSoundId()
+        : SoundModel.getState().currentSoundId;
+
+    if (!currentSoundId || currentSoundId === "none") {
+      playerSlot.classList.add("hidden");
+    } else {
+      playerSlot.classList.remove("hidden");
+    }
   }
 
   update() {
     if (!this.container) return;
 
-    // Use getState() to avoid side-effects and re-initializations
+    this.updateSoundPlayerVisibility();
+
     const state = StateManager.getState();
     const { activeMode, timer } = state;
 
@@ -240,7 +268,8 @@ export class TimerView {
   }
 
   destroy() {
-    if (this.unsubscribe) this.unsubscribe();
+    if (this.unsubscribeState) this.unsubscribeState();
+    if (this.unsubscribeSound) this.unsubscribeSound();
     if (this.soundPlayer) this.soundPlayer.destroy();
     if (this.soundSelector) this.soundSelector.destroy();
   }

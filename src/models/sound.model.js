@@ -19,7 +19,7 @@ export const soundState = {
   isPlaying: false,
   isLoading: false,
   isMuted: false,
-  currentSoundId: "track-1",
+  currentSoundId: "none",
   volume: 50,
   previousVolume: 50,
   trackList: [...defaultTrackList],
@@ -39,7 +39,7 @@ export const SoundModel = {
     } else if (savedSettings.lastSelectedSoundId) {
       soundState.currentSoundId = savedSettings.lastSelectedSoundId;
     } else {
-      soundState.currentSoundId = defaultTrackList[0]?.id || "track-1";
+      soundState.currentSoundId = defaultTrackList[0]?.id || "none";
     }
 
     soundState.volume =
@@ -68,10 +68,19 @@ export const SoundModel = {
   },
 
   getCurrentTrack() {
-    return (
-      soundState.trackList.find((t) => t.id === soundState.currentSoundId) ||
-      soundState.trackList[0]
+    if (!soundState.currentSoundId || soundState.currentSoundId === "none") {
+      return null;
+    }
+
+    const foundTrack = soundState.trackList.find(
+      (t) => t.id === soundState.currentSoundId,
     );
+
+    return foundTrack || null;
+  },
+
+  getCurrentSoundId() {
+    return soundState.currentSoundId || "none";
   },
 
   getTrackList() {
@@ -93,10 +102,12 @@ export const SoundModel = {
   },
 
   setSoundTrack(soundId) {
-    soundState.currentSoundId = soundId;
+    const targetId = soundId || "none";
+    soundState.currentSoundId = targetId;
+
     try {
       if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem(STORAGE_KEY_SELECTED_TRACK, soundId);
+        localStorage.setItem(STORAGE_KEY_SELECTED_TRACK, targetId);
       }
     } catch (e) {
       console.warn("Failed to save track to LocalStorage:", e);

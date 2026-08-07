@@ -97,7 +97,10 @@ class SoundService {
   }
 
   async playTrack(track) {
-    if (!track) return;
+    if (!track || track.id === "none") {
+      await this.stopAll();
+      return;
+    }
 
     this._initAudioElement();
     const isSameTrack = this.currentTrack?.id === track.id;
