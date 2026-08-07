@@ -134,6 +134,7 @@ export class SoundPlayerComponent {
     const state = SoundModel.getState();
     const currentTrack = SoundModel.getCurrentTrack();
     const isPlaying = state.isPlaying;
+    const isLoading = state.isLoading;
     const isMuted = state.isMuted;
     const volume = state.volume;
 
@@ -168,11 +169,29 @@ export class SoundPlayerComponent {
       coverFallback?.classList.remove("hidden");
     }
 
+    // Dynamic Play/Pause/Loading Icon Handler
     const playSlot = this.container.querySelector("#btn-play-icon-slot");
     if (playSlot) {
-      playSlot.innerHTML = isPlaying
-        ? `<i class="fa-solid fa-pause text-base"></i>`
-        : `<i class="fa-solid fa-play ms-0.5 text-base"></i>`;
+      if (isLoading) {
+        playSlot.innerHTML = `
+          <svg
+            viewBox="0 0 16 16"
+            height="48"
+            width="48"
+            class="windows-loading-spinner"
+          >
+            <circle
+              r="7px"
+              cy="8px"
+              cx="8px"
+            ></circle>
+          </svg>
+        `;
+      } else if (isPlaying) {
+        playSlot.innerHTML = `<i class="fa-solid fa-pause text-base"></i>`;
+      } else {
+        playSlot.innerHTML = `<i class="fa-solid fa-play ms-0.5 text-base"></i>`;
+      }
     }
 
     // Volume Popover State
@@ -212,6 +231,8 @@ export class SoundPlayerComponent {
     const playBtn = this.container.querySelector("#btn-player-play-toggle");
     playBtn?.addEventListener("click", async () => {
       const state = SoundModel.getState();
+      if (state.isLoading) return; // Prevent multiple triggers while loading
+
       if (state.isPlaying) {
         await soundService.pause();
       } else {
@@ -269,10 +290,18 @@ export class SoundPlayerComponent {
   }
 
   formatDuration(seconds) {
-    if (!seconds || isNaN(seconds)) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+    if (!seconds || isNaN(seconds) || seconds < 0) return "0:00";
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    const formattedM = h > 0 && m < 10 ? `0${m}` : `${m}`;
+    const formattedS = s < 10 ? `0${s}` : `${s}`;
+
+    return h > 0
+      ? `${h}:${formattedM}:${formattedS}`
+      : `${formattedM}:${formattedS}`;
   }
 
   destroy() {

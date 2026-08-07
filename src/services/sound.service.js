@@ -17,21 +17,38 @@ class SoundService {
       this.audioElement = new Audio();
       this.audioElement.loop = true;
 
+      // Event Listeners for buffering & loading states
+      this.audioElement.addEventListener("loadstart", () => {
+        SoundModel.setLoading(true);
+      });
+
+      this.audioElement.addEventListener("waiting", () => {
+        SoundModel.setLoading(true);
+      });
+
+      this.audioElement.addEventListener("canplay", () => {
+        SoundModel.setLoading(false);
+      });
+
+      this.audioElement.addEventListener("playing", () => {
+        SoundModel.setLoading(false);
+        SoundModel.setPlaying(true);
+      });
+
       this.audioElement.addEventListener("ended", () => {
         SoundModel.setPlaying(false);
+        SoundModel.setLoading(false);
       });
 
       this.audioElement.addEventListener("pause", () => {
         SoundModel.setPlaying(false);
-      });
-
-      this.audioElement.addEventListener("play", () => {
-        SoundModel.setPlaying(true);
+        SoundModel.setLoading(false);
       });
 
       this.audioElement.addEventListener("error", (e) => {
         console.error("Audio playback error:", e);
         SoundModel.setPlaying(false);
+        SoundModel.setLoading(false);
       });
     }
   }
@@ -55,6 +72,7 @@ class SoundService {
         throw new Error("No media links found in Aparat response");
       }
 
+      // Pick low-tier stream URL (e.g., 240p/360p) to optimize initial buffer time
       const directUrl = fileLinks[0]?.urls?.[0];
 
       if (!directUrl) throw new Error("Direct stream URL is invalid");
@@ -77,9 +95,11 @@ class SoundService {
     let mediaSourceUrl = track.sourceId;
 
     if (track.type === "aparat") {
+      SoundModel.setLoading(true);
       const directUrl = await this._getAparatDirectUrl(track.sourceId);
       if (!directUrl) {
         console.error("Could not resolve Aparat direct audio stream.");
+        SoundModel.setLoading(false);
         return;
       }
       mediaSourceUrl = directUrl;
@@ -88,6 +108,7 @@ class SoundService {
     if (!isSameTrack || this.audioElement.src !== mediaSourceUrl) {
       await this.stopAll();
       this.currentTrack = track;
+      SoundModel.setLoading(true);
       this.audioElement.src = mediaSourceUrl;
     }
 
@@ -96,10 +117,10 @@ class SoundService {
     try {
       this.playPromise = this.audioElement.play();
       await this.playPromise;
-      SoundModel.setPlaying(true);
     } catch (err) {
       if (err.name !== "AbortError") {
         console.error("Playback execution failed:", err);
+        SoundModel.setLoading(false);
       }
     } finally {
       this.playPromise = null;
@@ -116,6 +137,7 @@ class SoundService {
       this.audioElement.pause();
     }
     SoundModel.setPlaying(false);
+    SoundModel.setLoading(false);
   }
 
   async stopAll() {
@@ -129,6 +151,7 @@ class SoundService {
       this.audioElement.currentTime = 0;
     }
     SoundModel.setPlaying(false);
+    SoundModel.setLoading(false);
   }
 
   setVolume() {
