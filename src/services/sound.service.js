@@ -20,7 +20,8 @@ class SoundService {
   _initAudioElement() {
     if (!this.audioElement) {
       this.audioElement = new Audio();
-      this.audioElement.loop = true;
+      // Disable looping so the 'ended' event fires properly
+      this.audioElement.loop = false;
 
       this.audioElement.addEventListener("loadstart", () =>
         SoundModel.setLoading(true),
@@ -35,10 +36,14 @@ class SoundService {
         SoundModel.setLoading(false);
         SoundModel.setPlaying(true);
       });
-      this.audioElement.addEventListener("ended", () => {
+
+      // AUTO-ADVANCE LOGIC ON TRACK END
+      this.audioElement.addEventListener("ended", async () => {
         SoundModel.setPlaying(false);
         SoundModel.setLoading(false);
+        await this.playNextTrack();
       });
+
       this.audioElement.addEventListener("pause", () => {
         SoundModel.setPlaying(false);
         SoundModel.setLoading(false);
@@ -48,6 +53,20 @@ class SoundService {
         SoundModel.setPlaying(false);
         SoundModel.setLoading(false);
       });
+    }
+  }
+
+  async playNextTrack() {
+    const nextTrack = SoundModel.getNextTrack();
+
+    if (nextTrack) {
+      // Update Model state (This automatically syncs the Autocomplete & Player UI)
+      SoundModel.setSoundTrack(nextTrack.id);
+
+      // Play the newly selected track
+      await this.playTrack(nextTrack);
+    } else {
+      await this.stopAll();
     }
   }
 
@@ -79,10 +98,7 @@ class SoundService {
               .toLowerCase() === "720p",
         ) ?? fileLinks[fileLinks.length - 1];
 
-      console.log(selectedFileLink?.profile);
-
       const streamUrl = selectedFileLink?.urls?.[0];
-
       const coverUrl =
         attributes?.big_poster || attributes?.small_poster || null;
 

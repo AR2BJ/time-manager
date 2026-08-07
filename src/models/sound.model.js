@@ -91,6 +91,20 @@ export const SoundModel = {
     return soundState.isMuted ? 0 : soundState.volume;
   },
 
+  getNextTrack() {
+    const list = soundState.trackList;
+    if (!list || list.length === 0) return null;
+
+    const currentIndex = list.findIndex(
+      (t) => t.id === soundState.currentSoundId,
+    );
+
+    if (currentIndex === -1) return list[0];
+
+    const nextIndex = (currentIndex + 1) % list.length;
+    return list[nextIndex];
+  },
+
   setPlaying(isPlaying) {
     soundState.isPlaying = Boolean(isPlaying);
     this.notify();
