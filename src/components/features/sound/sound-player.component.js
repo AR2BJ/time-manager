@@ -39,7 +39,6 @@ export class SoundPlayerComponent {
               id="player-cover-fallback" 
               class="w-full h-full flex items-center justify-center text-brand bg-brand/10"
             >
-              <i class="fa-solid fa-music text-lg"></i>
             </div>
 
             <button
