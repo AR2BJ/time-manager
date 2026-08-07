@@ -29,6 +29,7 @@ export class SoundPlayerComponent {
     this.container.innerHTML = `
       <div class="relative w-full bg-surface-2 border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3 transition-all duration-300">
         
+        <!-- Header Controls -->
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 overflow-hidden">
             <div id="player-music-icon-wrapper" class="w-12 h-12 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center shrink-0 text-brand">
@@ -46,6 +47,7 @@ export class SoundPlayerComponent {
             </div>
           </div>
 
+          <!-- Volume Controls -->
           <div class="relative">
             <button
               type="button"
@@ -85,6 +87,7 @@ export class SoundPlayerComponent {
           </div>
         </div>
 
+        <!-- Progress & Timeline Slider -->
         <div class="flex flex-col gap-1 mt-2">
           <input
             type="range"
@@ -95,12 +98,14 @@ export class SoundPlayerComponent {
             class="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-brand transition-all dir-ltr"
             style="background: linear-gradient(to right, var(--color-brand, #14b8a6) 0%, var(--color-surface-3, #334155) 0%);"
           />
+          <!-- Time Display (LTR layout for standard audio players) -->
           <div class="flex items-center justify-between text-[11px] font-mono text-tertiary dir-ltr pt-1">
             <span id="player-current-time">0:00</span>
-            <span id="player-total-time">-0:00</span>
+            <span id="player-total-time">0:00</span>
           </div>
         </div>
 
+        <!-- Action Controls -->
         <div class="flex items-center justify-center gap-4 pt-1">
           <button
             type="button"
@@ -282,8 +287,7 @@ export class SoundPlayerComponent {
         const bar = this.container?.querySelector("#audio-progress-bar");
 
         if (currEl) currEl.textContent = this.formatDuration(this.currentTime);
-        if (totEl)
-          totEl.textContent = `-${this.formatDuration(Math.max(0, this.duration - this.currentTime))}`;
+        if (totEl) totEl.textContent = this.formatDuration(this.duration);
 
         if (bar) {
           bar.max = this.duration || 100;

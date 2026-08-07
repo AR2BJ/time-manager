@@ -117,9 +117,7 @@ class SoundService {
   async playTrack(track) {
     if (!track) return;
 
-    await this.stopAll();
-
-    this.currentTrack = track;
+    const isSameTrack = this.currentTrack?.id === track.id;
     const currentVol = SoundModel.getEffectiveVolume();
 
     if (track.type === "youtube") {
@@ -127,19 +125,34 @@ class SoundService {
         this.pendingTrack = track;
         return;
       }
-      this.ytPlayer.loadVideoById(track.sourceId);
+      if (!isSameTrack) {
+        await this.stopAll();
+        this.currentTrack = track;
+        this.ytPlayer.loadVideoById(track.sourceId);
+      }
       this.ytPlayer.setVolume(currentVol);
       this.ytPlayer.playVideo();
       SoundModel.setPlaying(true);
     } else if (track.type === "aparat") {
-      const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?autoplay=true`;
-      if (this.aparatFrame) {
-        this.aparatFrame.src = aparatUrl;
+      if (!isSameTrack) {
+        await this.stopAll();
+        this.currentTrack = track;
+        const aparatUrl = `https://www.aparat.com/video/video/embed/videohash/${track.sourceId}/vt/frame?autoplay=true`;
+        if (this.aparatFrame) {
+          this.aparatFrame.src = aparatUrl;
+        }
       }
       SoundModel.setPlaying(true);
     } else if (track.type === "audio") {
       if (!this.audioElement) this._initAudioElement();
-      this.audioElement.src = track.sourceId;
+
+      // Only re-set src and reset position if switching to a new track
+      if (!isSameTrack || !this.audioElement.src) {
+        await this.stopAll();
+        this.currentTrack = track;
+        this.audioElement.src = track.sourceId;
+      }
+
       this.audioElement.volume = currentVol / 100;
 
       try {
@@ -211,7 +224,9 @@ class SoundService {
 
   seekTo(seconds) {
     if (this.currentTrack?.type === "audio" && this.audioElement) {
-      this.audioElement.currentTime = seconds;
+      if (!isNaN(seconds) && isFinite(seconds)) {
+        this.audioElement.currentTime = seconds;
+      }
     } else if (
       this.currentTrack?.type === "youtube" &&
       this.isYtReady &&
