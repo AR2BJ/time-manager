@@ -1,4 +1,3 @@
-// src/models/sound.model.js
 import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
 
 const STORAGE_KEY_SELECTED_TRACK = "app_selected_sound_id";

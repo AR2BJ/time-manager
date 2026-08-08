@@ -1,4 +1,3 @@
-// src/models/state.model.js
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
 import { SoundModel } from "./sound.model.js";
