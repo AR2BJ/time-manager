@@ -1,15 +1,15 @@
-const SCRATCHPAD_STORAGE_KEY = "tm_focus_scratchpad_items";
+const NOTE_STORAGE_KEY = "tm_focus_note_items";
 
-export class ScratchpadModel {
+export class NoteModel {
   static items = [];
   static listeners = new Set();
 
   static init() {
     try {
-      const raw = localStorage.getItem(SCRATCHPAD_STORAGE_KEY);
+      const raw = localStorage.getItem(NOTE_STORAGE_KEY);
       this.items = raw ? JSON.parse(raw) : [];
     } catch (e) {
-      console.error("Failed to load scratchpad notes:", e);
+      console.error("Failed to load notes:", e);
       this.items = [];
     }
     return this.items;
@@ -42,7 +42,7 @@ export class ScratchpadModel {
     try {
       localStorage.setItem(SCRATCHPAD_STORAGE_KEY, JSON.stringify(this.items));
     } catch (e) {
-      console.error("Failed to save scratchpad notes:", e);
+      console.error("Failed to save notes:", e);
     }
     this.notify();
   }

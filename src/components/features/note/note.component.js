@@ -1,14 +1,14 @@
-import { ScratchpadModel } from "@/models/scratchpad.model.js";
-import { ScratchpadService } from "@/services/scratchpad.service.js";
+import { NoteModel } from "@/models/note.model.js";
+import { NoteService } from "@/services/note.service.js";
 
-export class ScratchpadComponent {
+export class NoteComponent {
   constructor() {
     this.container = null;
     this.unsubscribe = null;
   }
 
   render() {
-    ScratchpadService.init();
+    NoteService.init();
 
     this.container = document.createElement("div");
     this.container.className =
@@ -17,7 +17,7 @@ export class ScratchpadComponent {
     this.updateUI();
 
     if (!this.unsubscribe) {
-      this.unsubscribe = ScratchpadModel.subscribe(() => this.updateUI());
+      this.unsubscribe = NoteModel.subscribe(() => this.updateUI());
     }
 
     this.bindEvents();
@@ -27,7 +27,7 @@ export class ScratchpadComponent {
   updateUI() {
     if (!this.container) return;
 
-    const items = ScratchpadModel.getItems();
+    const items = NoteModel.getItems();
 
     this.container.innerHTML = `
       <div
@@ -47,12 +47,12 @@ export class ScratchpadComponent {
       </div>
 
       <form
-        id="scratchpad-form"
+        id="note-form"
         class="relative flex items-center gap-2"
       >
         <input
           type="text"
-          id="scratchpad-input"
+          id="note-input"
           placeholder="Catch a distraction or idea..."
           class="flex-1 bg-surface-2 border border-border/80 rounded-xl p-2.5 text-xs text-primary placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
           autocomplete="off"
@@ -114,11 +114,11 @@ export class ScratchpadComponent {
 
   bindEvents() {
     this.container.addEventListener("submit", (e) => {
-      if (e.target.id === "scratchpad-form") {
+      if (e.target.id === "note-form") {
         e.preventDefault();
-        const input = this.container.querySelector("#scratchpad-input");
+        const input = this.container.querySelector("#note-input");
         if (input && input.value.trim()) {
-          ScratchpadService.addNote(input.value);
+          NoteService.addNote(input.value);
           input.value = "";
           input.focus();
         }
@@ -130,7 +130,7 @@ export class ScratchpadComponent {
       const itemEl = e.target.closest("[data-id]");
 
       if (deleteBtn && itemEl) {
-        ScratchpadService.removeNote(itemEl.dataset.id);
+        NoteService.removeNote(itemEl.dataset.id);
       }
     });
   }
