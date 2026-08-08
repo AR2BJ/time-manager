@@ -495,6 +495,7 @@ export class AutocompleteComponent {
       const text = this.getItemText(item);
       this.inputValue = text;
       this.elements.input.value = text;
+      this.elements.input.blur();
       this.searchQuery = text;
       this.closeDropdown();
       this.updateClearButton();
