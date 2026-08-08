@@ -1,5 +1,5 @@
+import { ScratchpadComponent } from "@/components/features/scratchpad/scratchpad.component";
 import { SoundModel } from "@/models/sound.model.js";
-// src/views/timer-view.js
 import { SoundPlayerComponent } from "@/components/features/sound/sound-player.component.js";
 import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
 import { StateManager } from "@/models/state.model.js";
@@ -10,6 +10,7 @@ export class TimerView {
     this.container = null;
     this.soundPlayer = new SoundPlayerComponent();
     this.soundSelector = new SoundSelectorComponent();
+    this.scratchpad = new ScratchpadComponent();
     this.unsubscribeState = null;
     this.unsubscribeSound = null;
   }
@@ -47,23 +48,8 @@ export class TimerView {
       >
         <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
-            <div
-              class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col justify-between gap-4"
-            >
-              <div
-                class="flex items-center justify-between pb-3 border-b border-border"
-              >
-                <span
-                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
-                >
-                  <i class="fa-regular fa-headphones text-brand"></i>
-                  Soundscape Player
-                </span>
-              </div>
-
-              <div id="sound-selector-slot"></div>
-              <div id="sound-player-slot"></div>
-            </div>
+            <div id="active-task-container"></div>
+            <div id="scratchpad-slot"></div>
           </div>
 
           <div
@@ -182,7 +168,23 @@ export class TimerView {
           </div>
 
           <div class="lg:col-span-3 flex flex-col gap-6 order-3">
-            <div id="active-task-container"></div>
+            <div
+              class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col justify-between gap-4"
+            >
+              <div
+                class="flex items-center justify-between pb-3 border-b border-border"
+              >
+                <span
+                  class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
+                >
+                  <i class="fa-regular fa-headphones text-brand"></i>
+                  Soundscape Player
+                </span>
+              </div>
+
+              <div id="sound-selector-slot"></div>
+              <div id="sound-player-slot"></div>
+            </div>
             <div id="today-overview-container"></div>
           </div>
         </div>
@@ -193,6 +195,11 @@ export class TimerView {
     const selectorSlot = this.container.querySelector("#sound-selector-slot");
     if (selectorSlot) {
       selectorSlot.appendChild(this.soundSelector.render());
+    }
+
+    const scratchpadSlot = this.container.querySelector("#scratchpad-slot");
+    if (scratchpadSlot) {
+      scratchpadSlot.appendChild(this.scratchpad.render());
     }
 
     const playerSlot = this.container.querySelector("#sound-player-slot");
