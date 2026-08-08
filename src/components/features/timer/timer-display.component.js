@@ -11,7 +11,7 @@ export class TimerDisplayComponent {
   render() {
     this.container = document.createElement("div");
     this.container.className =
-      "lg:col-span-6 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden order-1 lg:order-2";
+      "lg:col-span-4 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden";
 
     this.mountLayout();
     this.update();
@@ -27,17 +27,17 @@ export class TimerDisplayComponent {
   mountLayout() {
     this.container.innerHTML = `
       <div
-        class="relative flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 p-1.5 mb-6 w-full max-w-xs shadow-inner"
+        class="relative flex flex-col w-full justify-center rounded-xl border border-border bg-surface p-1 xs:flex-row xs:w-fit xs:justify-start"
       >
         <div
           id="mode-indicator"
-          class="absolute rounded-lg bg-brand/80 transition-all duration-300 ease-in-out"
+          class="absolute top-1 left-1 h-12 w-[calc(100%-8px)] rounded-lg bg-brand/80 transition-all duration-300 xs:h-[calc(100%-8px)] xs:w-32"
         ></div>
 
         <button
           id="mode-pomodoro"
           data-mode="pomodoro"
-          class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold transition cursor-pointer text-center"
+          class="relative z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer text-center xs:w-35 xs:rounded-l-xl xs:rounded-tr-none"
         >
           <i class="fa-regular fa-stopwatch pointer-events-none"></i>
           <span class="pointer-events-none">Pomodoro</span>
@@ -46,7 +46,7 @@ export class TimerDisplayComponent {
         <button
           id="mode-flow"
           data-mode="flow"
-          class="relative flex justify-center items-center gap-2 z-10 flex-1 py-2 text-sm font-semibold transition cursor-pointer text-center"
+          class="relative z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer text-center xs:w-35"
         >
           <i class="fa-regular fa-water pointer-events-none"></i>
           <span class="pointer-events-none">Flow Mode</span>

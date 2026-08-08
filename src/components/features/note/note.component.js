@@ -54,7 +54,7 @@ export class NoteComponent {
           type="text"
           id="note-input"
           placeholder="Catch a distraction or idea..."
-          class="flex-1 bg-surface-2 border border-border/80 rounded-xl p-2.5 text-xs text-primary placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
+          class="w-full bg-surface-2 border border-border/80 rounded-xl p-2.5 pe-20 text-xs text-primary truncate placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
           autocomplete="off"
         />
         <button

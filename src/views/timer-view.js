@@ -42,20 +42,17 @@ export class TimerView {
     this.container.innerHTML = `
       <section
         id="timer-view"
-        class="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
+        class="hidden w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
       >
-        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
+        <div class="w-full grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-4 flex flex-col gap-6">
             <div id="active-task-container"></div>
             <div id="note-slot"></div>
           </div>
 
-          <div
-            id="timer-display-slot"
-            class="lg:col-span-6 order-1 lg:order-2"
-          ></div>
+          <div id="timer-display-slot"></div>
 
-          <div class="lg:col-span-3 flex flex-col gap-6 order-3">
+          <div class="lg:col-span-4 flex flex-col gap-6">
             <div
               class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col justify-between gap-4"
             >
