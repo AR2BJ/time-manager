@@ -1,5 +1,4 @@
 import { StateManager } from "@/models/state.model.js";
-import { flipClockInstance } from "./flip-clock.component";
 import { formatTime } from "@/utils/helpers.js";
 import { timerService } from "@/services/timer.service.js";
 
@@ -29,7 +28,7 @@ export class TimerDisplayComponent {
   mountLayout() {
     this.container.innerHTML = `
       <button
-        id="enter-fullscreen-btn"
+        id="fullscreen-btn"
         type="button"
         class="absolute top-4 right-4 z-20 p-2 rounded-xl text-secondary hover:text-primary hover:bg-surface-2 transition cursor-pointer"
         title="Enter Fullscreen Focus"
@@ -198,12 +197,6 @@ export class TimerDisplayComponent {
 
   bindEvents() {
     this.container.addEventListener("click", (e) => {
-      const fsBtn = e.target.closest("#enter-fullscreen-btn");
-      if (fsBtn) {
-        flipClockInstance.open();
-        return;
-      }
-
       const toggleBtn = e.target.closest("#timer-start-toggle-btn");
       if (toggleBtn) {
         timerService.toggle();

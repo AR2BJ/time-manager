@@ -3,6 +3,7 @@ import { StateManager, state } from "@/models/state.model.js";
 import { ActiveTaskCardComponent } from "@/components/features/tasks/active-task-card.component";
 import { AnalyticsView } from "@/views/analytics-view.js";
 import { DesktopNavComponent } from "@/components/layout/desktop-nav.component.js";
+import { FlipClockController } from "./flip-clock.controller";
 import { HeaderComponent } from "@/components/shared/header.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
 import { ModalController } from "./modal.controller";
@@ -24,6 +25,7 @@ export const TimerController = {
     timerService.initFromSavedState();
     TaskController.init();
     ModalController.init();
+    FlipClockController.init();
 
     soundService.init();
 
@@ -70,6 +72,7 @@ export const TimerController = {
   bindTimerEvents() {
     const btnPomodoro = document.getElementById("mode-pomodoro");
     const btnFlow = document.getElementById("mode-flow");
+    const btnOpenFlip = document.getElementById("fullscreen-btn");
     const controlsContainer = document.getElementById(
       "timer-controls-container",
     );
@@ -108,6 +111,11 @@ export const TimerController = {
       e.preventDefault();
       e.stopPropagation();
       this.handleModeSwitch("flow");
+    });
+
+    btnOpenFlip?.addEventListener("click", (e) => {
+      e.preventDefault();
+      FlipClockController.open();
     });
   },
 
