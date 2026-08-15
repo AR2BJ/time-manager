@@ -254,6 +254,51 @@ body {
   text-shadow: 0 0 10px rgba(0, 187, 167, 0.2);
 }
 
+/* ============================================ */
+/* FLIP CLOCK 3D ANIMATIONS & PERSPECTIVE      */
+/* ============================================ */
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.animate-flip-top {
+  animation: flipDownTop 0.3s ease-in forwards;
+  transform-origin: bottom;
+}
+
+.animate-flip-bottom {
+  animation: flipDownBottom 0.3s ease-out 0.3s forwards;
+  transform-origin: top;
+}
+
+@keyframes flipDownTop {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipDownBottom {
+  0% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
 @keyframes micro-ping {
   0% {
     transform: scale(1);

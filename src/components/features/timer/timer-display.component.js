@@ -1,5 +1,7 @@
 import { StateManager } from "@/models/state.model.js";
+import { flipClockInstance } from "./flip-clock.component";
 import { formatTime } from "@/utils/helpers.js";
+import { timerService } from "@/services/timer.service.js";
 
 export class TimerDisplayComponent {
   constructor() {
@@ -26,6 +28,14 @@ export class TimerDisplayComponent {
 
   mountLayout() {
     this.container.innerHTML = `
+      <button
+        id="enter-fullscreen-btn"
+        type="button"
+        class="absolute top-4 right-4 z-20 p-2 rounded-xl text-secondary hover:text-primary hover:bg-surface-2 transition cursor-pointer"
+        title="Enter Fullscreen Focus"
+      >
+        <i class="fa-regular fa-expand text-lg"></i>
+      </button>
       <div
         class="relative flex flex-col w-full justify-center rounded-xl border border-border bg-surface p-1 mb-6 sm:flex-row sm:w-fit sm:justify-start"
       >
@@ -125,7 +135,7 @@ export class TimerDisplayComponent {
           id="timer-start-toggle-btn"
           class="px-5 py-3 rounded-xl xs:px-6 xs:py-3.5 sm:px-8 sm:py-3.5 bg-brand hover:bg-brand/90 text-white font-semibold text-sm xs:text-base shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
         >
-          Start
+          Start Focus
         </button>
 
         <button
@@ -171,10 +181,41 @@ export class TimerDisplayComponent {
           : "Break Phase"
         : "Flow Mode";
     }
+
+    const toggleBtn = this.container.querySelector("#timer-start-toggle-btn");
+    if (toggleBtn) {
+      if (timer.isRunning) {
+        toggleBtn.textContent = "Pause";
+        toggleBtn.classList.remove("bg-brand", "hover:bg-brand/90");
+        toggleBtn.classList.add("bg-amber-500", "hover:bg-amber-600");
+      } else {
+        toggleBtn.textContent = isPomodoro ? "Start Focus" : "Start Flow";
+        toggleBtn.classList.remove("bg-amber-500", "hover:bg-amber-600");
+        toggleBtn.classList.add("bg-brand", "hover:bg-brand/90");
+      }
+    }
   }
 
   bindEvents() {
     this.container.addEventListener("click", (e) => {
+      const fsBtn = e.target.closest("#enter-fullscreen-btn");
+      if (fsBtn) {
+        flipClockInstance.open();
+        return;
+      }
+
+      const toggleBtn = e.target.closest("#timer-start-toggle-btn");
+      if (toggleBtn) {
+        timerService.toggle();
+        return;
+      }
+
+      const resetBtn = e.target.closest("#timer-reset-btn");
+      if (resetBtn) {
+        timerService.reset();
+        return;
+      }
+
       const modeBtn = e.target.closest("[data-mode]");
       if (modeBtn) {
         const mode = modeBtn.dataset.mode;

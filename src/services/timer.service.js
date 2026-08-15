@@ -14,6 +14,14 @@ class TimerService {
     }
   }
 
+  toggle() {
+    if (state.timer.isRunning && !state.timer.isPaused) {
+      this.pause();
+    } else {
+      this.start();
+    }
+  }
+
   start() {
     if (state.timer.isRunning && !state.timer.isPaused) return;
 
@@ -90,7 +98,6 @@ class TimerService {
       StateManager.updateTimerState({ timeRemaining: newTime });
     }
   }
-
 
   _handleFlowTick() {
     const newFlowTime = (state.timer.flowTime || 0) + 1;
