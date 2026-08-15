@@ -322,7 +322,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-start"
-              class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">Start Focus</span>
@@ -332,7 +332,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-pause"
-              class="flex h-14 min-w-48 items-center justify-center gap-3 rounded-2xl bg-amber-500 px-8 text-base font-bold text-white shadow-lg shadow-amber-500/25 hover:bg-amber-600 transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-pause pointer-events-none"></i>
               <span class="pointer-events-none">Pause</span>
@@ -342,7 +342,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-stop"
-              class="flex h-14 items-center justify-center gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-6 text-sm font-bold text-rose-500 hover:bg-rose-500/20 transition cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
               title="Stop & Reset"
             >
               <i class="fa-regular fa-square pointer-events-none"></i>
@@ -351,7 +351,7 @@ export const TimerController = {
 
             <button
               id="btn-timer-continue"
-              class="flex h-14 min-w-40 items-center justify-center gap-3 rounded-2xl bg-brand px-8 text-base font-bold text-white shadow-lg shadow-brand/25 hover:bg-(--color-brand-hover) transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">Continue</span>

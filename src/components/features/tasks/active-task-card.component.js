@@ -7,14 +7,14 @@ export const ActiveTaskCardComponent = {
     if (!activeTask) {
       return `
         <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-border">
+          <div class="flex flex-col sm:flex-row items-center sm:justify-between mb-4 pb-3 border-b border-border gap-2">
             <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
               <i class="fa-regular fa-bullseye-arrow text-brand"></i>
               <span>Active Focus Task</span>
             </span>
             <button 
               id="btn-change-task" 
-              class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+              class="w-full sm:w-auto rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
             >
               Select
             </button>

@@ -27,17 +27,17 @@ export class TimerDisplayComponent {
   mountLayout() {
     this.container.innerHTML = `
       <div
-        class="relative flex flex-col w-full justify-center rounded-xl border border-border bg-surface p-1 xs:flex-row xs:w-fit xs:justify-start"
+        class="relative flex flex-col w-full justify-center rounded-xl border border-border bg-surface p-1 mb-6 sm:flex-row sm:w-fit sm:justify-start"
       >
         <div
           id="mode-indicator"
-          class="absolute top-1 left-1 h-12 w-[calc(100%-8px)] rounded-lg bg-brand/80 transition-all duration-300 xs:h-[calc(100%-8px)] xs:w-32"
+          class="absolute top-1 left-1 h-12 w-[calc(100%-8px)] rounded-lg bg-brand/80 transition-all duration-300 xs:h-[calc(100%-8px)] sm:w-32"
         ></div>
 
         <button
           id="mode-pomodoro"
           data-mode="pomodoro"
-          class="relative z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer text-center xs:w-35 xs:rounded-l-xl xs:rounded-tr-none"
+          class="relative z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer text-center sm:w-35 xs:rounded-l-xl xs:rounded-tr-none"
         >
           <i class="fa-regular fa-stopwatch pointer-events-none"></i>
           <span class="pointer-events-none">Pomodoro</span>
@@ -46,7 +46,7 @@ export class TimerDisplayComponent {
         <button
           id="mode-flow"
           data-mode="flow"
-          class="relative z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer text-center xs:w-35"
+          class="relative z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer text-center sm:w-35"
         >
           <i class="fa-regular fa-water pointer-events-none"></i>
           <span class="pointer-events-none">Flow Mode</span>
@@ -54,7 +54,7 @@ export class TimerDisplayComponent {
       </div>
 
       <div
-        class="relative flex items-center justify-center w-95 h-95 sm:w-110 sm:h-110"
+        class="relative flex items-center justify-center w-50 h-50 xs:w-64 xs:h-64 sm:w-90 sm:h-90 lg:w-100 lg:h-100 2xl:w-110 2xl:h-110 transition-all"
       >
         <svg
           id="timer-svg-container"
@@ -95,21 +95,21 @@ export class TimerDisplayComponent {
         >
           <span
             id="timer-phase-badge"
-            class="mb-3 rounded-full bg-brand/10 px-4 py-1 text-xs font-bold text-brand uppercase tracking-widest border border-brand/20"
+            class="mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20"
           >
             Focus Phase
           </span>
 
           <span
             id="timer-display"
-            class="font-mono text-5xl sm:text-7xl font-extrabold tracking-tighter text-primary my-1"
+            class="font-mono text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold tracking-tighter text-primary my-1"
           >
             25:00
           </span>
 
           <span
             id="timer-sub-info"
-            class="mt-2 text-xs font-medium text-muted"
+            class="mt-2 text-[8px] xs:text-[10px] sm:text-xs font-medium text-muted"
           >
             Session Ready
           </span>
@@ -118,12 +118,12 @@ export class TimerDisplayComponent {
 
       <div
         id="timer-controls-container"
-        class="mt-6 flex items-center gap-4 w-full justify-center min-h-14"
+        class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2 w-full min-h-14"
       >
         <button
           type="button"
           id="timer-start-toggle-btn"
-          class="px-8 py-3.5 rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold text-base shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
+          class="px-5 py-3 rounded-xl xs:px-6 xs:py-3.5 sm:px-8 sm:py-3.5 bg-brand hover:bg-brand/90 text-white font-semibold text-sm xs:text-base shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
         >
           Start
         </button>
@@ -131,7 +131,7 @@ export class TimerDisplayComponent {
         <button
           type="button"
           id="timer-reset-btn"
-          class="px-5 py-3.5 rounded-xl bg-surface-2 hover:bg-surface-3 text-secondary font-medium text-base transition-all duration-200 active:scale-95 cursor-pointer border border-border"
+          class="px-4 py-3 rounded-xl xs:px-5 xs:py-3.5 sm:px-5 sm:py-3.5 bg-surface-2 hover:bg-surface-3 text-secondary font-medium text-sm xs:text-base transition-all duration-200 active:scale-95 cursor-pointer border border-border"
         >
           Reset
         </button>
