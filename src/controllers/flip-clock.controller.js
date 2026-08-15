@@ -27,8 +27,13 @@ export const FlipClockController = {
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen();
       }
+
+      // Auto-rotate and lock screen orientation to landscape on supported devices
+      if (screen.orientation && typeof screen.orientation.lock === "function") {
+        await screen.orientation.lock("landscape");
+      }
     } catch (err) {
-      console.warn("Fullscreen request declined:", err);
+      console.warn("Fullscreen or orientation lock failed:", err);
     }
 
     await this.requestWakeLock();
@@ -47,6 +52,15 @@ export const FlipClockController = {
 
     this.overlayEl.classList.add("opacity-0");
     setTimeout(() => this.overlayEl.classList.add("hidden"), 300);
+
+    // Unlock screen orientation when exiting
+    if (screen.orientation && typeof screen.orientation.unlock === "function") {
+      try {
+        screen.orientation.unlock();
+      } catch (err) {
+        console.warn("Failed to unlock screen orientation:", err);
+      }
+    }
 
     if (document.fullscreenElement) {
       try {
