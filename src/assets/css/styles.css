@@ -271,6 +271,25 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
+/* ============================================ */
+/* FLIP CLOCK 3D LEAF ANIMATIONS                */
+/* ============================================ */
+
+.flip-leaf-top {
+  transform-origin: bottom;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  animation: flipLeafTop 0.25s ease-in forwards;
+}
+
+.flip-leaf-bottom {
+  transform-origin: top;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateX(90deg);
+  animation: flipLeafBottom 0.25s ease-out 0.25s forwards;
+}
+
 .animate-flip-top {
   animation: flipDownTop 0.3s ease-in forwards;
   transform-origin: bottom;
@@ -279,6 +298,24 @@ body {
 .animate-flip-bottom {
   animation: flipDownBottom 0.3s ease-out 0.3s forwards;
   transform-origin: top;
+}
+
+@keyframes flipLeafTop {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipLeafBottom {
+  0% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
 }
 
 @keyframes flipDownTop {
