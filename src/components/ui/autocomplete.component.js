@@ -70,7 +70,7 @@ export class AutocompleteComponent {
             id="autocomplete-container-${uuid}"
             class="${
               this.options.containerClass
-            } relative min-h-10 w-full flex flex-wrap items-center content-start gap-1.5 rounded-xl border border-border bg-surface-2 p-1.75 pe-10 focus-within:border-brand/80 focus-within:ring-1 focus-within:ring-brand/30 transition group cursor-pointer"
+            } relative min-h-10 w-full flex flex-wrap items-center content-start gap-1.5 rounded-xl border border-border bg-surface-2 p-1.75 pe-10 transition group cursor-pointer text-sm text-primary placeholder:text-secondary/70 focus-within:border-brand/80 focus-within:outline-none"
           >
             <div
               id="autocomplete-chips-${uuid}"
