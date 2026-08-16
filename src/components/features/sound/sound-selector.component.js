@@ -11,6 +11,11 @@ export class SoundSelectorComponent {
   }
 
   render() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
+
     this.container = document.createElement("div");
     this.container.className = "w-full relative dir-rtl";
 
@@ -95,7 +100,11 @@ export class SoundSelectorComponent {
   setValueSilently(value) {
     if (!this.autocomplete) return;
     this.isSilentUpdating = true;
-    this.autocomplete.setValue(value);
+
+    if (typeof this.autocomplete.setValue === "function") {
+      this.autocomplete.setValue(value, false);
+    }
+
     this.isSilentUpdating = false;
   }
 
@@ -111,9 +120,11 @@ export class SoundSelectorComponent {
   destroy() {
     if (typeof this.unsubscribe === "function") {
       this.unsubscribe();
+      this.unsubscribe = null;
     }
     if (this.autocomplete && typeof this.autocomplete.destroy === "function") {
       this.autocomplete.destroy();
+      this.autocomplete = null;
     }
   }
 }

@@ -23,6 +23,7 @@ export const SettingsController = {
   pomoSoundAutocomplete: null,
   breakSoundAutocomplete: null,
   unsubscribeSound: null,
+  unsubscribeState: null,
 
   init() {
     this.mountSoundSelector();
@@ -90,7 +91,7 @@ export const SettingsController = {
     }
 
     if (this.soundSelector) {
-      this.soundSelector.render();
+      this.soundSelector.syncSelectedTrack();
     }
   },
 
@@ -432,6 +433,10 @@ export const SettingsController = {
 
         if (displayEl) {
           displayEl.textContent = `${effectiveVol}%`;
+        }
+
+        if (this.soundSelector) {
+          this.soundSelector.syncSelectedTrack();
         }
       });
     }
