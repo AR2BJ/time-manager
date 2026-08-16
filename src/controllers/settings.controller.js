@@ -32,8 +32,90 @@ export const SettingsController = {
     this.bindSettingsEvents();
     this.listenToSoundChanges();
 
+    this.unsubscribeState = StateManager.subscribe(() => {
+      this.syncUI();
+    });
+
     SettingsImportController.init();
     SettingsResetController.init();
+
+    this.syncUI();
+  },
+
+  syncUI() {
+    const { settings } = StateManager.getState();
+
+    const pomoLen = document.getElementById("sett-pomo-len");
+    if (pomoLen) pomoLen.value = settings.pomodoroWorkTime ?? 25;
+
+    const shortBreak = document.getElementById("sett-short-break-len");
+    if (shortBreak) shortBreak.value = settings.shortBreakTime ?? 5;
+
+    const longBreak = document.getElementById("sett-long-break-len");
+    if (longBreak) longBreak.value = settings.longBreakTime ?? 15;
+
+    const longInterval = document.getElementById("sett-long-break-interval");
+    if (longInterval) longInterval.value = settings.longBreakInterval ?? 4;
+
+    const volume = document.getElementById("sett-volume");
+    if (volume) {
+      volume.value = settings.volume ?? 50;
+      updateRangeFill(volume);
+    }
+
+    const volumeVal = document.getElementById("sett-volume-val");
+    if (volumeVal) volumeVal.textContent = `${settings.volume ?? 50}%`;
+
+    this.setToggleUI(
+      "sett-auto-start-pomo",
+      Boolean(settings.autoStartPomodoros),
+    );
+    this.setToggleUI(
+      "sett-auto-start-break",
+      Boolean(settings.autoStartBreaks),
+    );
+    this.setToggleUI("sett-disable-breaks", Boolean(settings.disableBreaks));
+
+    if (this.pomoSoundAutocomplete) {
+      this.pomoSoundAutocomplete.setValue(
+        settings.pomodoroEndSound || "none",
+        false,
+      );
+    }
+    if (this.breakSoundAutocomplete) {
+      this.breakSoundAutocomplete.setValue(
+        settings.breakEndSound || "none",
+        false,
+      );
+    }
+
+    if (this.soundSelector) {
+      this.soundSelector.render();
+    }
+  },
+
+  setToggleUI(id, isChecked) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    btn.dataset.checked = String(isChecked);
+    const dot = btn.querySelector("span");
+
+    if (isChecked) {
+      btn.classList.remove("bg-neutral-300/80", "dark:bg-neutral-700/80");
+      btn.classList.add("bg-brand");
+      if (dot) {
+        dot.classList.remove("translate-x-0");
+        dot.classList.add("translate-x-5");
+      }
+    } else {
+      btn.classList.remove("bg-brand");
+      btn.classList.add("bg-neutral-300/80", "dark:bg-neutral-700/80");
+      if (dot) {
+        dot.classList.remove("translate-x-5");
+        dot.classList.add("translate-x-0");
+      }
+    }
   },
 
   mountSoundSelector() {
@@ -179,7 +261,7 @@ export const SettingsController = {
     }
   },
 
-saveAllTimerSettings() {
+  saveAllTimerSettings() {
     const pomodoroWorkTime =
       Number(document.getElementById("sett-pomo-len")?.value) || 25;
     const shortBreakTime =
@@ -360,5 +442,6 @@ saveAllTimerSettings() {
     if (this.breakSoundAutocomplete) this.breakSoundAutocomplete.destroy();
     if (this.soundSelector) this.soundSelector.destroy();
     if (typeof this.unsubscribeSound === "function") this.unsubscribeSound();
+    if (typeof this.unsubscribeState === "function") this.unsubscribeState();
   },
 };

@@ -3,7 +3,9 @@ import { loadFromStorage, saveToStorage } from "./storage.model.js";
 import { SoundModel } from "./sound.model.js";
 import { generateId } from "@/utils/helpers.js";
 
-const DEFAULT_SETTINGS = {
+export const SOUND_STORAGE_KEY = "app_selected_sound_id";
+
+export const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
   shortBreakTime: 5,
   longBreakTime: 15,
@@ -17,6 +19,7 @@ const DEFAULT_SETTINGS = {
   vibration: true,
   currentSoundId: "none",
   notificationSound: true,
+  lastSelectedSoundId: "none",
 };
 
 export const state = {
@@ -57,6 +60,7 @@ export const StateManager = {
           longBreakInterval:
             Number(saved.settings.longBreakInterval) ||
             DEFAULT_SETTINGS.longBreakInterval,
+          lastSelectedSoundId: saved.settings.lastSelectedSoundId || "none",
         };
         SoundModel.init(saved.settings);
       } else {
@@ -175,6 +179,31 @@ export const StateManager = {
     this.notify();
   },
 
+  resetToDefaults() {
+    state.settings = { ...DEFAULT_SETTINGS };
+    state.tasks = [];
+    state.sessions = [];
+    state.activeTaskId = null;
+    state.activeMode = "pomodoro";
+
+    const defaultSecs = DEFAULT_SETTINGS.pomodoroWorkTime * 60;
+    state.timer = {
+      isRunning: false,
+      isPaused: false,
+      timeRemaining: defaultSecs,
+      duration: defaultSecs,
+      flowTime: 0,
+      pomodoroSessionCount: 0,
+      currentPhase: "work",
+    };
+
+    localStorage.removeItem(SOUND_STORAGE_KEY);
+    SoundModel.init(DEFAULT_SETTINGS);
+
+    this.save();
+    this.notify();
+  },
+
   addSession(sessionData = {}) {
     const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
     const session = {
@@ -203,6 +232,10 @@ export const StateManager = {
 
   save() {
     const soundData = SoundModel.getCurrentTrack();
+    const soundId = soundData ? soundData.id : "none";
+
+    state.settings.lastSelectedSoundId = soundId;
+
     saveToStorage({
       activeMode: state.activeMode,
       tasks: state.tasks,
@@ -211,7 +244,7 @@ export const StateManager = {
       settings: {
         ...state.settings,
         longBreakInterval: Number(state.settings.longBreakInterval) || 4,
-        lastSelectedSoundId: soundData ? soundData.id : "none",
+        lastSelectedSoundId: soundId,
       },
     });
   },

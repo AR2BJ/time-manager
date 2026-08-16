@@ -128,9 +128,6 @@ export const NotificationService = {
   removeToast(toast) {
     toast.classList.add("opacity-0", "translate-y-2");
     setTimeout(() => {
-      document.getElementById("edit-modal").classList.contains("flex")
-        ? document.body.classList.add("overflow-hidden")
-        : "";
       if (toast.parentNode) {
         toast.remove();
       }

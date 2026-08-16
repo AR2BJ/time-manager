@@ -42,7 +42,7 @@ export class NoteModel {
 
   static saveAndNotify() {
     try {
-      localStorage.setItem(SCRATCHPAD_STORAGE_KEY, JSON.stringify(this.items));
+      localStorage.setItem(NOTE_STORAGE_KEY, JSON.stringify(this.items));
     } catch (e) {
       console.error("Failed to save notes:", e);
     }

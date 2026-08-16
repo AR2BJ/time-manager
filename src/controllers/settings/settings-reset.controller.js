@@ -1,94 +1,19 @@
-import { StateManager, state } from "@/models/state.model.js";
+import {
+  SOUND_STORAGE_KEY,
+  StateManager,
+  state,
+} from "@/models/state.model.js";
 
-import { GlobalLoaderService } from "@/services/loader.service";
+import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
-
-// import { generateDynamicMockData } from "@/utils/seed-generator";
+import { SoundModel } from "@/models/sound.model.js";
 
 export const SettingsResetController = {
   keydownHandler: null,
 
   init() {
     this.initResetModalEvents();
-    this.initSeedEvents();
-  },
-
-  initSeedEvents() {
-    document
-      .getElementById("sett-seed-btn")
-      ?.addEventListener("click", () => this.handleDataSeeding());
-  },
-
-  handleDataSeeding() {
-    const seedBtn = document.getElementById("sett-seed-btn");
-    const seedIcon = document.getElementById("sett-seed-icon");
-    const seedSpinner = document.getElementById("sett-seed-spinner");
-    const seedText = document.getElementById("sett-seed-text");
-
-    const mockDataCount = Math.floor(Math.random() * 100);
-
-    if (seedBtn) seedBtn.disabled = true;
-    if (seedIcon) seedIcon.classList.replace("flex", "hidden");
-    if (seedSpinner) seedSpinner.classList.replace("hidden", "flex");
-    if (seedText)
-      seedText.textContent = "Processing & Constructing Database Layers...";
-
-    NotificationService.show({
-      type: "info",
-      message: `Initiating massive ${mockDataCount}-time matrix calculation...`,
-      icon: "fa-gears",
-      iconColor: "text-brand/80",
-      duration: 5000,
-    });
-
-    setTimeout(() => {
-      this.resetSession();
-    }, 200);
-
-    setTimeout(() => {
-      try {
-        // const dynamicMockData = generateDynamicMockData(mockDataCount);
-
-        // StateManager.save(dynamicMockData.times, dynamicMockData.tags || []);
-
-        state.activeTab = "active";
-        state.currentView = "times";
-
-        setTimeout(() => {
-          NotificationService.show({
-            type: "success",
-            message: `Sandbox environment populated with ${mockDataCount} edge-case routine logs.`,
-            icon: "fa-circle-check",
-            iconColor: "text-emerald-500/80",
-            duration: 5000,
-          });
-
-          if (seedBtn) seedBtn.disabled = false;
-          if (seedIcon) seedIcon.classList.replace("hidden", "flex");
-          if (seedSpinner) seedSpinner.classList.replace("flex", "hidden");
-          if (seedText) seedText.textContent = "Seed Historical Mock Data";
-        }, 200);
-      } catch (error) {
-        console.error("Critical fault inside seeding controller:", error);
-
-        if (seedBtn) seedBtn.disabled = false;
-        if (seedIcon) seedIcon.classList.replace("hidden", "flex");
-        if (seedSpinner) seedSpinner.classList.replace("flex", "hidden");
-
-        NotificationService.show({
-          type: "error",
-          message: error.message || "Fail-Safe Trigger: Retry Seeding",
-          icon: "fa-circle-exclamation",
-          iconColor: "text-red-500/80",
-          duration: 5000,
-        });
-      }
-    }, 60);
-  },
-
-  resetSession() {
-    StateManager.init();
   },
 
   closeResetModal() {
@@ -118,7 +43,6 @@ export const SettingsResetController = {
       this.executeApplicationReset();
     });
 
-    // Keydown handler for reset modal
     if (this.keydownHandler) {
       document.removeEventListener("keydown", this.keydownHandler);
     }
@@ -144,8 +68,15 @@ export const SettingsResetController = {
 
   executeApplicationReset() {
     const previousPayload = localStorage.getItem(STORAGE_KEY);
-    const previousTimes = StateManager.getTimes().map((time) => ({ ...time }));
-    const previousTags = StateManager.getTags().map((tag) => ({ ...tag }));
+    const previousSoundId = localStorage.getItem(SOUND_STORAGE_KEY);
+
+    const previousState = {
+      tasks: (state.tasks || []).map((t) => ({ ...t })),
+      sessions: (state.sessions || []).map((s) => ({ ...s })),
+      settings: { ...state.settings },
+      activeMode: state.activeMode,
+      timer: { ...state.timer },
+    };
 
     this.closeResetModal();
 
@@ -154,18 +85,16 @@ export const SettingsResetController = {
     setTimeout(() => {
       try {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(SOUND_STORAGE_KEY);
 
-        state.times = [];
-        state.tags = [];
-        state.activeTab = "active";
-        state.currentView = "times";
+        StateManager.resetToDefaults();
 
-        renderTimeList([], state.activeTab);
+        StateManager.setView("timer");
 
         NotificationService.show({
           type: "error",
           message:
-            "Application synchronization storage has been completely cleared.",
+            "Application synchronization storage and audio settings have been completely reset.",
           duration: 5000,
           undoAction: () => {
             GlobalLoaderService.show(
@@ -175,21 +104,23 @@ export const SettingsResetController = {
               try {
                 if (previousPayload) {
                   localStorage.setItem(STORAGE_KEY, previousPayload);
-                } else {
-                  localStorage.removeItem(STORAGE_KEY);
+                }
+                if (previousSoundId) {
+                  localStorage.setItem(SOUND_STORAGE_KEY, previousSoundId);
                 }
 
-                StateManager.save(previousTimes || [], previousTags || []);
-                state.times = previousTimes || [];
-                state.tags = previousTags || [];
+                state.tasks = previousState.tasks;
+                state.sessions = previousState.sessions;
+                state.settings = previousState.settings;
+                state.activeMode = previousState.activeMode;
+                state.timer = previousState.timer;
 
-                state.activeTab = "active";
-                state.currentView = "times";
+                SoundModel.init(previousState.settings);
 
-                renderTimeList(
-                  StateManager.getFilteredTimes(),
-                  state.activeTab,
-                );
+                StateManager.setView("timer");
+
+                StateManager.save();
+                StateManager.notify();
               } finally {
                 GlobalLoaderService.hide();
               }

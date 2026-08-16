@@ -288,10 +288,10 @@ export const SettingsViewComponent = {
                 <h3
                   class="text-sm sm:text-base font-semibold text-primary truncate"
                 >
-                  Data Backup & Sandbox
+                  Data Backup & Synchronization
                 </h3>
                 <p class="text-[11px] sm:text-xs text-secondary truncate">
-                  Export workspace records, import snapshots, or seed mock data.
+                  Export core ledger, import backup snapshots, or reset storage.
                 </p>
               </div>
             </div>
@@ -354,10 +354,10 @@ export const SettingsViewComponent = {
                     >browse local files</span
                   >
                 </span>
-                <span class="text-[10px] text-secondary font-medium"
-                  >Supports validated .json backups, .md reports or structured
-                  .csv tables</span
-                >
+                <span class="text-[10px] text-secondary font-medium">
+                  Supports validated .json backups, .md reports or structured
+                  .csv tables
+                </span>
                 <input
                   type="file"
                   id="sett-import-file"
