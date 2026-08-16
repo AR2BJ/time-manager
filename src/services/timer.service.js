@@ -107,26 +107,44 @@ class TimerService {
   _onPomodoroComplete() {
     clearInterval(this.timerInterval);
 
-    // Play unified notification beep sound
     soundService.playNotificationSound();
 
     const isWorkPhase = state.timer.currentPhase === "work";
 
     if (isWorkPhase) {
       const newSessionCount = (state.timer.pomodoroSessionCount || 0) + 1;
-      const interval = state.settings.longBreakInterval || 4;
+      const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
 
+      StateManager.addSession({
+        type: "pomodoro",
+        durationSeconds: workSecs,
+      });
+
+      if (state.settings.disableBreaks) {
+        StateManager.updateTimerState({
+          isRunning: false,
+          isPaused: false,
+          pomodoroSessionCount: newSessionCount,
+          currentPhase: "work",
+          timeRemaining: workSecs,
+          duration: workSecs,
+        });
+
+        if (state.settings.autoStartPomodoros) {
+          this.start();
+        } else {
+          soundService.pause();
+        }
+        return;
+      }
+
+      const interval = state.settings.longBreakInterval || 4;
       const isLongBreak = newSessionCount % interval === 0;
       const nextPhase = isLongBreak ? "longBreak" : "shortBreak";
       const breakMinutes =
         nextPhase === "longBreak"
           ? state.settings.longBreakTime || 15
           : state.settings.shortBreakTime || 5;
-
-      StateManager.addSession({
-        type: "pomodoro",
-        durationSeconds: (state.settings.pomodoroWorkTime || 25) * 60,
-      });
 
       StateManager.updateTimerState({
         isRunning: false,

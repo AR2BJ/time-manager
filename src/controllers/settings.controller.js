@@ -3,6 +3,7 @@ import { SettingsImportController } from "./settings/settings-import.controller.
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
 import { StateManager } from "@/models/state.model.js";
 import { getTheme } from "@/services/theme.service.js";
+import { timerService } from "@/services/timer.service.js";
 
 export const SettingsController = {
   init() {
@@ -96,6 +97,8 @@ export const SettingsController = {
       vibration,
       currentSoundId,
     });
+
+    timerService.reset();
   },
 
   bindSettingsEvents() {
