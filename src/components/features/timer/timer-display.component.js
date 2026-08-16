@@ -7,6 +7,7 @@ export class TimerDisplayComponent {
     this.container = null;
     this.unsubscribeState = null;
     this.currentViewMode = "default";
+    this.onDocumentTouch = this.handleOutsideTouch.bind(this);
   }
 
   render() {
@@ -27,14 +28,6 @@ export class TimerDisplayComponent {
 
   mountLayout() {
     this.container.innerHTML = `
-      <button
-        id="fullscreen-btn"
-        type="button"
-        class="absolute top-4 right-4 z-20 p-2 rounded-xl text-secondary hover:text-primary hover:bg-surface-2 transition cursor-pointer"
-        title="Enter Fullscreen Focus"
-      >
-        <i class="fa-regular fa-expand text-lg"></i>
-      </button>
       <div
         class="relative flex flex-col w-full justify-center rounded-xl border border-border bg-surface p-1 mb-6 sm:flex-row sm:w-fit sm:justify-start"
       >
@@ -63,8 +56,20 @@ export class TimerDisplayComponent {
       </div>
 
       <div
-        class="relative flex items-center justify-center w-50 h-50 xs:w-64 xs:h-64 sm:w-90 sm:h-90 lg:w-100 lg:h-100 2xl:w-110 2xl:h-110 transition-all"
+        id="timer-ring-wrapper"
+        class="relative group flex items-center justify-center w-50 h-50 xs:w-64 xs:h-64 sm:w-90 sm:h-90 lg:w-100 lg:h-100 2xl:w-110 2xl:h-110 transition cursor-pointer"
       >
+        <button
+          id="open-fullscreen-btn"
+          type="button"
+          class="absolute top-1 right-1 sm:top-6 sm:right-6 z-30 backdrop-blur-md duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-surface hover:bg-surface-2  text-secondary hover:text-primary transition flex items-center justify-center cursor-pointer border border-border active:scale-95"
+          title="Enter Fullscreen Focus"
+        >
+          <i
+            class="fa-regular fa-expand text-xs sm:text-sm pointer-events-none"
+          ></i>
+        </button>
+
         <svg
           id="timer-svg-container"
           class="w-full h-full transform -rotate-90 origin-center relative z-0"
@@ -125,6 +130,7 @@ export class TimerDisplayComponent {
         </div>
       </div>
 
+      <!-- Controls Container -->
       <div
         id="timer-controls-container"
         class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2 w-full min-h-14"
@@ -196,6 +202,22 @@ export class TimerDisplayComponent {
   }
 
   bindEvents() {
+    const fullscreenBtn = this.container.querySelector("#open-fullscreen-btn");
+
+    this.container.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target.closest("#open-fullscreen-btn")) return;
+
+        this.showFullscreenBtn(fullscreenBtn);
+      },
+      { passive: true },
+    );
+
+    document.addEventListener("touchstart", this.onDocumentTouch, {
+      passive: true,
+    });
+
     this.container.addEventListener("click", (e) => {
       const toggleBtn = e.target.closest("#timer-start-toggle-btn");
       if (toggleBtn) {
@@ -217,7 +239,26 @@ export class TimerDisplayComponent {
     });
   }
 
+  showFullscreenBtn(btn) {
+    if (!btn) return;
+    btn.classList.remove("opacity-0", "pointer-events-none");
+    btn.classList.add("opacity-100", "pointer-events-auto");
+  }
+
+  hideFullscreenBtn(btn) {
+    if (!btn) return;
+    btn.classList.remove("opacity-100", "pointer-events-auto");
+    btn.classList.add("opacity-0", "pointer-events-none");
+  }
+
+  handleOutsideTouch(e) {
+    if (!this.container || this.container.contains(e.target)) return;
+    const fullscreenBtn = this.container.querySelector("#open-fullscreen-btn");
+    this.hideFullscreenBtn(fullscreenBtn);
+  }
+
   destroy() {
+    document.removeEventListener("touchstart", this.onDocumentTouch);
     if (this.unsubscribeState) this.unsubscribeState();
   }
 }

@@ -72,7 +72,7 @@ export const TimerController = {
   bindTimerEvents() {
     const btnPomodoro = document.getElementById("mode-pomodoro");
     const btnFlow = document.getElementById("mode-flow");
-    const btnOpenFlip = document.getElementById("fullscreen-btn");
+    const btnOpenFlip = document.getElementById("open-fullscreen-btn");
     const controlsContainer = document.getElementById(
       "timer-controls-container",
     );
