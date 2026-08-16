@@ -351,7 +351,7 @@ export const SettingsController = {
     document
       .getElementById("sett-export-csv-btn")
       ?.addEventListener("click", () =>
-        SettingsExportController.handleDataExport("notion"),
+        SettingsExportController.handleDataExport("csv"),
       );
 
     window.addEventListener("resize", () => this.syncThemeControls(getTheme()));

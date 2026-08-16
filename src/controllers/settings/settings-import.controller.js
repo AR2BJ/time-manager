@@ -2,7 +2,9 @@ import { StateManager, state } from "@/models/state.model.js";
 import { formatDate, generateId } from "@/utils/helpers.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
+import { NoteModel } from "@/models/note.model.js";
 import { NotificationService } from "@/services/notification.service.js";
+import { SoundModel } from "@/models/sound.model.js";
 
 export const SettingsImportController = {
   init() {
@@ -69,32 +71,54 @@ export const SettingsImportController = {
           const rawContent = event.target.result;
           let importedTasks = [];
           let importedSessions = [];
+          let importedNotes = [];
+          let importedSettings = null;
 
           if (format === "json") {
             const parsedJson = JSON.parse(rawContent);
             importedTasks = parsedJson.tasks || [];
             importedSessions = parsedJson.sessions || [];
+            importedNotes = parsedJson.notes || [];
+            importedSettings = parsedJson.settings || null;
           } else if (format === "markdown") {
             const parsedMd = this.parseMarkdownToState(rawContent);
             importedTasks = parsedMd.tasks;
             importedSessions = parsedMd.sessions;
+            importedNotes = parsedMd.notes;
+            importedSettings = parsedMd.settings;
           } else if (format === "csv") {
             const parsedCsv = this.parseCsvToState(rawContent);
             importedTasks = parsedCsv.tasks;
             importedSessions = parsedCsv.sessions;
+            importedNotes = parsedCsv.notes;
+            importedSettings = parsedCsv.settings;
           }
 
           if (
             !Array.isArray(importedTasks) &&
-            !Array.isArray(importedSessions)
+            !Array.isArray(importedSessions) &&
+            !Array.isArray(importedNotes)
           ) {
             throw new Error("Invalid payload structure.");
           }
 
           state.tasks = importedTasks;
           state.sessions = importedSessions;
+
+          if (importedSettings) {
+            StateManager.updateSettings(importedSettings);
+            if (importedSettings.lastSelectedSoundId) {
+              SoundModel.setSoundTrack(importedSettings.lastSelectedSoundId);
+            }
+            if (typeof importedSettings.volume === "number") {
+              SoundModel.setVolume(importedSettings.volume);
+            }
+          }
+
           StateManager.save();
           StateManager.notify();
+
+          NoteModel.setItems(importedNotes);
 
           NotificationService.show({
             type: "success",
@@ -124,6 +148,65 @@ export const SettingsImportController = {
   parseMarkdownToState(mdContent) {
     const tasks = [];
     const sessions = [];
+    const notes = [];
+    const settings = {};
+
+    const settingsSection = mdContent.split("## ⚙️ SETTINGS")[1];
+    if (settingsSection) {
+      const getVal = (label) => {
+        const match = settingsSection.match(
+          new RegExp(`- \\*\\*${label}:\\*\\*\\s*(.+)`),
+        );
+        return match ? match[1].trim() : null;
+      };
+
+      const pomodoroWorkTime = getVal("Pomodoro Work Time");
+      if (pomodoroWorkTime)
+        settings.pomodoroWorkTime = Number(pomodoroWorkTime);
+
+      const shortBreakTime = getVal("Short Break Time");
+      if (shortBreakTime) settings.shortBreakTime = Number(shortBreakTime);
+
+      const longBreakTime = getVal("Long Break Time");
+      if (longBreakTime) settings.longBreakTime = Number(longBreakTime);
+
+      const longBreakInterval = getVal("Long Break Interval");
+      if (longBreakInterval)
+        settings.longBreakInterval = Number(longBreakInterval);
+
+      const autoStartBreaks = getVal("Auto Start Breaks");
+      if (autoStartBreaks)
+        settings.autoStartBreaks = autoStartBreaks.toLowerCase() === "yes";
+
+      const autoStartPomodoros = getVal("Auto Start Pomodoros");
+      if (autoStartPomodoros)
+        settings.autoStartPomodoros =
+          autoStartPomodoros.toLowerCase() === "yes";
+
+      const disableBreaks = getVal("Disable Breaks");
+      if (disableBreaks)
+        settings.disableBreaks = disableBreaks.toLowerCase() === "yes";
+
+      const volume = getVal("Volume");
+      if (volume) settings.volume = Number(volume);
+
+      const pomodoroEndSound = getVal("Pomodoro End Sound");
+      if (pomodoroEndSound) settings.pomodoroEndSound = pomodoroEndSound;
+
+      const breakEndSound = getVal("Break End Sound");
+      if (breakEndSound) settings.breakEndSound = breakEndSound;
+
+      const notificationSound = getVal("Notification Sound");
+      if (notificationSound)
+        settings.notificationSound = notificationSound.toLowerCase() === "yes";
+
+      const vibration = getVal("Vibration");
+      if (vibration) settings.vibration = vibration.toLowerCase() === "yes";
+
+      const lastSelectedSoundId = getVal("Last Selected Sound ID");
+      if (lastSelectedSoundId)
+        settings.lastSelectedSoundId = lastSelectedSoundId;
+    }
 
     const taskBlocks = mdContent
       .split(/---\s*\n/)
@@ -132,20 +215,40 @@ export const SettingsImportController = {
       const idMatch = block.match(/## #️⃣\s*(.+)/);
       const titleMatch = block.match(/### 🎯\s*(.+)/);
       const statusMatch = block.match(/- \*\*Status:\*\*\s*(.+)/);
+      const priorityMatch = block.match(/- \*\*Priority:\*\*\s*(.+)/);
+      const tagsMatch = block.match(/- \*\*Tags:\*\*\s*(.*)/);
       const estMatch = block.match(/- \*\*Estimated Pomodoros:\*\*\s*(\d+)/);
       const compMatch = block.match(/- \*\*Completed Pomodoros:\*\*\s*(\d+)/);
+      const dueDateMatch = block.match(/- \*\*Due Date:\*\*\s*(.+)/);
       const createdAtMatch = block.match(/- \*\*Created At:\*\*\s*(.+)/);
+      const completedAtMatch = block.match(/- \*\*Completed At:\*\*\s*(.+)/);
+      const descMatch = block.match(/- \*\*Description:\*\*\s*(.*)/);
 
       if (idMatch && titleMatch) {
+        const rawTags = tagsMatch ? tagsMatch[1].trim() : "";
+        const tags = rawTags ? rawTags.split(",").map((t) => t.trim()) : [];
+        const dueDate = dueDateMatch ? dueDateMatch[1].trim() : null;
+        const completedAt = completedAtMatch
+          ? completedAtMatch[1].trim()
+          : null;
+
         tasks.push({
           id: idMatch[1].trim(),
           title: titleMatch[1].trim(),
           status: statusMatch ? statusMatch[1].trim() : "todo",
+          priority: priorityMatch ? priorityMatch[1].trim() : "medium",
+          tags: tags,
           estimatedPomodoros: estMatch ? parseInt(estMatch[1], 10) : 1,
           completedPomodoros: compMatch ? parseInt(compMatch[1], 10) : 0,
+          dueDate: dueDate === "N/A" ? null : dueDate,
           createdAt: createdAtMatch
             ? createdAtMatch[1].trim()
             : formatDate(new Date()),
+          completedAt: completedAt === "N/A" ? null : completedAt,
+          description:
+            descMatch && descMatch[1].trim() !== "None"
+              ? descMatch[1].trim()
+              : "",
         });
       }
     });
@@ -155,7 +258,7 @@ export const SettingsImportController = {
       const sessionLines = sessionSection.match(/- \*\*ID:\*\*\s*(.+)/g);
       sessionLines?.forEach((line) => {
         const match = line.match(
-          /- \*\*ID:\*\*\s*(.+?)\s*\|\s*\*\*Task:\*\*\s*(.+?)\s*\(Task ID:\s*(.+?)\)\s*\|\s*\*\*Type:\*\*\s*(.+?)\s*\|\s*\*\*Duration:\*\*\s*(\d+)s\s*\|\s*\*\*Completed At:\*\*\s*(.+)/,
+          /- \*\*ID:\*\*\s*(.+?)\s*\|\s*\*\*Task:\*\*\s*(.+?)\s*\(Task ID:\s*(.+?)\)\s*\|\s*\*\*Type:\*\*\s*(.+?)\s*\|\s*\*\*Duration:\*\*\s*(\d+)s\s*\/\s*(\d+)s\s*\|\s*\*\*Flow Mode:\*\*\s*(.+?)\s*\|\s*\*\*Completed At:\*\*\s*(.+)/,
         );
         if (match) {
           sessions.push({
@@ -164,18 +267,44 @@ export const SettingsImportController = {
             taskId: match[3].trim() === "N/A" ? null : match[3].trim(),
             type: match[4].trim(),
             durationSeconds: parseInt(match[5], 10) || 0,
-            completedAt: match[6].trim(),
+            targetDurationSeconds: parseInt(match[6], 10) || 1500,
+            isFlowMode: match[7].trim().toLowerCase() === "yes",
+            completedAt: match[8].trim(),
           });
         }
       });
     }
 
-    return { tasks, sessions };
+    const noteSection = mdContent.split("## 📌 NOTES")[1];
+    if (noteSection) {
+      const noteBlocks = noteSection
+        .split(/- \*\*ID:\*\*/)
+        .filter((b) => b.trim());
+      noteBlocks.forEach((block) => {
+        const lines = block.trim().split("\n");
+        const idAndDateMatch = lines[0].match(
+          /(.+?)\s*\|\s*\*\*Created At:\*\*\s*(.+)/,
+        );
+        const textMatch = block.match(/\*\*Text:\*\*\s*(.*)/);
+
+        if (idAndDateMatch) {
+          notes.push({
+            id: idAndDateMatch[1].trim(),
+            createdAt: Number(idAndDateMatch[2].trim()) || Date.now(),
+            text: textMatch ? textMatch[1].trim() : "",
+          });
+        }
+      });
+    }
+
+    return { tasks, sessions, notes, settings };
   },
 
   parseCsvToState(csvContent) {
     const tasks = [];
     const sessions = [];
+    const notes = [];
+    const settings = {};
 
     const parseCsvLine = (text) => {
       const result = [];
@@ -208,26 +337,70 @@ export const SettingsImportController = {
       const line = lines[i].trim();
       if (!line || line.startsWith("#")) continue;
 
-      if (line === "[TASKS]") {
+      if (line === "[SETTINGS]") {
+        currentSection = "SETTINGS";
+        continue;
+      } else if (line === "[TASKS]") {
         currentSection = "TASKS";
         continue;
       } else if (line === "[SESSIONS]") {
         currentSection = "SESSIONS";
         continue;
+      } else if (line === "[NOTES]") {
+        currentSection = "NOTES";
+        continue;
       }
 
       const cols = parseCsvLine(line);
 
-      if (currentSection === "TASKS") {
+      if (currentSection === "SETTINGS") {
+        if (cols[0] === "Key" && cols[1] === "Value") continue;
+        if (cols.length >= 2) {
+          const key = cols[0].trim();
+          const val = cols[1].trim();
+
+          if (
+            [
+              "pomodoroWorkTime",
+              "shortBreakTime",
+              "longBreakTime",
+              "longBreakInterval",
+              "volume",
+            ].includes(key)
+          ) {
+            settings[key] = Number(val);
+          } else if (
+            [
+              "autoStartBreaks",
+              "autoStartPomodoros",
+              "disableBreaks",
+              "isMuted",
+              "notificationSound",
+              "vibration",
+            ].includes(key)
+          ) {
+            settings[key] = val.toLowerCase() === "true";
+          } else {
+            settings[key] = val;
+          }
+        }
+      } else if (currentSection === "TASKS") {
         if (cols[0] === "Id" && cols[1] === "Title") continue;
         if (cols.length >= 2) {
+          const tagsStr = cols[4] ? cols[4].trim() : "";
           tasks.push({
             id: cols[0] ? cols[0].trim() : generateId(),
             title: cols[1] ? cols[1].trim() : "Untitled Task",
             status: cols[2] ? cols[2].trim() : "todo",
-            estimatedPomodoros: cols[3] ? parseInt(cols[3], 10) : 1,
-            completedPomodoros: cols[4] ? parseInt(cols[4], 10) : 0,
-            createdAt: cols[5] ? cols[5].trim() : formatDate(new Date()),
+            priority: cols[3] ? cols[3].trim() : "medium",
+            tags: tagsStr ? tagsStr.split(";").map((t) => t.trim()) : [],
+            estimatedPomodoros: cols[5] ? parseInt(cols[5], 10) : 1,
+            completedPomodoros: cols[6] ? parseInt(cols[6], 10) : 0,
+            dueDate: cols[7] && cols[7].trim() !== "" ? cols[7].trim() : null,
+            createdAt: cols[8] ? cols[8].trim() : formatDate(new Date()),
+            completedAt:
+              cols[9] && cols[9].trim() !== "" ? cols[9].trim() : null,
+            description: cols[10] ? cols[10].trim() : "",
           });
         }
       } else if (currentSection === "SESSIONS") {
@@ -240,12 +413,27 @@ export const SettingsImportController = {
             taskTitle: cols[2] ? cols[2].trim() : "Untitled",
             type: cols[3] ? cols[3].trim() : "pomodoro",
             durationSeconds: cols[4] ? parseInt(cols[4], 10) : 0,
-            completedAt: cols[5] ? cols[5].trim() : formatDate(new Date()),
+            targetDurationSeconds: cols[5] ? parseInt(cols[5], 10) : 1500,
+            isFlowMode: cols[6]
+              ? cols[6].trim().toLowerCase() === "true"
+              : false,
+            completedAt: cols[7] ? cols[7].trim() : formatDate(new Date()),
+          });
+        }
+      } else if (currentSection === "NOTES") {
+        if (cols[0] === "Id" && cols[1] === "Text") continue;
+        if (cols.length >= 2) {
+          notes.push({
+            id: cols[0] ? cols[0].trim() : generateId(),
+            text: cols[1] ? cols[1].trim() : "",
+            createdAt: cols[2]
+              ? Number(cols[2].trim()) || Date.now()
+              : Date.now(),
           });
         }
       }
     }
 
-    return { tasks, sessions };
+    return { tasks, sessions, notes, settings };
   },
 };
