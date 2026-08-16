@@ -84,9 +84,6 @@ export const SettingsResetController = {
 
     setTimeout(() => {
       try {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(SOUND_STORAGE_KEY);
-
         StateManager.resetToDefaults();
 
         StateManager.setView("timer");

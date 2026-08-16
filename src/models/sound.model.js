@@ -166,4 +166,23 @@ export const SoundModel = {
 
     this.notify();
   },
+
+  reset() {
+    soundState.isPlaying = false;
+    soundState.isLoading = false;
+    soundState.isMuted = false;
+    soundState.currentSoundId = "none";
+    soundState.volume = 50;
+    soundState.previousVolume = 50;
+
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.removeItem(STORAGE_KEY_SELECTED_TRACK);
+      }
+    } catch (e) {
+      console.warn("Failed to clear sound storage:", e);
+    }
+
+    this.notify();
+  },
 };

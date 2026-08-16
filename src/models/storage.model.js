@@ -24,7 +24,7 @@ function normalizeSession(session) {
   return {
     id: String(session.id || generateId()),
     taskId: session.taskId || null,
-    taskTitle: session.taskTitle || "Untitled",
+    taskTitle: session.taskTitle || "Untitled Task",
     type: session.type || "pomodoro",
     durationSeconds: Number(session.durationSeconds) || 0,
     completedAt: session.completedAt || formatDate(new Date()),

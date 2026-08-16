@@ -1,5 +1,6 @@
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
+import { NoteModel } from "./note.model.js";
 import { SoundModel } from "./sound.model.js";
 import { generateId } from "@/utils/helpers.js";
 
@@ -197,8 +198,10 @@ export const StateManager = {
       currentPhase: "work",
     };
 
-    localStorage.removeItem(SOUND_STORAGE_KEY);
-    SoundModel.init(DEFAULT_SETTINGS);
+    SoundModel.reset();
+    if (typeof NoteModel?.reset === "function") {
+      NoteModel.reset();
+    }
 
     this.save();
     this.notify();

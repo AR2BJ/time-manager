@@ -59,4 +59,14 @@ export class NoteModel {
   static notify() {
     this.listeners.forEach((listener) => listener(this.items));
   }
+
+  static reset() {
+    this.items = [];
+    try {
+      localStorage.removeItem(NOTE_STORAGE_KEY);
+    } catch (e) {
+      console.error("Failed to reset notes storage:", e);
+    }
+    this.notify();
+  }
 }
