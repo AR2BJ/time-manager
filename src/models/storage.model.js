@@ -23,7 +23,7 @@ function normalizeTask(task) {
 function normalizeSession(session) {
   return {
     id: String(session.id || generateId()),
-    taskId: session.taskId || null,
+    taskId: session.taskId ? String(session.taskId) : null,
     taskTitle: session.taskTitle || "Untitled Task",
     type: session.type || "pomodoro",
     durationSeconds: Number(session.durationSeconds) || 0,
@@ -57,6 +57,7 @@ function migrateData(data) {
   return {
     version: STORAGE_VERSION,
     activeMode: data.activeMode === "flow" ? "flow" : "pomodoro",
+    activeTaskId: data.activeTaskId ? String(data.activeTaskId) : null,
     tasks: tasks.map(normalizeTask),
     sessions: sessions.map(normalizeSession),
     timer: normalizeTimer(data.timer, pomodoroWorkTime),
@@ -82,6 +83,7 @@ export function saveToStorage(data) {
       JSON.stringify({
         version: STORAGE_VERSION,
         activeMode: data.activeMode || "pomodoro",
+        activeTaskId: data.activeTaskId ? String(data.activeTaskId) : null,
         tasks: data.tasks || [],
         sessions: data.sessions || [],
         timer: data.timer || {},

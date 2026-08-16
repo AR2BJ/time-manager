@@ -3,8 +3,18 @@ import { TaskModel } from "@/models/task.model";
 export const ActiveTaskCardComponent = {
   render() {
     const activeTask = TaskModel.getActiveTask();
+    const allTasks = TaskModel.getTasks();
+    const hasTasks = allTasks.length > 0;
 
     if (!activeTask) {
+      const buttonText = hasTasks ? "Select" : "Create";
+      const boxTitle = hasTasks
+        ? "Select or create task..."
+        : "Create a task...";
+      const boxSubtitle = hasTasks
+        ? "Link sessions to monitor progress."
+        : "Add your first task to start tracking.";
+
       return `
         <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs">
           <div class="flex flex-col sm:flex-row items-center sm:justify-between mb-4 pb-3 border-b border-border gap-2">
@@ -13,10 +23,10 @@ export const ActiveTaskCardComponent = {
               <span>Active Focus Task</span>
             </span>
             <button 
-              id="btn-change-task" 
+              id="btn-select-task" 
               class="w-full sm:w-auto rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
             >
-              Select
+              ${buttonText}
             </button>
           </div>
           
@@ -24,8 +34,8 @@ export const ActiveTaskCardComponent = {
             id="box-empty-task"
             class="p-3.5 rounded-2xl bg-surface-2 border border-dashed border-border cursor-pointer hover:border-brand/50 transition text-center"
           >
-            <p class="text-sm font-semibold text-primary mb-1">Select or create task...</p>
-            <p class="text-[11px] text-muted">Link sessions to monitor progress.</p>
+            <p class="text-sm font-semibold text-primary mb-1">${boxTitle}</p>
+            <p class="text-[11px] text-muted">${boxSubtitle}</p>
           </div>
         </div>
       `;
@@ -46,10 +56,10 @@ export const ActiveTaskCardComponent = {
             <span>Active Focus Task</span>
           </span>
           <button 
-            id="btn-change-task" 
+            id="btn-select-task" 
             class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
           >
-            Change
+            Select
           </button>
         </div>
 

@@ -4,8 +4,6 @@ import { NoteModel } from "./note.model.js";
 import { SoundModel } from "./sound.model.js";
 import { generateId } from "@/utils/helpers.js";
 
-export const SOUND_STORAGE_KEY = "app_selected_sound_id";
-
 export const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
   shortBreakTime: 5,
@@ -53,6 +51,7 @@ export const StateManager = {
       state.activeMode = saved.activeMode || "pomodoro";
       state.tasks = saved.tasks || [];
       state.sessions = saved.sessions || [];
+      state.activeTaskId = saved.activeTaskId || null;
 
       if (saved.settings) {
         state.settings = {
@@ -75,10 +74,15 @@ export const StateManager = {
       SoundModel.init({});
     }
 
-    const firstTask = state.tasks.find((t) => t.status !== "done");
-    if (firstTask) {
-      state.activeTaskId = firstTask.id;
+    const hasActiveTask = state.tasks.some(
+      (t) => String(t.id) === String(state.activeTaskId),
+    );
+    if (!hasActiveTask) {
+      const firstTask = state.tasks.find((t) => t.status !== "done");
+      state.activeTaskId = firstTask ? String(firstTask.id) : null;
     }
+
+    NoteModel.init();
 
     isInitialized = true;
     return state;
@@ -199,16 +203,16 @@ export const StateManager = {
     };
 
     SoundModel.reset();
-    if (typeof NoteModel?.reset === "function") {
-      NoteModel.reset();
-    }
+    NoteModel.reset();
 
     this.save();
     this.notify();
   },
 
   addSession(sessionData = {}) {
-    const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
+    const activeTask = state.tasks.find(
+      (t) => String(t.id) === String(state.activeTaskId),
+    );
     const session = {
       id: generateId(),
       taskId: sessionData.taskId || state.activeTaskId || null,
@@ -223,7 +227,9 @@ export const StateManager = {
     state.sessions.unshift(session);
 
     if (session.taskId) {
-      const task = state.tasks.find((t) => t.id === session.taskId);
+      const task = state.tasks.find(
+        (t) => String(t.id) === String(session.taskId),
+      );
       if (task) {
         task.completedPomodoros = (task.completedPomodoros || 0) + 1;
       }
@@ -241,6 +247,7 @@ export const StateManager = {
 
     saveToStorage({
       activeMode: state.activeMode,
+      activeTaskId: state.activeTaskId,
       tasks: state.tasks,
       sessions: state.sessions,
       timer: state.timer,

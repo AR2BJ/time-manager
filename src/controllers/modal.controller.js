@@ -14,11 +14,11 @@ export const ModalController = {
   bindGlobalTriggers() {
     // Task Modal & Help Modal Triggers from UI
     document.addEventListener("click", (e) => {
-      const btnChange = e.target.closest("#btn-change-task");
+      const btnSelect = e.target.closest("#btn-select-task");
       const boxEmpty = e.target.closest("#box-empty-task");
       const helpToggle = e.target.closest("#help-toggle");
 
-      if (btnChange || boxEmpty) {
+      if (btnSelect || boxEmpty) {
         this.openTaskModal();
       }
 

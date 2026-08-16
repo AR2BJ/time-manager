@@ -1,6 +1,6 @@
 import { generateId } from "@/utils/helpers";
 
-const NOTE_STORAGE_KEY = "tm_focus_note_items";
+export const NOTE_STORAGE_KEY = "tm_focus_note_items";
 
 export class NoteModel {
   static items = [];
@@ -14,11 +14,17 @@ export class NoteModel {
       console.error("Failed to load notes:", e);
       this.items = [];
     }
+    this.notify();
     return this.items;
   }
 
   static getItems() {
     return this.items;
+  }
+
+  static setItems(items = []) {
+    this.items = Array.isArray(items) ? [...items] : [];
+    this.saveAndNotify();
   }
 
   static addItem(text) {

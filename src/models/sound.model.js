@@ -1,8 +1,9 @@
 import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
 import { StateManager } from "./state.model";
 
-const STORAGE_KEY_SELECTED_TRACK = "app_selected_sound_id";
 const defaultTrackList = DEFAULT_TRACK_LIST;
+
+export const STORAGE_KEY_SELECTED_TRACK = "app_selected_sound_id";
 
 const getPersistedTrackId = () => {
   try {

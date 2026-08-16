@@ -1,13 +1,15 @@
+import { NOTE_STORAGE_KEY, NoteModel } from "@/models/note.model.js";
 import {
-  SOUND_STORAGE_KEY,
-  StateManager,
-  state,
-} from "@/models/state.model.js";
+  STORAGE_KEY_SELECTED_TRACK,
+  SoundModel,
+} from "@/models/sound.model.js";
+import { StateManager, state } from "@/models/state.model.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
-import { SoundModel } from "@/models/sound.model.js";
+import { TimerController } from "../timer.controller";
+import { soundService } from "@/services/sound.service";
 
 export const SettingsResetController = {
   keydownHandler: null,
@@ -68,13 +70,15 @@ export const SettingsResetController = {
 
   executeApplicationReset() {
     const previousPayload = localStorage.getItem(STORAGE_KEY);
-    const previousSoundId = localStorage.getItem(SOUND_STORAGE_KEY);
+    const previousSoundId = localStorage.getItem(STORAGE_KEY_SELECTED_TRACK);
+    const previousNotesPayload = localStorage.getItem(NOTE_STORAGE_KEY);
 
     const previousState = {
       tasks: (state.tasks || []).map((t) => ({ ...t })),
       sessions: (state.sessions || []).map((s) => ({ ...s })),
       settings: { ...state.settings },
       activeMode: state.activeMode,
+      activeTaskId: state.activeTaskId,
       timer: { ...state.timer },
     };
 
@@ -85,8 +89,10 @@ export const SettingsResetController = {
     setTimeout(() => {
       try {
         StateManager.resetToDefaults();
+        soundService.stopAll();
 
         StateManager.setView("timer");
+        TimerController.refreshUI();
 
         NotificationService.show({
           type: "error",
@@ -103,21 +109,30 @@ export const SettingsResetController = {
                   localStorage.setItem(STORAGE_KEY, previousPayload);
                 }
                 if (previousSoundId) {
-                  localStorage.setItem(SOUND_STORAGE_KEY, previousSoundId);
+                  localStorage.setItem(
+                    STORAGE_KEY_SELECTED_TRACK,
+                    previousSoundId,
+                  );
+                }
+                if (previousNotesPayload) {
+                  localStorage.setItem(NOTE_STORAGE_KEY, previousNotesPayload);
                 }
 
                 state.tasks = previousState.tasks;
                 state.sessions = previousState.sessions;
                 state.settings = previousState.settings;
                 state.activeMode = previousState.activeMode;
+                state.activeTaskId = previousState.activeTaskId;
                 state.timer = previousState.timer;
 
                 SoundModel.init(previousState.settings);
+                NoteModel.init();
 
                 StateManager.setView("timer");
 
                 StateManager.save();
                 StateManager.notify();
+                TimerController.refreshUI();
               } finally {
                 GlobalLoaderService.hide();
               }

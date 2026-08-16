@@ -8,11 +8,16 @@ export const TaskModel = {
   },
 
   getActiveTask() {
-    return state.tasks.find((t) => t.id === state.activeTaskId) || null;
+    if (!state.activeTaskId) return null;
+    return (
+      state.tasks.find((t) => String(t.id) === String(state.activeTaskId)) ||
+      null
+    );
   },
 
   setActiveTaskId(taskId) {
-    state.activeTaskId = taskId;
+    state.activeTaskId = taskId ? String(taskId) : null;
+    StateManager.save();
     StateManager.notify();
   },
 
@@ -29,7 +34,7 @@ export const TaskModel = {
     };
 
     state.tasks.unshift(newTask);
-    state.activeTaskId = newTask.id;
+    state.activeTaskId = String(newTask.id);
     StateManager.save();
     StateManager.notify();
     return newTask;
@@ -38,10 +43,12 @@ export const TaskModel = {
   deleteTask(taskId) {
     if (!taskId) return;
 
-    state.tasks = state.tasks.filter((t) => t.id !== taskId);
+    const targetIdStr = String(taskId);
+    state.tasks = state.tasks.filter((t) => String(t.id) !== targetIdStr);
 
-    if (state.activeTaskId === taskId) {
-      state.activeTaskId = null;
+    if (String(state.activeTaskId) === targetIdStr) {
+      const remainingTask = state.tasks.find((t) => t.status !== "done");
+      state.activeTaskId = remainingTask ? String(remainingTask.id) : null;
     }
 
     StateManager.save();
@@ -49,7 +56,8 @@ export const TaskModel = {
   },
 
   toggleTaskStatus(taskId) {
-    const task = state.tasks.find((t) => t.id === taskId);
+    const targetIdStr = String(taskId);
+    const task = state.tasks.find((t) => String(t.id) === targetIdStr);
     if (task) {
       task.status = task.status === "done" ? "todo" : "done";
       StateManager.save();

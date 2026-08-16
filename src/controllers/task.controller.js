@@ -8,10 +8,10 @@ export const TaskController = {
 
   bindEvents() {
     document.addEventListener("click", (e) => {
-      const btnChange = e.target.closest("#btn-change-task");
+      const btnSelect = e.target.closest("#btn-select-task");
       const boxEmpty = e.target.closest("#box-empty-task");
 
-      if (btnChange || boxEmpty) {
+      if (btnSelect || boxEmpty) {
         ModalController.openTaskModal();
       }
     });
