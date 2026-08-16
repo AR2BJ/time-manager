@@ -86,7 +86,7 @@ export const SettingsController = {
         },
       );
       this.pomoSoundAutocomplete.setValue(
-        settings.pomodoroEndSound || "bell",
+        settings.pomodoroEndSound || "none",
         false,
       );
       isInitializingPomo = false;
@@ -118,7 +118,7 @@ export const SettingsController = {
         },
       );
       this.breakSoundAutocomplete.setValue(
-        settings.breakEndSound || "chime",
+        settings.breakEndSound || "none",
         false,
       );
       isInitializingBreak = false;
@@ -179,7 +179,7 @@ export const SettingsController = {
     }
   },
 
-  saveAllTimerSettings() {
+saveAllTimerSettings() {
     const pomodoroWorkTime =
       Number(document.getElementById("sett-pomo-len")?.value) || 25;
     const shortBreakTime =
@@ -192,7 +192,6 @@ export const SettingsController = {
     const autoStartPomodoros = this.getToggleState("sett-auto-start-pomo");
     const autoStartBreaks = this.getToggleState("sett-auto-start-break");
     const disableBreaks = this.getToggleState("sett-disable-breaks");
-    const vibration = this.getToggleState("sett-vibration");
 
     const volume = Number(document.getElementById("sett-volume")?.value) ?? 80;
     const pomodoroEndSound = this.pomoSoundAutocomplete?.getValue() || "bell";
@@ -209,7 +208,6 @@ export const SettingsController = {
       volume,
       pomodoroEndSound,
       breakEndSound,
-      vibration,
       currentSoundId: SoundModel.getCurrentSoundId(),
     });
 
@@ -221,7 +219,6 @@ export const SettingsController = {
       "sett-auto-start-pomo",
       "sett-auto-start-break",
       "sett-disable-breaks",
-      "sett-vibration",
     ];
 
     genericElements.forEach((id) => {

@@ -34,13 +34,10 @@ class SoundService {
 
   playNotificationSound(soundType) {
     const { settings } = StateManager.getState();
-    const type = soundType || "bell";
 
-    if (type === "none") return;
+    const type = typeof soundType === "object" ? soundType?.value : soundType;
 
-    if (settings.vibration && "vibrate" in navigator) {
-      navigator.vibrate([200, 100, 200, 100, 400]);
-    }
+    if (!type || type === "none") return;
 
     const ctx = this._getAudioContext();
     if (!ctx) return;
@@ -120,28 +117,60 @@ class SoundService {
       }
 
       case "birds": {
-        [0, 0.18, 0.35].forEach((delay) => {
+        const chirps = [
+          {
+            delay: 0.0,
+            startFreq: 2600,
+            maxFreq: 4600,
+            endFreq: 3100,
+            duration: 0.12,
+          },
+          {
+            delay: 0.14,
+            startFreq: 3100,
+            maxFreq: 5200,
+            endFreq: 2400,
+            duration: 0.1,
+          },
+          {
+            delay: 0.28,
+            startFreq: 3400,
+            maxFreq: 4800,
+            endFreq: 2800,
+            duration: 0.15,
+          },
+        ];
+
+        chirps.forEach(({ delay, startFreq, maxFreq, endFreq, duration }) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
           osc.type = "sine";
           const startTime = now + delay;
+          const midTime = startTime + duration * 0.35;
+          const stopTime = startTime + duration;
 
-          osc.frequency.setValueAtTime(2400, startTime);
-          osc.frequency.exponentialRampToValueAtTime(3200, startTime + 0.08);
-          osc.frequency.exponentialRampToValueAtTime(2000, startTime + 0.15);
+          // Pitch arc contour: Fast pitch rise followed by a drop
+          osc.frequency.setValueAtTime(startFreq, startTime);
+          osc.frequency.exponentialRampToValueAtTime(maxFreq, midTime);
+          osc.frequency.exponentialRampToValueAtTime(endFreq, stopTime);
 
-          gain.gain.setValueAtTime(0.2, startTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+          // Amplitude envelope: Soft attack to avoid clicks, exponential decay
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.22, startTime + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.001, stopTime);
 
           osc.connect(gain);
           gain.connect(masterGain);
 
           osc.start(startTime);
-          osc.stop(startTime + 0.15);
+          osc.stop(stopTime);
         });
         break;
       }
+
+      default:
+        break;
     }
   }
 

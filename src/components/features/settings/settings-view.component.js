@@ -239,7 +239,7 @@ export const SettingsViewComponent = {
                   Audio & Haptics
                 </h3>
                 <p class="text-[11px] sm:text-xs text-secondary truncate">
-                  Manage feedback sounds, volume, and ambient audio.
+                  Manage feedback sounds, volume, and background sounds.
                 </p>
               </div>
             </div>
@@ -264,25 +264,13 @@ export const SettingsViewComponent = {
                 />
               </div>
 
+              <div class="flex flex-col gap-1.5 border-b border-border/60 pb-3">
+                <div id="sett-sound-selector-container"></div>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div id="sett-pomo-end-sound-container"></div>
                 <div id="sett-break-end-sound-container"></div>
-              </div>
-
-              <div
-                class="flex items-center justify-between border-t border-border/60 pt-3"
-              >
-                <span class="text-xs font-medium text-primary"
-                  >Vibration Reminder</span
-                >
-                ${SettingsViewComponent.renderToggle(
-                  "sett-vibration",
-                  settings.vibration,
-                )}
-              </div>
-
-              <div class="flex flex-col gap-1.5 border-t border-border/60 pt-3">
-                <div id="sett-sound-selector-container"></div>
               </div>
             </div>
           </div>
