@@ -110,10 +110,10 @@ export class FlipClockComponent {
     if (!cardEl) return;
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${topVal}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${topVal}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${botVal}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${botVal}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-black/80 z-30 shadow-md"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
@@ -132,16 +132,16 @@ export class FlipClockComponent {
 
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${newValue}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${oldValue}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${oldValue}</span>
       </div>
       <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg/60 flex items-end justify-center overflow-hidden z-20">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${oldValue}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${oldValue}</span>
       </div>
       <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${newValue}</span>
+        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-bg/80 z-30 shadow-md"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
