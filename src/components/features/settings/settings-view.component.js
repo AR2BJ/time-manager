@@ -177,13 +177,13 @@ export const SettingsViewComponent = {
                   for="sett-long-break-interval"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Long Break Interval (Max 12 Pomo)
+                  Long Break Interval (Max 20 Pomo)
                 </label>
                 <input
                   id="sett-long-break-interval"
                   type="text"
                   inputmode="numeric"
-                  data-max="12"
+                  data-max="20"
                   value="${settings.longBreakInterval || 4}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
                 />

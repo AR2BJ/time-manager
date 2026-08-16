@@ -99,7 +99,7 @@ export const FlipClockController = {
   update(force = false) {
     if (!this.overlayEl || this.overlayEl.classList.contains("hidden")) return;
 
-    const { activeMode, timer } = StateManager.getState();
+    const { activeMode, timer, settings } = StateManager.getState();
     const isPomodoro = activeMode === "pomodoro";
     const totalSeconds = isPomodoro ? timer.timeRemaining : timer.flowTime;
 
@@ -116,11 +116,20 @@ export const FlipClockController = {
     this.prevMinutes = mins;
     this.prevSeconds = secs;
 
-    const phaseText = isPomodoro
-      ? timer.currentPhase === "work"
-        ? "Focus Phase"
-        : "Break Phase"
-      : "Flow Mode";
+    let phaseText = "Flow Mode";
+    if (isPomodoro) {
+      const currentPhase = timer.currentPhase;
+      const isSingleInterval = Number(settings?.longBreakInterval) === 1;
+
+      const phaseNames = {
+        work: "Focus Phase",
+        shortBreak: "Short Break",
+        longBreak: isSingleInterval ? "Break Phase" : "Long Break",
+      };
+
+      phaseText = phaseNames[currentPhase] || "Focus Phase";
+    }
+
     flipClockComponent.updateBadge(phaseText);
 
     const controlState =
