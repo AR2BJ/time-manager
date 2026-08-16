@@ -127,6 +127,12 @@ export class SoundPlayerComponent {
     this.updateUI();
   }
 
+  updateSliderFill(volInput, val) {
+    if (!volInput) return;
+    const percentage = Math.max(0, Math.min(100, Number(val)));
+    volInput.style.background = `linear-gradient(to right, var(--color-brand, #00bba7) ${percentage}%, var(--color-surface-3, #334155) ${percentage}%)`;
+  }
+
   updateUI() {
     if (!this.container) return;
 
@@ -233,15 +239,19 @@ export class SoundPlayerComponent {
         : `<i class="fa-solid fa-volume-high"></i>`;
     }
 
-    if (volSlider) volSlider.value = isMuted ? 0 : volume;
-    if (volText) volText.textContent = `${isMuted ? 0 : volume}%`;
+    const currentDisplayVol = isMuted ? 0 : volume;
+    if (volSlider) {
+      volSlider.value = currentDisplayVol;
+      this.updateSliderFill(volSlider, currentDisplayVol);
+    }
+    if (volText) volText.textContent = `${currentDisplayVol}%`;
   }
 
   bindEvents() {
     const playBtn = this.container.querySelector("#btn-player-play-toggle");
     playBtn?.addEventListener("click", async () => {
       const state = SoundModel.getState();
-      if (state.isLoading) return; // Prevent multiple triggers while loading
+      if (state.isLoading) return;
 
       if (state.isPlaying) {
         await soundService.pause();
@@ -263,6 +273,7 @@ export class SoundPlayerComponent {
     const volSlider = this.container.querySelector("#volume-slider");
     volSlider?.addEventListener("input", (e) => {
       const vol = Number(e.target.value);
+      this.updateSliderFill(e.target, vol);
       SoundModel.setVolume(vol);
       soundService.setVolume();
     });

@@ -23,9 +23,9 @@ export const DesktopNavComponent = {
           <button
             id="nav-timer"
             class="nav-item justify-center shadow-brand/10"
-            title="Times"
+            title="Timer"
           >
-            <i class="fa-regular fa-list text-xl"></i>
+            <i class="fa-regular fa-clock text-xl"></i>
           </button>
 
           <button

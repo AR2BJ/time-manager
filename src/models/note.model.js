@@ -1,3 +1,5 @@
+import { generateId } from "@/utils/helpers";
+
 const NOTE_STORAGE_KEY = "tm_focus_note_items";
 
 export class NoteModel {
@@ -23,7 +25,7 @@ export class NoteModel {
     if (!text || !text.trim()) return null;
 
     const newItem = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       text: text.trim(),
       createdAt: Date.now(),
     };

@@ -24,11 +24,18 @@ export class VolumeDropdownComponent {
     return this.container;
   }
 
+  updateSliderFill(inputEl, val) {
+    if (!inputEl) return;
+    const percentage = Math.max(0, Math.min(100, Number(val)));
+    inputEl.style.background = `linear-gradient(to right, var(--color-brand, #00bba7) ${percentage}%, var(--color-surface-3, #334155) ${percentage}%)`;
+  }
+
   update() {
     if (!this.container) return;
 
     const volume = soundState?.volume ?? 50;
     const isMuted = soundState?.isMuted ?? false;
+    const currentVal = isMuted ? 0 : volume;
 
     let iconSvg = "";
     let buttonColorClass = "text-slate-400 hover:text-slate-200";
@@ -76,7 +83,7 @@ export class VolumeDropdownComponent {
         <div class="flex flex-col gap-2">
           <div class="flex justify-between items-center text-xs text-slate-400 font-medium">
             <span>Volume</span>
-            <span id="vol-percentage-text">${isMuted ? "0%" : `${volume}%`}</span>
+            <span id="vol-percentage-text">${currentVal}%</span>
           </div>
           
           <input 
@@ -84,7 +91,7 @@ export class VolumeDropdownComponent {
             id="vol-range-input" 
             min="0" 
             max="100" 
-            value="${isMuted ? 0 : volume}" 
+            value="${currentVal}" 
             class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
           />
 
@@ -98,6 +105,9 @@ export class VolumeDropdownComponent {
         </div>
       </div>
     `;
+
+    const rangeInput = this.container.querySelector("#vol-range-input");
+    this.updateSliderFill(rangeInput, currentVal);
   }
 
   bindEvents() {
@@ -124,6 +134,7 @@ export class VolumeDropdownComponent {
     this.container.addEventListener("input", (e) => {
       if (e.target.id === "vol-range-input") {
         const val = Number(e.target.value);
+        this.updateSliderFill(e.target, val);
         if (typeof SoundModel.setVolume === "function") {
           SoundModel.setVolume(val);
         }

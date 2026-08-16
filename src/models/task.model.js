@@ -1,5 +1,7 @@
 import { StateManager, state } from "./state.model.js";
 
+import { generateId } from "@/utils/helpers.js";
+
 export const TaskModel = {
   getTasks() {
     return state.tasks || [];
@@ -18,7 +20,7 @@ export const TaskModel = {
     if (!title || !title.trim()) return null;
 
     const newTask = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       title: title.trim(),
       status: "todo",
       estimatedPomodoros: Number(estimatedPomodoros) || 1,

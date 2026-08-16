@@ -1,4 +1,5 @@
 import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
+import { StateManager } from "./state.model";
 
 const STORAGE_KEY_SELECTED_TRACK = "app_selected_sound_id";
 const defaultTrackList = DEFAULT_TRACK_LIST;
@@ -38,7 +39,7 @@ export const SoundModel = {
     } else if (savedSettings.lastSelectedSoundId) {
       soundState.currentSoundId = savedSettings.lastSelectedSoundId;
     } else {
-      soundState.currentSoundId = defaultTrackList[0]?.id || "none";
+      soundState.currentSoundId = "none";
     }
 
     soundState.volume =
@@ -75,7 +76,7 @@ export const SoundModel = {
       (t) => t.id === soundState.currentSoundId,
     );
 
-    return foundTrack || "none";
+    return foundTrack || null;
   },
 
   getCurrentSoundId() {
@@ -137,6 +138,13 @@ export const SoundModel = {
     } else {
       soundState.isMuted = true;
     }
+
+    if (typeof StateManager?.updateSettings === "function") {
+      StateManager.updateSettings({
+        volume: soundState.isMuted ? 0 : numericVol,
+      });
+    }
+
     this.notify();
   },
 
@@ -149,6 +157,13 @@ export const SoundModel = {
         soundState.volume > 0 ? soundState.volume : 50;
       soundState.isMuted = true;
     }
+
+    if (typeof StateManager?.updateSettings === "function") {
+      StateManager.updateSettings({
+        volume: soundState.isMuted ? 0 : soundState.volume,
+      });
+    }
+
     this.notify();
   },
 };

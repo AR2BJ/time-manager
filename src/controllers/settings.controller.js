@@ -1,19 +1,48 @@
 import { SettingsExportController } from "./settings/settings-export.controller.js";
 import { SettingsImportController } from "./settings/settings-import.controller.js";
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
+import { SoundModel } from "@/models/sound.model.js";
+import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
 import { StateManager } from "@/models/state.model.js";
 import { getTheme } from "@/services/theme.service.js";
+import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
 
+const updateRangeFill = (inputEl) => {
+  if (!inputEl) return;
+  const min = Number(inputEl.min) || 0;
+  const max = Number(inputEl.max) || 100;
+  const val = Number(inputEl.value) || 0;
+  const pct = ((val - min) / (max - min)) * 100;
+  inputEl.style.background = `linear-gradient(to right, var(--color-brand, #00bba7) ${pct}%, var(--color-surface-3, #334155) ${pct}%)`;
+};
+
 export const SettingsController = {
+  soundSelector: null,
+  unsubscribeSound: null,
+
   init() {
+    this.mountSoundSelector();
     this.bindThemeEvents();
     this.bindBoundedInputEvents();
     this.bindSettingsEvents();
+    this.listenToSoundChanges();
 
-    // Initialize sub-controllers
     SettingsImportController.init();
     SettingsResetController.init();
+  },
+
+  mountSoundSelector() {
+    const container = document.getElementById("sett-sound-selector-container");
+    if (!container) return;
+
+    if (this.soundSelector) {
+      this.soundSelector.destroy();
+    }
+
+    this.soundSelector = new SoundSelectorComponent();
+    container.innerHTML = "";
+    container.appendChild(this.soundSelector.render());
   },
 
   bindThemeEvents() {
@@ -80,8 +109,6 @@ export const SettingsController = {
       document.getElementById("sett-break-end-sound")?.value || "chime";
     const vibration =
       document.getElementById("sett-vibration")?.checked || false;
-    const currentSoundId =
-      document.getElementById("sett-sound-track")?.value || "none";
 
     StateManager.updateSettings({
       pomodoroWorkTime,
@@ -95,14 +122,13 @@ export const SettingsController = {
       pomodoroEndSound,
       breakEndSound,
       vibration,
-      currentSoundId,
+      currentSoundId: SoundModel.getCurrentSoundId(),
     });
 
     timerService.reset();
   },
 
   bindSettingsEvents() {
-    // Checkboxes & Selects change event binding
     const genericElements = [
       "sett-auto-start-pomo",
       "sett-auto-start-break",
@@ -110,7 +136,6 @@ export const SettingsController = {
       "sett-pomo-end-sound",
       "sett-break-end-sound",
       "sett-vibration",
-      "sett-sound-track",
     ];
 
     genericElements.forEach((id) => {
@@ -119,15 +144,28 @@ export const SettingsController = {
         ?.addEventListener("change", () => this.saveAllTimerSettings());
     });
 
-    // Volume range slider
     const volumeEl = document.getElementById("sett-volume");
-    volumeEl?.addEventListener("input", (e) => {
-      const display = document.getElementById("sett-volume-val");
-      if (display) display.textContent = `${e.target.value}%`;
-      this.saveAllTimerSettings();
-    });
+    if (volumeEl) {
+      updateRangeFill(volumeEl);
+      volumeEl.addEventListener("input", (e) => {
+        const val = Number(e.target.value);
+        const display = document.getElementById("sett-volume-val");
+        if (display) display.textContent = `${val}%`;
 
-    // Exports
+        updateRangeFill(e.target);
+
+        if (typeof SoundModel.setVolume === "function") {
+          SoundModel.setVolume(val);
+        }
+
+        if (typeof soundService?.setVolume === "function") {
+          soundService.setVolume(val);
+        }
+
+        this.saveAllTimerSettings();
+      });
+    }
+
     document
       .getElementById("sett-export-json-btn")
       ?.addEventListener("click", () =>
@@ -192,5 +230,25 @@ export const SettingsController = {
 
     document.getElementById("theme-toggle")?.click();
     this.syncThemeControls(targetTheme);
+  },
+
+  listenToSoundChanges() {
+    if (typeof SoundModel.subscribe === "function") {
+      this.unsubscribeSound = SoundModel.subscribe(() => {
+        const volumeEl = document.getElementById("sett-volume");
+        const displayEl = document.getElementById("sett-volume-val");
+
+        const effectiveVol = SoundModel.getEffectiveVolume();
+
+        if (volumeEl && Number(volumeEl.value) !== effectiveVol) {
+          volumeEl.value = effectiveVol;
+          updateRangeFill(volumeEl);
+        }
+
+        if (displayEl) {
+          displayEl.textContent = `${effectiveVol}%`;
+        }
+      });
+    }
   },
 };

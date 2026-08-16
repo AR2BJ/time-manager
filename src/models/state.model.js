@@ -1,6 +1,7 @@
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
 import { SoundModel } from "./sound.model.js";
+import { generateId } from "@/utils/helpers.js";
 
 const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
@@ -177,7 +178,7 @@ export const StateManager = {
   addSession(sessionData = {}) {
     const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
     const session = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       taskId: sessionData.taskId || state.activeTaskId || null,
       taskTitle:
         sessionData.taskTitle ||
