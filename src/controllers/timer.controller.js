@@ -8,6 +8,7 @@ import { HeaderComponent } from "@/components/shared/header.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
 import { ModalController } from "./modal.controller";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
+import { SoundModel } from "@/models/sound.model.js";
 import { TaskController } from "./task.controller";
 import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
@@ -404,79 +405,6 @@ export const TimerController = {
         }
       }
     });
-  },
-
-  startTick() {
-    this.stopTick();
-
-    this.timerInterval = setInterval(() => {
-      const state = StateManager.init();
-      const { activeMode, timer } = state;
-
-      if (activeMode === "pomodoro") {
-        if (timer.timeRemaining > 0) {
-          StateManager.updateTimerState({
-            timeRemaining: timer.timeRemaining - 1,
-          });
-        } else {
-          this.onTimerComplete();
-        }
-      } else if (activeMode === "flow") {
-        StateManager.updateTimerState({
-          flowTime: timer.flowTime + 1,
-        });
-      }
-    }, 1000);
-  },
-
-  stopTick() {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
-    }
-  },
-
-  onTimerComplete() {
-    this.stopTick();
-
-    const state = StateManager.init();
-
-    soundService.pause();
-
-    StateManager.addSession({
-      durationSeconds: state.timer.duration,
-      type: "pomodoro",
-    });
-
-    if (state.settings.notificationSound) {
-      this.playNotificationBeep();
-    }
-
-    StateManager.updateTimerState({
-      isRunning: false,
-      isPaused: false,
-      timeRemaining: state.settings.pomodoroWorkTime * 60,
-    });
-  },
-
-  playNotificationBeep() {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.8);
-    } catch (e) {
-      console.error("Failed to play notification sound:", e);
-    }
   },
 
   bindSoundEvents() {

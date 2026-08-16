@@ -1,7 +1,9 @@
 import { SoundModel } from "@/models/sound.model.js";
+import { StateManager } from "@/models/state.model.js";
 
 class SoundService {
   constructor() {
+    this.audioCtx = null;
     this.audioElement = null;
     this.currentTrack = null;
     this.playPromise = null;
@@ -14,6 +16,132 @@ class SoundService {
     const currentTrack = SoundModel.getCurrentTrack();
     if (currentTrack) {
       this.fetchCoverOnly(currentTrack);
+    }
+  }
+
+  _getAudioContext() {
+    if (!this.audioCtx) {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtxClass) {
+        this.audioCtx = new AudioCtxClass();
+      }
+    }
+    if (this.audioCtx && this.audioCtx.state === "suspended") {
+      this.audioCtx.resume();
+    }
+    return this.audioCtx;
+  }
+
+  playNotificationSound(soundType) {
+    const { settings } = StateManager.getState();
+    const type = soundType || "bell";
+
+    if (type === "none") return;
+
+    if (settings.vibration && "vibrate" in navigator) {
+      navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+
+    const ctx = this._getAudioContext();
+    if (!ctx) return;
+
+    const masterVolume = (settings.volume ?? 80) / 100;
+    if (masterVolume <= 0) return;
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(masterVolume, ctx.currentTime);
+    masterGain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    switch (type) {
+      case "bell": {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = "sine";
+        osc2.type = "sine";
+        osc1.frequency.setValueAtTime(587.33, now);
+        osc2.frequency.setValueAtTime(880, now);
+
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(masterGain);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 1.2);
+        osc2.stop(now + 1.2);
+        break;
+      }
+
+      case "chime": {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+          gain.gain.setValueAtTime(0, now + idx * 0.08);
+          gain.gain.linearRampToValueAtTime(0.25, now + idx * 0.08 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 1.5);
+
+          osc.connect(gain);
+          gain.connect(masterGain);
+
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 1.5);
+        });
+        break;
+      }
+
+      case "gong": {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.exponentialRampToValueAtTime(108, now + 2.5);
+
+        gain.gain.setValueAtTime(0.6, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+        osc.connect(gain);
+        gain.connect(masterGain);
+
+        osc.start(now);
+        osc.stop(now + 2.5);
+        break;
+      }
+
+      case "birds": {
+        [0, 0.18, 0.35].forEach((delay) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = "sine";
+          const startTime = now + delay;
+
+          osc.frequency.setValueAtTime(2400, startTime);
+          osc.frequency.exponentialRampToValueAtTime(3200, startTime + 0.08);
+          osc.frequency.exponentialRampToValueAtTime(2000, startTime + 0.15);
+
+          gain.gain.setValueAtTime(0.2, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+
+          osc.connect(gain);
+          gain.connect(masterGain);
+
+          osc.start(startTime);
+          osc.stop(startTime + 0.15);
+        });
+        break;
+      }
     }
   }
 
@@ -217,29 +345,6 @@ class SoundService {
       };
     }
     return { currentTime: 0, duration: 0 };
-  }
-
-  /**
-   * Unified Notification Beep Sound
-   */
-  playNotificationSound() {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 Tone
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.8);
-    } catch (e) {
-      console.error("Failed to play notification sound:", e);
-    }
   }
 }
 

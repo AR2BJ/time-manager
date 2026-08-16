@@ -1,3 +1,4 @@
+import { AutocompleteComponent } from "@/components/ui/autocomplete.component.js";
 import { SettingsExportController } from "./settings/settings-export.controller.js";
 import { SettingsImportController } from "./settings/settings-import.controller.js";
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
@@ -19,10 +20,13 @@ const updateRangeFill = (inputEl) => {
 
 export const SettingsController = {
   soundSelector: null,
+  pomoSoundAutocomplete: null,
+  breakSoundAutocomplete: null,
   unsubscribeSound: null,
 
   init() {
     this.mountSoundSelector();
+    this.mountAlertSoundSelectors();
     this.bindThemeEvents();
     this.bindBoundedInputEvents();
     this.bindSettingsEvents();
@@ -45,20 +49,80 @@ export const SettingsController = {
     container.appendChild(this.soundSelector.render());
   },
 
-  bindThemeEvents() {
-    document
-      .getElementById("sett-theme-light")
-      ?.addEventListener("click", () => this.handleThemeSwitch("light"));
+  mountAlertSoundSelectors() {
+    const { settings } = StateManager.getState();
 
-    document
-      .getElementById("sett-theme-dark")
-      ?.addEventListener("click", () => this.handleThemeSwitch("dark"));
+    const soundOptions = [
+      { title: "Digital Bell", value: "bell", icon: "fa-regular fa-bell" },
+      { title: "Soft Chime", value: "chime", icon: "fa-regular fa-wind" },
+      { title: "Deep Gong", value: "gong", icon: "fa-regular fa-circle-dot" },
+      { title: "Forest Birds", value: "birds", icon: "fa-regular fa-crow" },
+      { title: "Mute", value: "none", icon: "fa-regular fa-volume-xmark" },
+    ];
 
-    document.addEventListener("themeChanged", (event) => {
-      this.syncThemeControls(event.detail?.theme || getTheme());
-    });
+    let isInitializingPomo = true;
+    const pomoContainer = document.getElementById(
+      "sett-pomo-end-sound-container",
+    );
+    if (pomoContainer) {
+      pomoContainer.innerHTML = "";
+      this.pomoSoundAutocomplete = new AutocompleteComponent(
+        pomoContainer,
+        soundOptions,
+        {
+          label: "Pomodoro End Sound",
+          placeholder: "Select sound...",
+          itemTitle: "title",
+          itemValue: "value",
+          itemIcon: "icon",
+          clearable: false,
+          isRow: false,
+          onChange: (selected) => {
+            this.saveAllTimerSettings();
+            if (!isInitializingPomo) {
+              soundService.playNotificationSound(selected.value);
+            }
+          },
+        },
+      );
+      this.pomoSoundAutocomplete.setValue(
+        settings.pomodoroEndSound || "bell",
+        false,
+      );
+      isInitializingPomo = false;
+    }
 
-    this.syncThemeControls(getTheme());
+    let isInitializingBreak = true;
+    const breakContainer = document.getElementById(
+      "sett-break-end-sound-container",
+    );
+    if (breakContainer) {
+      breakContainer.innerHTML = "";
+      this.breakSoundAutocomplete = new AutocompleteComponent(
+        breakContainer,
+        soundOptions,
+        {
+          label: "Break End Sound",
+          placeholder: "Select sound...",
+          itemTitle: "title",
+          itemValue: "value",
+          itemIcon: "icon",
+          clearable: false,
+          isRow: false,
+          onChange: (selected) => {
+            this.saveAllTimerSettings();
+            if (!isInitializingBreak) {
+              soundService.playNotificationSound(selected.value);
+            }
+          },
+        },
+      );
+      this.breakSoundAutocomplete.setValue(
+        settings.breakEndSound || "chime",
+        false,
+      );
+      isInitializingBreak = false;
+    }
   },
 
   bindBoundedInputEvents() {
@@ -85,6 +149,36 @@ export const SettingsController = {
     });
   },
 
+  getToggleState(id) {
+    const btn = document.getElementById(id);
+    return btn ? btn.dataset.checked === "true" : false;
+  },
+
+  updateToggleUI(btn) {
+    if (!btn) return;
+    const isChecked = btn.dataset.checked === "true";
+    const newState = !isChecked;
+    btn.dataset.checked = String(newState);
+
+    const dot = btn.querySelector("span");
+
+    if (newState) {
+      btn.classList.remove("bg-neutral-300/80", "dark:bg-neutral-700/80");
+      btn.classList.add("bg-brand");
+      if (dot) {
+        dot.classList.remove("translate-x-0");
+        dot.classList.add("translate-x-5");
+      }
+    } else {
+      btn.classList.remove("bg-brand");
+      btn.classList.add("bg-neutral-300/80", "dark:bg-neutral-700/80");
+      if (dot) {
+        dot.classList.remove("translate-x-5");
+        dot.classList.add("translate-x-0");
+      }
+    }
+  },
+
   saveAllTimerSettings() {
     const pomodoroWorkTime =
       Number(document.getElementById("sett-pomo-len")?.value) || 25;
@@ -95,20 +189,14 @@ export const SettingsController = {
     const longBreakInterval =
       Number(document.getElementById("sett-long-break-interval")?.value) || 4;
 
-    const autoStartPomodoros =
-      document.getElementById("sett-auto-start-pomo")?.checked || false;
-    const autoStartBreaks =
-      document.getElementById("sett-auto-start-break")?.checked || false;
-    const disableBreaks =
-      document.getElementById("sett-disable-breaks")?.checked || false;
+    const autoStartPomodoros = this.getToggleState("sett-auto-start-pomo");
+    const autoStartBreaks = this.getToggleState("sett-auto-start-break");
+    const disableBreaks = this.getToggleState("sett-disable-breaks");
+    const vibration = this.getToggleState("sett-vibration");
 
     const volume = Number(document.getElementById("sett-volume")?.value) ?? 80;
-    const pomodoroEndSound =
-      document.getElementById("sett-pomo-end-sound")?.value || "bell";
-    const breakEndSound =
-      document.getElementById("sett-break-end-sound")?.value || "chime";
-    const vibration =
-      document.getElementById("sett-vibration")?.checked || false;
+    const pomodoroEndSound = this.pomoSoundAutocomplete?.getValue() || "bell";
+    const breakEndSound = this.breakSoundAutocomplete?.getValue() || "chime";
 
     StateManager.updateSettings({
       pomodoroWorkTime,
@@ -133,15 +221,17 @@ export const SettingsController = {
       "sett-auto-start-pomo",
       "sett-auto-start-break",
       "sett-disable-breaks",
-      "sett-pomo-end-sound",
-      "sett-break-end-sound",
       "sett-vibration",
     ];
 
     genericElements.forEach((id) => {
-      document
-        .getElementById(id)
-        ?.addEventListener("change", () => this.saveAllTimerSettings());
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener("click", () => {
+          this.updateToggleUI(btn);
+          this.saveAllTimerSettings();
+        });
+      }
     });
 
     const volumeEl = document.getElementById("sett-volume");
@@ -185,6 +275,22 @@ export const SettingsController = {
       );
 
     window.addEventListener("resize", () => this.syncThemeControls(getTheme()));
+  },
+
+  bindThemeEvents() {
+    document
+      .getElementById("sett-theme-light")
+      ?.addEventListener("click", () => this.handleThemeSwitch("light"));
+
+    document
+      .getElementById("sett-theme-dark")
+      ?.addEventListener("click", () => this.handleThemeSwitch("dark"));
+
+    document.addEventListener("themeChanged", (event) => {
+      this.syncThemeControls(event.detail?.theme || getTheme());
+    });
+
+    this.syncThemeControls(getTheme());
   },
 
   syncThemeControls(targetTheme) {
@@ -250,5 +356,12 @@ export const SettingsController = {
         }
       });
     }
+  },
+
+  destroy() {
+    if (this.pomoSoundAutocomplete) this.pomoSoundAutocomplete.destroy();
+    if (this.breakSoundAutocomplete) this.breakSoundAutocomplete.destroy();
+    if (this.soundSelector) this.soundSelector.destroy();
+    if (typeof this.unsubscribeSound === "function") this.unsubscribeSound();
   },
 };

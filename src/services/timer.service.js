@@ -111,6 +111,12 @@ class TimerService {
 
     const isWorkPhase = state.timer.currentPhase === "work";
 
+    const soundToPlay = isWorkPhase
+      ? state.settings.pomodoroEndSound || "bell"
+      : state.settings.breakEndSound || "chime";
+
+    soundService.playNotificationSound(soundToPlay);
+
     if (isWorkPhase) {
       const newSessionCount = (state.timer.pomodoroSessionCount || 0) + 1;
       const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
