@@ -1,11 +1,13 @@
 import { SettingsExportController } from "./settings/settings-export.controller.js";
 import { SettingsImportController } from "./settings/settings-import.controller.js";
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
+import { StateManager } from "@/models/state.model.js";
 import { getTheme } from "@/services/theme.service.js";
 
 export const SettingsController = {
   init() {
     this.bindThemeEvents();
+    this.bindBoundedInputEvents();
     this.bindSettingsEvents();
 
     // Initialize sub-controllers
@@ -17,6 +19,7 @@ export const SettingsController = {
     document
       .getElementById("sett-theme-light")
       ?.addEventListener("click", () => this.handleThemeSwitch("light"));
+
     document
       .getElementById("sett-theme-dark")
       ?.addEventListener("click", () => this.handleThemeSwitch("dark"));
@@ -28,8 +31,100 @@ export const SettingsController = {
     this.syncThemeControls(getTheme());
   },
 
+  bindBoundedInputEvents() {
+    const inputs = document.querySelectorAll(".bounded-numeric-input");
+
+    inputs.forEach((input) => {
+      const max = Number(input.dataset.max) || 99;
+
+      input.addEventListener("input", (e) => {
+        let val = e.target.value.replace(/\D/g, "");
+        if (val !== "") {
+          let numVal = parseInt(val, 10);
+          if (numVal > max) numVal = max;
+          if (numVal < 1) numVal = 1;
+          val = numVal.toString();
+        }
+        e.target.value = val;
+      });
+
+      input.addEventListener("blur", (e) => {
+        if (!e.target.value) e.target.value = "1";
+        this.saveAllTimerSettings();
+      });
+    });
+  },
+
+  saveAllTimerSettings() {
+    const pomodoroWorkTime =
+      Number(document.getElementById("sett-pomo-len")?.value) || 25;
+    const shortBreakTime =
+      Number(document.getElementById("sett-short-break-len")?.value) || 5;
+    const longBreakTime =
+      Number(document.getElementById("sett-long-break-len")?.value) || 15;
+    const longBreakInterval =
+      Number(document.getElementById("sett-long-break-interval")?.value) || 4;
+
+    const autoStartPomodoros =
+      document.getElementById("sett-auto-start-pomo")?.checked || false;
+    const autoStartBreaks =
+      document.getElementById("sett-auto-start-break")?.checked || false;
+    const disableBreaks =
+      document.getElementById("sett-disable-breaks")?.checked || false;
+
+    const volume = Number(document.getElementById("sett-volume")?.value) ?? 80;
+    const pomodoroEndSound =
+      document.getElementById("sett-pomo-end-sound")?.value || "bell";
+    const breakEndSound =
+      document.getElementById("sett-break-end-sound")?.value || "chime";
+    const vibration =
+      document.getElementById("sett-vibration")?.checked || false;
+    const currentSoundId =
+      document.getElementById("sett-sound-track")?.value || "none";
+
+    StateManager.updateSettings({
+      pomodoroWorkTime,
+      shortBreakTime,
+      longBreakTime,
+      longBreakInterval,
+      autoStartPomodoros,
+      autoStartBreaks,
+      disableBreaks,
+      volume,
+      pomodoroEndSound,
+      breakEndSound,
+      vibration,
+      currentSoundId,
+    });
+  },
+
   bindSettingsEvents() {
-    // Export events
+    // Checkboxes & Selects change event binding
+    const genericElements = [
+      "sett-auto-start-pomo",
+      "sett-auto-start-break",
+      "sett-disable-breaks",
+      "sett-pomo-end-sound",
+      "sett-break-end-sound",
+      "sett-vibration",
+      "sett-sound-track",
+    ];
+
+    genericElements.forEach((id) => {
+      document
+        .getElementById(id)
+        ?.addEventListener("change", () => this.saveAllTimerSettings());
+    });
+
+    // Volume range slider
+    const volumeEl = document.getElementById("sett-volume");
+    volumeEl?.addEventListener("input", (e) => {
+      const display = document.getElementById("sett-volume-val");
+      if (display) display.textContent = `${e.target.value}%`;
+      this.saveAllTimerSettings();
+    });
+
+    // Exports
     document
       .getElementById("sett-export-json-btn")
       ?.addEventListener("click", () =>
@@ -48,10 +143,7 @@ export const SettingsController = {
         SettingsExportController.handleDataExport("notion"),
       );
 
-    // Window resize handler for theme
-    window.addEventListener("resize", () => {
-      this.syncThemeControls(getTheme());
-    });
+    window.addEventListener("resize", () => this.syncThemeControls(getTheme()));
   },
 
   syncThemeControls(targetTheme) {

@@ -130,7 +130,6 @@ export class TimerDisplayComponent {
         </div>
       </div>
 
-      <!-- Controls Container -->
       <div
         id="timer-controls-container"
         class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2 w-full min-h-14"

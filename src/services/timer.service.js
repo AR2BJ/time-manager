@@ -107,6 +107,9 @@ class TimerService {
   _onPomodoroComplete() {
     clearInterval(this.timerInterval);
 
+    // Play unified notification beep sound
+    soundService.playNotificationSound();
+
     const isWorkPhase = state.timer.currentPhase === "work";
 
     if (isWorkPhase) {
@@ -117,8 +120,8 @@ class TimerService {
       const nextPhase = isLongBreak ? "longBreak" : "shortBreak";
       const breakMinutes =
         nextPhase === "longBreak"
-          ? state.settings.longBreakTime
-          : state.settings.shortBreakTime;
+          ? state.settings.longBreakTime || 15
+          : state.settings.shortBreakTime || 5;
 
       StateManager.addSession({
         type: "pomodoro",

@@ -218,6 +218,29 @@ class SoundService {
     }
     return { currentTime: 0, duration: 0 };
   }
+
+  /**
+   * Unified Notification Beep Sound
+   */
+  playNotificationSound() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 Tone
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.8);
+    } catch (e) {
+      console.error("Failed to play notification sound:", e);
+    }
+  }
 }
 
 export const soundService = new SoundService();

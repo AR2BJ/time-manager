@@ -9,6 +9,12 @@ const DEFAULT_SETTINGS = {
   longBreakInterval: 4,
   autoStartBreaks: false,
   autoStartPomodoros: false,
+  disableBreaks: false,
+  volume: 50,
+  pomodoroEndSound: "bell",
+  breakEndSound: "chime",
+  vibration: true,
+  currentSoundId: "none",
   notificationSound: true,
 };
 

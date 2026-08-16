@@ -75,7 +75,7 @@ export const SoundModel = {
       (t) => t.id === soundState.currentSoundId,
     );
 
-    return foundTrack || null;
+    return foundTrack || "none";
   },
 
   getCurrentSoundId() {

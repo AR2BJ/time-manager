@@ -282,13 +282,16 @@ export const TimerController = {
       }
 
       if (phaseBadge) {
+        const currentPhase = state.timer.currentPhase;
+        const isSingleInterval = Number(state.settings.longBreakInterval) === 1;
+
         const phaseNames = {
           work: "Focus Phase",
           shortBreak: "Short Break",
-          longBreak: "Long Break",
+          longBreak: isSingleInterval ? "Break Phase" : "Long Break",
         };
-        phaseBadge.textContent =
-          phaseNames[state.timer.currentPhase] || "Focus Phase";
+
+        phaseBadge.textContent = phaseNames[currentPhase] || "Focus Phase";
       }
 
       if (subInfo) {
