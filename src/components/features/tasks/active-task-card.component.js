@@ -1,9 +1,9 @@
-import { TaskModel } from "@/models/task.model";
+import { TaskService } from "@/services/task.service";
 
 export const ActiveTaskCardComponent = {
   render() {
-    const activeTask = TaskModel.getActiveTask();
-    const allTasks = TaskModel.getTasks();
+    const activeTask = TaskService.getActiveTask();
+    const allTasks = TaskService.getTasks();
     const hasTasks = allTasks.length > 0;
 
     if (!activeTask) {

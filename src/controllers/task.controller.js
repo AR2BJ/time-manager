@@ -1,9 +1,63 @@
-import { ModalController } from "./modal.controller";
-import { StateManager } from "@/models/state.model.js";
+import { ModalController } from "./modal.controller.js";
+import { NotificationService } from "@/services/notification.service.js";
+import { TaskService } from "@/services/task.service.js";
 
 export const TaskController = {
   init() {
-    // this.bindEvents();
+    this.bindEvents();
+  },
+
+  createTask(title, estimatedPomodoros = 1) {
+    const newTask = TaskService.addTask(title, estimatedPomodoros);
+    if (!newTask) return null;
+
+    NotificationService.show({
+      type: "success",
+      message: `Task "${newTask.title}" created.`,
+      icon: "fa-plus",
+      iconColor: "text-emerald-500",
+    });
+
+    return newTask;
+  },
+
+  updateTask(taskId, newTitle, newEstimatedPomodoros) {
+    const updatedTask = TaskService.updateTask(
+      taskId,
+      newTitle,
+      newEstimatedPomodoros,
+    );
+    if (updatedTask) {
+      NotificationService.show({
+        type: "success",
+        message: "Task updated successfully.",
+        icon: "fa-pen-to-square",
+        iconColor: "text-emerald-500",
+      });
+    }
+    return updatedTask;
+  },
+
+  deleteTask(taskId) {
+    const result = TaskService.deleteTask(taskId);
+    if (!result) return;
+
+    const { deletedTask, taskIndex, wasActive } = result;
+
+    if (ModalController.editingTask?.id === deletedTask.id) {
+      ModalController.editingTask = null;
+    }
+
+    ModalController.refreshTaskModal();
+
+    NotificationService.show({
+      type: "error",
+      message: `Task "${deletedTask.title}" removed.`,
+      undoAction: () => {
+        TaskService.restoreTask(deletedTask, taskIndex, wasActive);
+        ModalController.refreshTaskModal();
+      },
+    });
   },
 
   bindEvents() {
@@ -22,6 +76,6 @@ export const TaskController = {
     if (!taskTitle || !taskTitle.trim()) return;
 
     const estPomodoros = prompt("Estimated Pomodoros?", "1");
-    StateManager.addTask(taskTitle, Number(estPomodoros) || 1);
+    this.createTask(taskTitle, Number(estPomodoros) || 1);
   },
 };

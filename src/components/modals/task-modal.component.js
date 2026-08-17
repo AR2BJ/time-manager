@@ -1,9 +1,9 @@
-import { TaskModel } from "@/models/task.model";
+import { TaskService } from "@/services/task.service";
 
 export const TaskModalComponent = {
   render(editingTask = null) {
-    const tasks = TaskModel.getTasks();
-    const activeTask = TaskModel.getActiveTask();
+    const tasks = TaskService.getTasks();
+    const activeTask = TaskService.getActiveTask();
     const activeTaskId = activeTask ? String(activeTask.id) : null;
 
     const isEditing = Boolean(editingTask);

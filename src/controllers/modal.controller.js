@@ -1,10 +1,12 @@
 import { ConfirmModalComponent } from "@/components/modals/confirm-modal.component.js";
 import { InfoModalComponent } from "@/components/modals/info-modal.component";
+import { TaskController } from "./task.controller";
 import { TaskModalComponent } from "@/components/modals/task-modal.component.js";
-import { TaskModel } from "@/models/task.model";
+import { TaskService } from "@/services/task.service";
 
 export const ModalController = {
   confirmCallback: null,
+  editingTask: null,
 
   init() {
     this.bindGlobalTriggers();
@@ -93,12 +95,18 @@ export const ModalController = {
   },
 
   openTaskModal(editingTask = null) {
-    this.closeTaskModal();
+    this.editingTask = editingTask;
 
-    const modalWrapper = document.createElement("div");
-    modalWrapper.id = "task-modal-wrapper";
-    modalWrapper.innerHTML = TaskModalComponent.render(editingTask);
-    document.body.appendChild(modalWrapper);
+    let modalWrapper = document.getElementById("task-modal-wrapper");
+
+    if (modalWrapper) {
+      modalWrapper.innerHTML = TaskModalComponent.render(editingTask);
+    } else {
+      modalWrapper = document.createElement("div");
+      modalWrapper.id = "task-modal-wrapper";
+      modalWrapper.innerHTML = TaskModalComponent.render(editingTask);
+      document.body.appendChild(modalWrapper);
+    }
 
     // Auto Focus on Title Input for Seamless UX
     const titleInput = modalWrapper.querySelector("#input-task-title");
@@ -114,6 +122,7 @@ export const ModalController = {
     if (wrapper) {
       wrapper.remove();
     }
+    this.editingTask = null;
   },
 
   bindTaskModalEvents(wrapper) {
@@ -162,7 +171,7 @@ export const ModalController = {
         e.stopPropagation();
 
         const taskId = btnEdit.dataset.editTaskId;
-        const targetTask = TaskModel.getTasks().find(
+        const targetTask = TaskService.getTasks().find(
           (t) => String(t.id) === String(taskId),
         );
 
@@ -178,18 +187,16 @@ export const ModalController = {
         e.stopPropagation();
 
         const taskId = btnDelete.dataset.deleteTaskId;
-        const currentActiveTask = TaskModel.getActiveTask();
+        const currentActiveTask = TaskService.getActiveTask();
 
         if (
           currentActiveTask &&
           String(currentActiveTask.id) === String(taskId)
         ) {
-          TaskModel.setActiveTaskId(null);
+          TaskService.setActiveTask(null);
         }
 
-        TaskModel.deleteTask(taskId);
-
-        this.openTaskModal();
+        TaskController.deleteTask(taskId);
         return;
       }
 
@@ -202,7 +209,7 @@ export const ModalController = {
         if (isDone) return;
 
         const taskId = taskItem.dataset.taskId;
-        TaskModel.setActiveTaskId(taskId);
+        TaskService.setActiveTask(taskId);
         this.closeTaskModal();
       }
     });
@@ -217,7 +224,7 @@ export const ModalController = {
 
         if (titleInput && titleInput.value.trim()) {
           if (editId) {
-            const success = TaskModel.updateTask(
+            const success = TaskController.updateTask(
               editId,
               titleInput.value.trim(),
               pomoVal,
@@ -226,14 +233,24 @@ export const ModalController = {
               this.closeTaskModal();
             }
           } else {
-            const newTask = TaskModel.addTask(titleInput.value.trim(), pomoVal);
+            const newTask = TaskController.createTask(
+              titleInput.value.trim(),
+              pomoVal,
+            );
             if (newTask) {
-              TaskModel.setActiveTaskId(newTask.id);
+              TaskService.setActiveTask(newTask.id);
               this.closeTaskModal();
             }
           }
         }
       });
+    }
+  },
+
+  refreshTaskModal() {
+    const isModalOpen = Boolean(document.getElementById("task-modal-wrapper"));
+    if (isModalOpen) {
+      this.openTaskModal(this.editingTask);
     }
   },
 

@@ -1,7 +1,8 @@
 import { StateManager, state } from "@/models/state.model.js";
 
+import { NotificationService } from "./notification.service.js";
 import { SoundModel } from "@/models/sound.model.js";
-import { TaskModel } from "@/models/task.model.js";
+import { TaskService } from "./task.service.js";
 import { soundService } from "./sound.service.js";
 
 class TimerService {
@@ -120,7 +121,7 @@ class TimerService {
       const currentTaskId = state.activeTaskId;
 
       if (currentTaskId) {
-        TaskModel.incrementCompletedPomodoro(currentTaskId);
+        TaskService.incrementCompletedPomodoro(currentTaskId);
       }
 
       const newSessionCount = (state.timer.pomodoroSessionCount || 0) + 1;
@@ -129,6 +130,14 @@ class TimerService {
       StateManager.addSession({
         type: "pomodoro",
         durationSeconds: workSecs,
+      });
+
+      NotificationService.show({
+        type: "success",
+        message: "Focus session completed! Time for a break.",
+        icon: "fa-circle-check",
+        iconColor: "text-emerald-500",
+        duration: 5000,
       });
 
       if (state.settings.disableBreaks) {
@@ -180,6 +189,14 @@ class TimerService {
         currentPhase: "work",
         timeRemaining: workSecs,
         duration: workSecs,
+      });
+
+      NotificationService.show({
+        type: "info",
+        message: "Break has ended! Ready to focus?",
+        icon: "fa-bolt",
+        iconColor: "text-brand",
+        duration: 5000,
       });
 
       if (state.settings.autoStartPomodoros) {
