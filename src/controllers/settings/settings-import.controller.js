@@ -1,5 +1,5 @@
 import { StateManager, state } from "@/models/state.model.js";
-import { formatDate, generateId } from "@/utils/helpers.js";
+import { formatDate, generateId, todayISO } from "@/utils/helpers.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NoteModel } from "@/models/note.model.js";
@@ -74,6 +74,9 @@ export const SettingsImportController = {
           let importedSessions = [];
           let importedNotes = [];
           let importedSettings = null;
+          let importedActiveTaskId = null;
+          let importedActiveMode = "pomodoro";
+          let importedTimerState = {};
 
           if (format === "json") {
             const parsedJson = JSON.parse(rawContent);
@@ -81,18 +84,27 @@ export const SettingsImportController = {
             importedSessions = parsedJson.sessions || [];
             importedNotes = parsedJson.notes || [];
             importedSettings = parsedJson.settings || null;
+            importedActiveTaskId = parsedJson.activeTaskId || null;
+            importedActiveMode = parsedJson.activeMode || "pomodoro";
+            importedTimerState = parsedJson.timer || {};
           } else if (format === "markdown") {
             const parsedMd = this.parseMarkdownToState(rawContent);
             importedTasks = parsedMd.tasks;
             importedSessions = parsedMd.sessions;
             importedNotes = parsedMd.notes;
             importedSettings = parsedMd.settings;
+            importedActiveTaskId = parsedMd.activeTaskId;
+            importedActiveMode = parsedMd.activeMode;
+            importedTimerState = parsedMd.timer;
           } else if (format === "csv") {
             const parsedCsv = this.parseCsvToState(rawContent);
             importedTasks = parsedCsv.tasks;
             importedSessions = parsedCsv.sessions;
             importedNotes = parsedCsv.notes;
             importedSettings = parsedCsv.settings;
+            importedActiveTaskId = parsedCsv.activeTaskId;
+            importedActiveMode = parsedCsv.activeMode;
+            importedTimerState = parsedCsv.timer;
           }
 
           if (
@@ -105,6 +117,18 @@ export const SettingsImportController = {
 
           state.tasks = importedTasks;
           state.sessions = importedSessions;
+          state.activeMode = importedActiveMode || "pomodoro";
+
+          // Validate and apply activeTaskId
+          const hasActiveTask = importedTasks.some(
+            (t) => String(t.id) === String(importedActiveTaskId),
+          );
+          if (hasActiveTask) {
+            state.activeTaskId = String(importedActiveTaskId);
+          } else {
+            const fallbackTask = importedTasks.find((t) => t.status !== "done");
+            state.activeTaskId = fallbackTask ? String(fallbackTask.id) : null;
+          }
 
           if (importedSettings) {
             StateManager.updateSettings(importedSettings);
@@ -116,8 +140,16 @@ export const SettingsImportController = {
             }
           }
 
-          StateManager.setView("timer");
+          // Restore timer state metadata
+          if (importedTimerState) {
+            StateManager.updateTimerState({
+              pomodoroSessionCount:
+                Number(importedTimerState.pomodoroSessionCount) || 0,
+              currentPhase: importedTimerState.currentPhase || "work",
+            });
+          }
 
+          StateManager.setView("timer");
           TimerController.refreshUI();
 
           StateManager.save();
@@ -155,8 +187,13 @@ export const SettingsImportController = {
     const sessions = [];
     const notes = [];
     const settings = {};
+    let activeTaskId = null;
+    let activeMode = "pomodoro";
+    const timer = {};
 
-    const settingsSection = mdContent.split("## ⚙️ SETTINGS")[1];
+    const settingsSection =
+      mdContent.split("## ⚙️ SETTINGS & STATE")[1] ||
+      mdContent.split("## ⚙️ SETTINGS")[1];
     if (settingsSection) {
       const getVal = (label) => {
         const match = settingsSection.match(
@@ -164,6 +201,21 @@ export const SettingsImportController = {
         );
         return match ? match[1].trim() : null;
       };
+
+      const rawActiveTask = getVal("Active Task ID");
+      if (
+        rawActiveTask &&
+        rawActiveTask !== "none" &&
+        rawActiveTask !== "null"
+      ) {
+        activeTaskId = rawActiveTask;
+      }
+
+      const rawActiveMode = getVal("Active Mode");
+      if (rawActiveMode) activeMode = rawActiveMode;
+
+      const rawSessionCount = getVal("Pomodoro Session Count");
+      if (rawSessionCount) timer.pomodoroSessionCount = Number(rawSessionCount);
 
       const pomodoroWorkTime = getVal("Pomodoro Work Time");
       if (pomodoroWorkTime)
@@ -219,15 +271,15 @@ export const SettingsImportController = {
     taskBlocks.forEach((block) => {
       const idMatch = block.match(/## #️⃣\s*(.+)/);
       const titleMatch = block.match(/### 🎯\s*(.+)/);
-      const statusMatch = block.match(/- \*\*Status:\*\*\s*(.+)/);
-      const priorityMatch = block.match(/- \*\*Priority:\*\*\s*(.+)/);
-      const tagsMatch = block.match(/- \*\*Tags:\*\*\s*(.*)/);
-      const estMatch = block.match(/- \*\*Estimated Pomodoros:\*\*\s*(\d+)/);
-      const compMatch = block.match(/- \*\*Completed Pomodoros:\*\*\s*(\d+)/);
-      const dueDateMatch = block.match(/- \*\*Due Date:\*\*\s*(.+)/);
-      const createdAtMatch = block.match(/- \*\*Created At:\*\*\s*(.+)/);
-      const completedAtMatch = block.match(/- \*\*Completed At:\*\*\s*(.+)/);
-      const descMatch = block.match(/- \*\*Description:\*\*\s*(.*)/);
+      const statusMatch = block.match(/-\s*\*\*Status:\*\*\s*(.+)/);
+      const priorityMatch = block.match(/-\s*\*\*Priority:\*\*\s*(.+)/);
+      const tagsMatch = block.match(/-\s*\*\*Tags:\*\*\s*(.*)/);
+      const estMatch = block.match(/-\s*\*\*Estimated Pomodoros:\*\*\s*(\d+)/);
+      const compMatch = block.match(/-\s*\*\*Completed Pomodoros:\*\*\s*(\d+)/);
+      const dueDateMatch = block.match(/-\s*\*\*Due Date:\*\*\s*(.+)/);
+      const createdAtMatch = block.match(/-\s*\*\*Created At:\*\*\s*(.+)/);
+      const completedAtMatch = block.match(/-\s*\*\*Completed At:\*\*\s*(.+)/);
+      const descMatch = block.match(/-\s*\*\*Description:\*\*\s*(.*)/);
 
       if (idMatch && titleMatch) {
         const rawTags = tagsMatch ? tagsMatch[1].trim() : "";
@@ -300,7 +352,15 @@ export const SettingsImportController = {
       });
     }
 
-    return { tasks, sessions, notes, settings };
+    return {
+      tasks,
+      sessions,
+      notes,
+      settings,
+      activeTaskId,
+      activeMode,
+      timer,
+    };
   },
 
   parseCsvToState(csvContent) {
@@ -308,6 +368,9 @@ export const SettingsImportController = {
     const sessions = [];
     const notes = [];
     const settings = {};
+    let activeTaskId = null;
+    let activeMode = "pomodoro";
+    const timer = {};
 
     const parseCsvLine = (text) => {
       const result = [];
@@ -362,7 +425,13 @@ export const SettingsImportController = {
           const key = cols[0].trim();
           const val = cols[1].trim();
 
-          if (
+          if (key === "activeTaskId") {
+            if (val && val !== "none" && val !== "null") activeTaskId = val;
+          } else if (key === "activeMode") {
+            activeMode = val;
+          } else if (key === "pomodoroSessionCount") {
+            timer.pomodoroSessionCount = Number(val) || 0;
+          } else if (
             [
               "pomodoroWorkTime",
               "shortBreakTime",
@@ -437,6 +506,14 @@ export const SettingsImportController = {
       }
     }
 
-    return { tasks, sessions, notes, settings };
+    return {
+      tasks,
+      sessions,
+      notes,
+      settings,
+      activeTaskId,
+      activeMode,
+      timer,
+    };
   },
 };

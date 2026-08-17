@@ -25,6 +25,12 @@ export const SettingsExportController = {
       const essentialPayload = {
         version: STORAGE_VERSION,
         exportedAt: todayISO(),
+        activeTaskId: state.activeTaskId || null,
+        activeMode: state.activeMode || "pomodoro",
+        timer: {
+          pomodoroSessionCount: state.timer?.pomodoroSessionCount || 0,
+          currentPhase: state.timer?.currentPhase || "work",
+        },
         settings: {
           ...settings,
           lastSelectedSoundId: SoundModel.getCurrentSoundId(),
@@ -100,7 +106,10 @@ export const SettingsExportController = {
   generateMarkdownExport(tasks, sessions, notes, settings, soundState) {
     let content = `# 📊 Time Manager Ledger\n\n**Export Date:** ${todayISO()}\n**Version:** ${STORAGE_VERSION}\n\n---\n`;
 
-    content += `## ⚙️ SETTINGS\n\n`;
+    content += `## ⚙️ SETTINGS & STATE\n\n`;
+    content += `- **Active Task ID:** ${state.activeTaskId || "none"}\n`;
+    content += `- **Active Mode:** ${state.activeMode || "pomodoro"}\n`;
+    content += `- **Pomodoro Session Count:** ${state.timer?.pomodoroSessionCount || 0}\n`;
     content += `- **Pomodoro Work Time:** ${settings.pomodoroWorkTime || 25}\n`;
     content += `- **Short Break Time:** ${settings.shortBreakTime || 5}\n`;
     content += `- **Long Break Time:** ${settings.longBreakTime || 15}\n`;
@@ -168,6 +177,9 @@ export const SettingsExportController = {
     let content = `# VERSION: ${STORAGE_VERSION}\n`;
 
     content += `[SETTINGS]\nKey,Value\n`;
+    content += `activeTaskId,${escapeCsvValue(state.activeTaskId || "none")}\n`;
+    content += `activeMode,${escapeCsvValue(state.activeMode || "pomodoro")}\n`;
+    content += `pomodoroSessionCount,${escapeCsvValue(state.timer?.pomodoroSessionCount || 0)}\n`;
     content += `pomodoroWorkTime,${escapeCsvValue(settings.pomodoroWorkTime || 25)}\n`;
     content += `shortBreakTime,${escapeCsvValue(settings.shortBreakTime || 5)}\n`;
     content += `longBreakTime,${escapeCsvValue(settings.longBreakTime || 15)}\n`;
