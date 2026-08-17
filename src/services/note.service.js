@@ -1,39 +1,55 @@
+import { generateId, todayISO } from "@/utils/helpers.js";
+
 import { NoteModel } from "@/models/note.model.js";
 import { NotificationService } from "@/services/notification.service.js";
 
 export const NoteService = {
-  init() {
-    return NoteModel.init();
+  getNotes() {
+    return NoteModel.getNotes();
   },
 
   addNote(text) {
-    const newNote = NoteModel.addItem(text);
-    if (newNote) {
+    if (!text || !text.trim()) return null;
+
+    const newNote = {
+      id: generateId(),
+      text: text.trim(),
+      createdAt: todayISO(),
+    };
+
+    const createdNote = NoteModel.insert(newNote);
+
+    if (createdNote) {
       NotificationService.show({
         type: "success",
-        message: "Note added.",
+        message: "Note added successfully.",
         icon: "fa-sticky-note",
         iconColor: "text-emerald-500",
       });
     }
-    return newNote;
+
+    return createdNote;
   },
 
-  removeNote(id) {
-    const targetNote = NoteModel.getItems().find((n) => n.id === id);
-    if (!targetNote) return;
+  deleteNote(noteId) {
+    const result = NoteModel.remove(noteId);
+    if (!result) return null;
 
-    NoteModel.deleteItem(id);
+    const { deletedNote, index } = result;
 
     NotificationService.show({
-      type: "warning",
-      message: "Note removed.",
-      icon: "fa-trash-can",
-      iconColor: "text-amber-500",
-      duration: 5000,
+      type: "error",
+      message: `Note "${deletedNote.text}" removed.`,
       undoAction: () => {
-        NoteModel.addItem(targetNote.text);
+        this.restoreNote(deletedNote, index);
       },
     });
+
+    return result;
+  },
+
+  restoreNote(note, index) {
+    if (!note) return;
+    NoteModel.insertAt(note, index);
   },
 };

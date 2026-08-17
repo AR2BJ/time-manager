@@ -2,7 +2,7 @@ import { ConfirmModalComponent } from "@/components/modals/confirm-modal.compone
 import { InfoModalComponent } from "@/components/modals/info-modal.component";
 import { TaskController } from "./task.controller";
 import { TaskModalComponent } from "@/components/modals/task-modal.component.js";
-import { TaskService } from "@/services/task.service";
+import { TaskService } from "@/services/task.service.js";
 
 export const ModalController = {
   confirmCallback: null,

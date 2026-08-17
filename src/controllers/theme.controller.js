@@ -1,6 +1,6 @@
 import { getTheme, setTheme, toggleTheme } from "@/services/theme.service.js";
 
-import { GlobalLoaderService } from "@/services/loader.service";
+import { GlobalLoaderService } from "@/services/loader.service.js";
 
 export const ThemeController = {
   updateIcon(theme) {

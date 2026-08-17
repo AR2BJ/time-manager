@@ -36,6 +36,7 @@ export const state = {
   },
   tasks: [],
   sessions: [],
+  notes: [],
   settings: { ...DEFAULT_SETTINGS },
 };
 
@@ -51,6 +52,7 @@ export const StateManager = {
       state.activeMode = saved.activeMode || "pomodoro";
       state.tasks = saved.tasks || [];
       state.sessions = saved.sessions || [];
+      state.notes = saved.notes || [];
       state.activeTaskId = saved.activeTaskId || null;
 
       if (saved.settings) {
@@ -81,8 +83,6 @@ export const StateManager = {
       const firstTask = state.tasks.find((t) => t.status !== "done");
       state.activeTaskId = firstTask ? String(firstTask.id) : null;
     }
-
-    NoteModel.init();
 
     isInitialized = true;
     return state;
@@ -186,6 +186,7 @@ export const StateManager = {
     state.settings = { ...DEFAULT_SETTINGS };
     state.tasks = [];
     state.sessions = [];
+    state.notes = [];
     state.activeTaskId = null;
     state.activeMode = "pomodoro";
 
@@ -239,6 +240,7 @@ export const StateManager = {
       activeTaskId: state.activeTaskId,
       tasks: state.tasks,
       sessions: state.sessions,
+      notes: state.notes,
       timer: state.timer,
       settings: {
         ...state.settings,

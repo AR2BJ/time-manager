@@ -1,4 +1,4 @@
-import { formatDate, generateId } from "@/utils/helpers.js";
+import { generateId, todayISO } from "@/utils/helpers.js";
 
 export const STORAGE_KEY = "time_manager_data";
 export const STORAGE_VERSION = 1;
@@ -32,6 +32,17 @@ function normalizeSession(session) {
 }
 
 /**
+ * Normalizes a note entity
+ */
+function normalizeNote(note) {
+  return {
+    id: String(note.id || generateId()),
+    text: note.text ? String(note.text).trim() : "",
+    createdAt: note.createdAt || todayISO(),
+  };
+}
+
+/**
  * Normalizes live timer dynamic state for seamless rehydration
  */
 function normalizeTimer(timer, defaultWorkTime = 25) {
@@ -51,6 +62,7 @@ function normalizeTimer(timer, defaultWorkTime = 25) {
 function migrateData(data) {
   const tasks = Array.isArray(data.tasks) ? data.tasks : [];
   const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+  const notes = Array.isArray(data.notes) ? data.notes : [];
   const settings = data.settings || {};
   const pomodoroWorkTime = Number(settings.pomodoroWorkTime) || 25;
 
@@ -60,6 +72,7 @@ function migrateData(data) {
     activeTaskId: data.activeTaskId ? String(data.activeTaskId) : null,
     tasks: tasks.map(normalizeTask),
     sessions: sessions.map(normalizeSession),
+    notes: notes.map(normalizeNote),
     timer: normalizeTimer(data.timer, pomodoroWorkTime),
     settings: {
       pomodoroWorkTime,
@@ -86,6 +99,7 @@ export function saveToStorage(data) {
         activeTaskId: data.activeTaskId ? String(data.activeTaskId) : null,
         tasks: data.tasks || [],
         sessions: data.sessions || [],
+        notes: data.notes || [],
         timer: data.timer || {},
         settings: data.settings || {},
       }),

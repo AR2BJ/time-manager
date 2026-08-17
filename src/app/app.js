@@ -1,4 +1,4 @@
-import { GlobalLoaderService } from "@/services/loader.service";
+import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NavigationController } from "@/controllers/navigation.controller.js";
 import { SettingsController } from "@/controllers/settings.controller";
 import { ThemeController } from "@/controllers/theme.controller.js";

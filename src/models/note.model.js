@@ -1,78 +1,83 @@
-import { generateId, todayISO } from "@/utils/helpers";
+import { StateManager, state } from "./state.model.js";
 
-export const NOTE_STORAGE_KEY = "tm_focus_note_items";
+export const NoteModel = {
+  getNotes() {
+    return state.notes || [];
+  },
 
-export class NoteModel {
-  static items = [];
-  static listeners = new Set();
+  // Legacy Alias for getNotes
+  getItems() {
+    return this.getNotes();
+  },
 
-  static init() {
-    try {
-      const raw = localStorage.getItem(NOTE_STORAGE_KEY);
-      this.items = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      console.error("Failed to load notes:", e);
-      this.items = [];
+  getById(noteId) {
+    const targetIdStr = String(noteId);
+    return (
+      (state.notes || []).find((n) => String(n.id) === targetIdStr) || null
+    );
+  },
+
+  setItems(items = []) {
+    state.notes = Array.isArray(items) ? [...items] : [];
+    this.commit();
+  },
+
+  insert(noteData) {
+    if (!state.notes) {
+      state.notes = [];
     }
-    this.notify();
-    return this.items;
-  }
+    state.notes.unshift(noteData);
+    this.commit();
+    return noteData;
+  },
 
-  static getItems() {
-    return this.items;
-  }
-
-  static setItems(items = []) {
-    this.items = Array.isArray(items) ? [...items] : [];
-    this.saveAndNotify();
-  }
-
-  static addItem(text) {
-    if (!text || !text.trim()) return null;
-
-    const newItem = {
-      id: generateId(),
-      text: text.trim(),
-      createdAt: todayISO(),
-    };
-
-    this.items.unshift(newItem);
-    this.saveAndNotify();
-    return newItem;
-  }
-
-  static deleteItem(id) {
-    this.items = this.items.filter((item) => item.id !== id);
-    this.saveAndNotify();
-  }
-
-  static saveAndNotify() {
-    try {
-      localStorage.setItem(NOTE_STORAGE_KEY, JSON.stringify(this.items));
-    } catch (e) {
-      console.error("Failed to save notes:", e);
+  insertAt(noteData, index) {
+    if (!state.notes) {
+      state.notes = [];
     }
-    this.notify();
-  }
+    state.notes.splice(index, 0, noteData);
+    this.commit();
+  },
 
-  static subscribe(listener) {
-    if (typeof listener === "function") {
-      this.listeners.add(listener);
-    }
-    return () => this.listeners.delete(listener);
-  }
+  remove(noteId) {
+    const targetIdStr = String(noteId);
+    const index = (state.notes || []).findIndex(
+      (n) => String(n.id) === targetIdStr,
+    );
+    if (index === -1) return null;
 
-  static notify() {
-    this.listeners.forEach((listener) => listener(this.items));
-  }
+    const [deletedNote] = state.notes.splice(index, 1);
+    this.commit();
+    return { deletedNote, index };
+  },
 
-  static reset() {
-    this.items = [];
-    try {
-      localStorage.removeItem(NOTE_STORAGE_KEY);
-    } catch (e) {
-      console.error("Failed to reset notes storage:", e);
-    }
-    this.notify();
-  }
-}
+  // Legacy Alias for remove
+  deleteItem(noteId) {
+    return this.remove(noteId);
+  },
+
+  // ==========================================
+  // STATE SYNC & BACKWARD COMPATIBILITY API
+  // ==========================================
+  commit() {
+    StateManager.save();
+    StateManager.notify();
+  },
+
+  saveAndNotify() {
+    this.commit();
+  },
+
+  notify() {
+    StateManager.notify();
+  },
+
+  subscribe(listener) {
+    return StateManager.subscribe(listener);
+  },
+
+  reset() {
+    state.notes = [];
+    this.commit();
+  },
+};

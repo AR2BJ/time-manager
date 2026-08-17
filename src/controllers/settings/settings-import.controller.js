@@ -1,5 +1,5 @@
 import { StateManager, state } from "@/models/state.model.js";
-import { formatDate, generateId, todayISO } from "@/utils/helpers.js";
+import { generateId, todayISO } from "@/utils/helpers.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NoteModel } from "@/models/note.model.js";

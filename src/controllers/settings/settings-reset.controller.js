@@ -1,4 +1,3 @@
-import { NOTE_STORAGE_KEY, NoteModel } from "@/models/note.model.js";
 import {
   STORAGE_KEY_SELECTED_TRACK,
   SoundModel,
@@ -6,10 +5,11 @@ import {
 import { StateManager, state } from "@/models/state.model.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
+import { NoteController } from "../note.controller";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
 import { TimerController } from "../timer.controller";
-import { soundService } from "@/services/sound.service";
+import { soundService } from "@/services/sound.service.js";
 
 export const SettingsResetController = {
   keydownHandler: null,
@@ -71,7 +71,6 @@ export const SettingsResetController = {
   executeApplicationReset() {
     const previousPayload = localStorage.getItem(STORAGE_KEY);
     const previousSoundId = localStorage.getItem(STORAGE_KEY_SELECTED_TRACK);
-    const previousNotesPayload = localStorage.getItem(NOTE_STORAGE_KEY);
 
     const previousState = {
       tasks: (state.tasks || []).map((t) => ({ ...t })),
@@ -114,9 +113,6 @@ export const SettingsResetController = {
                     previousSoundId,
                   );
                 }
-                if (previousNotesPayload) {
-                  localStorage.setItem(NOTE_STORAGE_KEY, previousNotesPayload);
-                }
 
                 state.tasks = previousState.tasks;
                 state.sessions = previousState.sessions;
@@ -126,7 +122,7 @@ export const SettingsResetController = {
                 state.timer = previousState.timer;
 
                 SoundModel.init(previousState.settings);
-                NoteModel.init();
+                NoteController.init();
 
                 StateManager.setView("timer");
 

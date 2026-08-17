@@ -8,8 +8,6 @@ export class NoteComponent {
   }
 
   render() {
-    NoteService.init();
-
     this.container = document.createElement("div");
     this.container.className =
       "bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-3";
@@ -135,7 +133,7 @@ export class NoteComponent {
       const itemEl = e.target.closest("[data-id]");
 
       if (deleteBtn && itemEl) {
-        NoteService.removeNote(itemEl.dataset.id);
+        NoteService.deleteNote(itemEl.dataset.id);
       }
     });
   }

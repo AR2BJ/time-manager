@@ -7,6 +7,7 @@ import { FlipClockController } from "./flip-clock.controller";
 import { HeaderComponent } from "@/components/shared/header.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
 import { ModalController } from "./modal.controller";
+import { NoteController } from "./note.controller";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
 import { SoundModel } from "@/models/sound.model.js";
 import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component";
@@ -25,6 +26,7 @@ export const TimerController = {
   init() {
     StateManager.init();
     timerService.initFromSavedState();
+    NoteController.init();
     TaskController.init();
     ModalController.init();
     FlipClockController.init();
