@@ -1,13 +1,10 @@
-import {
-  STORAGE_KEY_SELECTED_TRACK,
-  SoundModel,
-} from "@/models/sound.model.js";
 import { StateManager, state } from "@/models/state.model.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NoteController } from "../note.controller";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
+import { SoundModel } from "@/models/sound.model.js";
 import { TimerController } from "../timer.controller";
 import { soundService } from "@/services/sound.service.js";
 
@@ -70,10 +67,10 @@ export const SettingsResetController = {
 
   executeApplicationReset() {
     const previousPayload = localStorage.getItem(STORAGE_KEY);
-    const previousSoundId = localStorage.getItem(STORAGE_KEY_SELECTED_TRACK);
 
     const previousState = {
       tasks: (state.tasks || []).map((t) => ({ ...t })),
+      notes: (state.notes || []).map((t) => ({ ...t })),
       sessions: (state.sessions || []).map((s) => ({ ...s })),
       settings: { ...state.settings },
       activeMode: state.activeMode,
@@ -107,14 +104,9 @@ export const SettingsResetController = {
                 if (previousPayload) {
                   localStorage.setItem(STORAGE_KEY, previousPayload);
                 }
-                if (previousSoundId) {
-                  localStorage.setItem(
-                    STORAGE_KEY_SELECTED_TRACK,
-                    previousSoundId,
-                  );
-                }
 
                 state.tasks = previousState.tasks;
+                state.notes = previousState.notes;
                 state.sessions = previousState.sessions;
                 state.settings = previousState.settings;
                 state.activeMode = previousState.activeMode;

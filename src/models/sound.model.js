@@ -1,20 +1,8 @@
+import { StateManager, state } from "./state.model";
+
 import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
-import { StateManager } from "./state.model";
 
 const defaultTrackList = DEFAULT_TRACK_LIST;
-
-export const STORAGE_KEY_SELECTED_TRACK = "app_selected_sound_id";
-
-const getPersistedTrackId = () => {
-  try {
-    if (typeof window !== "undefined" && window.localStorage) {
-      return localStorage.getItem(STORAGE_KEY_SELECTED_TRACK);
-    }
-  } catch (e) {
-    console.warn("LocalStorage access denied or unavailable:", e);
-  }
-  return null;
-};
 
 export const soundState = {
   isPlaying: false,
@@ -34,11 +22,9 @@ export const SoundModel = {
     soundState.isLoading = false;
     soundState.isMuted = false;
 
-    const savedTrackId = getPersistedTrackId();
+    const savedTrackId = savedSettings.currentSoundId;
     if (savedTrackId) {
       soundState.currentSoundId = savedTrackId;
-    } else if (savedSettings.lastSelectedSoundId) {
-      soundState.currentSoundId = savedSettings.lastSelectedSoundId;
     } else {
       soundState.currentSoundId = "none";
     }
@@ -120,13 +106,11 @@ export const SoundModel = {
     const targetId = soundId || "none";
     soundState.currentSoundId = targetId;
 
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem(STORAGE_KEY_SELECTED_TRACK, targetId);
-      }
-    } catch (e) {
-      console.warn("Failed to save track to LocalStorage:", e);
-    }
+    StateManager.updateSettings({
+      ...state.settings,
+      currentSoundId: targetId,
+    });
+
     this.notify();
   },
 
@@ -172,18 +156,10 @@ export const SoundModel = {
     soundState.isPlaying = false;
     soundState.isLoading = false;
     soundState.isMuted = false;
-    soundState.currentSoundId = "none";
     soundState.volume = 50;
     soundState.previousVolume = 50;
 
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.removeItem(STORAGE_KEY_SELECTED_TRACK);
-      }
-    } catch (e) {
-      console.warn("Failed to clear sound storage:", e);
-    }
-
+    this.setSoundTrack("none");
     this.notify();
   },
 };

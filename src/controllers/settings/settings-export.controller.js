@@ -1,4 +1,3 @@
-import { NoteModel } from "@/models/note.model.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_VERSION } from "@/models/storage.model.js";
 import { SoundModel } from "@/models/sound.model.js";
@@ -9,9 +8,7 @@ export const SettingsExportController = {
   handleDataExport(format = "json") {
     const tasks = Array.isArray(state.tasks) ? state.tasks : [];
     const sessions = Array.isArray(state.sessions) ? state.sessions : [];
-    const notes = Array.isArray(NoteModel.getItems())
-      ? NoteModel.getItems()
-      : [];
+    const notes = Array.isArray(state.notes) ? state.notes : [];
     const settings = state.settings || {};
     const soundState = SoundModel.getState();
 
@@ -32,7 +29,7 @@ export const SettingsExportController = {
         },
         settings: {
           ...settings,
-          lastSelectedSoundId: SoundModel.getCurrentSoundId(),
+          currentSoundId: SoundModel.getCurrentSoundId(),
           volume: soundState.volume,
           isMuted: soundState.isMuted,
         },
@@ -121,8 +118,7 @@ export const SettingsExportController = {
     content += `- **Pomodoro End Sound:** ${settings.pomodoroEndSound || "none"}\n`;
     content += `- **Break End Sound:** ${settings.breakEndSound || "none"}\n`;
     content += `- **Notification Sound:** ${settings.notificationSound !== false ? "Yes" : "No"}\n`;
-    content += `- **Vibration:** ${settings.vibration !== false ? "Yes" : "No"}\n`;
-    content += `- **Last Selected Sound ID:** ${SoundModel.getCurrentSoundId()}\n\n---\n\n`;
+    content += `- **Current Sound ID:** ${SoundModel.getCurrentSoundId()}\n\n---\n\n`;
 
     content += `## 📝 TASKS\n\n`;
     if (tasks.length === 0) {
@@ -191,8 +187,7 @@ export const SettingsExportController = {
     content += `pomodoroEndSound,${escapeCsvValue(settings.pomodoroEndSound || "none")}\n`;
     content += `breakEndSound,${escapeCsvValue(settings.breakEndSound || "none")}\n`;
     content += `notificationSound,${escapeCsvValue(settings.notificationSound !== false ? "true" : "false")}\n`;
-    content += `vibration,${escapeCsvValue(settings.vibration !== false ? "true" : "false")}\n`;
-    content += `lastSelectedSoundId,${escapeCsvValue(SoundModel.getCurrentSoundId())}\n\n`;
+    content += `currentSoundId,${escapeCsvValue(SoundModel.getCurrentSoundId())}\n\n`;
 
     content += `[TASKS]\nId,Title,Status,Priority,Tags,Estimated Pomodoros,Completed Pomodoros,Due Date,Created At,Completed At,Description\n`;
     tasks.forEach((t) => {

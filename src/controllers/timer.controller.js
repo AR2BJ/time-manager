@@ -10,7 +10,6 @@ import { ModalController } from "./modal.controller";
 import { NoteController } from "./note.controller";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
 import { SoundModel } from "@/models/sound.model.js";
-import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component";
 import { TaskController } from "./task.controller";
 import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";

@@ -137,7 +137,6 @@ class TimerService {
         message: "Focus session completed! Time for a break.",
         icon: "fa-circle-check",
         iconColor: "text-emerald-500",
-        duration: 5000,
       });
 
       if (state.settings.disableBreaks) {
@@ -196,7 +195,6 @@ class TimerService {
         message: "Break has ended! Ready to focus?",
         icon: "fa-bolt",
         iconColor: "text-brand",
-        duration: 5000,
       });
 
       if (state.settings.autoStartPomodoros) {

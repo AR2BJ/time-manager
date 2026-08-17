@@ -132,8 +132,8 @@ export const SettingsImportController = {
 
           if (importedSettings) {
             StateManager.updateSettings(importedSettings);
-            if (importedSettings.lastSelectedSoundId) {
-              SoundModel.setSoundTrack(importedSettings.lastSelectedSoundId);
+            if (importedSettings.currentSoundId) {
+              SoundModel.setSoundTrack(importedSettings.currentSoundId);
             }
             if (typeof importedSettings.volume === "number") {
               SoundModel.setVolume(importedSettings.volume);
@@ -257,12 +257,8 @@ export const SettingsImportController = {
       if (notificationSound)
         settings.notificationSound = notificationSound.toLowerCase() === "yes";
 
-      const vibration = getVal("Vibration");
-      if (vibration) settings.vibration = vibration.toLowerCase() === "yes";
-
-      const lastSelectedSoundId = getVal("Last Selected Sound ID");
-      if (lastSelectedSoundId)
-        settings.lastSelectedSoundId = lastSelectedSoundId;
+      const currentSoundId = getVal("Current Sound ID");
+      if (currentSoundId) settings.currentSoundId = currentSoundId;
     }
 
     const taskBlocks = mdContent
@@ -448,7 +444,6 @@ export const SettingsImportController = {
               "disableBreaks",
               "isMuted",
               "notificationSound",
-              "vibration",
             ].includes(key)
           ) {
             settings[key] = val.toLowerCase() === "true";

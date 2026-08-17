@@ -15,10 +15,8 @@ export const DEFAULT_SETTINGS = {
   volume: 50,
   pomodoroEndSound: "none",
   breakEndSound: "none",
-  vibration: true,
   currentSoundId: "none",
   notificationSound: true,
-  lastSelectedSoundId: "none",
 };
 
 export const state = {
@@ -59,21 +57,25 @@ export const StateManager = {
         state.settings = {
           ...DEFAULT_SETTINGS,
           ...saved.settings,
+          pomodoroEndSound:
+            saved.settings.pomodoroEndSound ??
+            DEFAULT_SETTINGS.pomodoroEndSound,
+          breakEndSound:
+            saved.settings.breakEndSound ?? DEFAULT_SETTINGS.breakEndSound,
           longBreakInterval:
             Number(saved.settings.longBreakInterval) ||
             DEFAULT_SETTINGS.longBreakInterval,
-          lastSelectedSoundId: saved.settings.lastSelectedSoundId || "none",
         };
-        SoundModel.init(saved.settings);
+        SoundModel.init(state.settings);
       } else {
-        SoundModel.init({});
+        SoundModel.init(DEFAULT_SETTINGS);
       }
 
       if (saved.timer) {
         state.timer = { ...state.timer, ...saved.timer };
       }
     } else {
-      SoundModel.init({});
+      SoundModel.init(DEFAULT_SETTINGS);
     }
 
     const hasActiveTask = state.tasks.some(
@@ -233,7 +235,12 @@ export const StateManager = {
     const soundData = SoundModel.getCurrentTrack();
     const soundId = soundData ? soundData.id : "none";
 
-    state.settings.lastSelectedSoundId = soundId;
+    state.settings = {
+      ...state.settings,
+      currentSoundId: soundId,
+      volume: SoundModel.getState().volume,
+      isMuted: SoundModel.getState().isMuted,
+    };
 
     saveToStorage({
       activeMode: state.activeMode,
@@ -242,11 +249,7 @@ export const StateManager = {
       sessions: state.sessions,
       notes: state.notes,
       timer: state.timer,
-      settings: {
-        ...state.settings,
-        longBreakInterval: Number(state.settings.longBreakInterval) || 4,
-        lastSelectedSoundId: soundId,
-      },
+      settings: state.settings,
     });
   },
 };

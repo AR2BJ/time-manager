@@ -75,6 +75,7 @@ function migrateData(data) {
     notes: notes.map(normalizeNote),
     timer: normalizeTimer(data.timer, pomodoroWorkTime),
     settings: {
+      ...settings,
       pomodoroWorkTime,
       shortBreakTime: Number(settings.shortBreakTime) || 5,
       longBreakTime: Number(settings.longBreakTime) || 15,
@@ -82,8 +83,11 @@ function migrateData(data) {
       autoStartBreaks: Boolean(settings.autoStartBreaks),
       autoStartPomodoros: Boolean(settings.autoStartPomodoros),
       notificationSound: settings.notificationSound !== false,
-      lastSelectedSoundId: settings.lastSelectedSoundId || "none",
-      volume: Number(settings.volume) ?? 50,
+      pomodoroEndSound: settings.pomodoroEndSound || "none",
+      breakEndSound: settings.breakEndSound || "none",
+      currentSoundId:
+        settings.currentSoundId || settings.lastSelectedSoundId || "none",
+      volume: typeof settings.volume === "number" ? settings.volume : 50,
       isMuted: Boolean(settings.isMuted),
     },
   };
