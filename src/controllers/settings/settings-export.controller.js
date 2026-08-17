@@ -1,8 +1,9 @@
+import { formatDate, todayISO } from "@/utils/helpers.js";
+
 import { NoteModel } from "@/models/note.model.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_VERSION } from "@/models/storage.model.js";
 import { SoundModel } from "@/models/sound.model.js";
-import { formatDate } from "@/utils/helpers.js";
 import { state } from "@/models/state.model.js";
 
 export const SettingsExportController = {
@@ -18,12 +19,12 @@ export const SettingsExportController = {
     let fileContent = "";
     let fileName = "";
     let contentType = "";
-    const dateStr = formatDate(new Date());
+    const dateStr = todayISO();
 
     if (format === "json") {
       const essentialPayload = {
         version: STORAGE_VERSION,
-        exportedAt: new Date().toISOString(),
+        exportedAt: todayISO(),
         settings: {
           ...settings,
           lastSelectedSoundId: SoundModel.getCurrentSoundId(),
@@ -97,7 +98,7 @@ export const SettingsExportController = {
   },
 
   generateMarkdownExport(tasks, sessions, notes, settings, soundState) {
-    let content = `# 📊 Time Manager Ledger\n\n**Export Date:** ${new Date().toISOString()}\n**Version:** ${STORAGE_VERSION}\n\n---\n`;
+    let content = `# 📊 Time Manager Ledger\n\n**Export Date:** ${todayISO()}\n**Version:** ${STORAGE_VERSION}\n\n---\n`;
 
     content += `## ⚙️ SETTINGS\n\n`;
     content += `- **Pomodoro Work Time:** ${settings.pomodoroWorkTime || 25}\n`;

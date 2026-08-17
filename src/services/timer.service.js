@@ -1,6 +1,7 @@
 import { StateManager, state } from "@/models/state.model.js";
 
 import { SoundModel } from "@/models/sound.model.js";
+import { TaskModel } from "@/models/task.model.js";
 import { soundService } from "./sound.service.js";
 
 class TimerService {
@@ -107,8 +108,6 @@ class TimerService {
   _onPomodoroComplete() {
     clearInterval(this.timerInterval);
 
-    soundService.playNotificationSound();
-
     const isWorkPhase = state.timer.currentPhase === "work";
 
     const soundToPlay = isWorkPhase
@@ -118,6 +117,12 @@ class TimerService {
     soundService.playNotificationSound(soundToPlay);
 
     if (isWorkPhase) {
+      const currentTaskId = state.activeTaskId;
+
+      if (currentTaskId) {
+        TaskModel.incrementCompletedPomodoro(currentTaskId);
+      }
+
       const newSessionCount = (state.timer.pomodoroSessionCount || 0) + 1;
       const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
 

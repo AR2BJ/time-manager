@@ -5,6 +5,7 @@ import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NoteModel } from "@/models/note.model.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { SoundModel } from "@/models/sound.model.js";
+import { TimerController } from "../timer.controller";
 
 export const SettingsImportController = {
   init() {
@@ -114,6 +115,10 @@ export const SettingsImportController = {
               SoundModel.setVolume(importedSettings.volume);
             }
           }
+
+          StateManager.setView("timer");
+
+          TimerController.refreshUI();
 
           StateManager.save();
           StateManager.notify();
@@ -241,9 +246,7 @@ export const SettingsImportController = {
           estimatedPomodoros: estMatch ? parseInt(estMatch[1], 10) : 1,
           completedPomodoros: compMatch ? parseInt(compMatch[1], 10) : 0,
           dueDate: dueDate === "N/A" ? null : dueDate,
-          createdAt: createdAtMatch
-            ? createdAtMatch[1].trim()
-            : formatDate(new Date()),
+          createdAt: createdAtMatch ? createdAtMatch[1].trim() : todayISO(),
           completedAt: completedAt === "N/A" ? null : completedAt,
           description:
             descMatch && descMatch[1].trim() !== "None"
@@ -397,7 +400,7 @@ export const SettingsImportController = {
             estimatedPomodoros: cols[5] ? parseInt(cols[5], 10) : 1,
             completedPomodoros: cols[6] ? parseInt(cols[6], 10) : 0,
             dueDate: cols[7] && cols[7].trim() !== "" ? cols[7].trim() : null,
-            createdAt: cols[8] ? cols[8].trim() : formatDate(new Date()),
+            createdAt: cols[8] ? cols[8].trim() : todayISO(),
             completedAt:
               cols[9] && cols[9].trim() !== "" ? cols[9].trim() : null,
             description: cols[10] ? cols[10].trim() : "",
@@ -417,7 +420,7 @@ export const SettingsImportController = {
             isFlowMode: cols[6]
               ? cols[6].trim().toLowerCase() === "true"
               : false,
-            completedAt: cols[7] ? cols[7].trim() : formatDate(new Date()),
+            completedAt: cols[7] ? cols[7].trim() : todayISO(),
           });
         }
       } else if (currentSection === "NOTES") {

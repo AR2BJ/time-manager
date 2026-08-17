@@ -13,7 +13,7 @@ function normalizeTask(task) {
     status: task.status || "todo",
     estimatedPomodoros: Number(task.estimatedPomodoros) || 1,
     completedPomodoros: Number(task.completedPomodoros) || 0,
-    createdAt: task.createdAt || formatDate(new Date()),
+    createdAt: task.createdAt || todayISO(),
   };
 }
 
@@ -27,7 +27,7 @@ function normalizeSession(session) {
     taskTitle: session.taskTitle || "Untitled Task",
     type: session.type || "pomodoro",
     durationSeconds: Number(session.durationSeconds) || 0,
-    completedAt: session.completedAt || formatDate(new Date()),
+    completedAt: session.completedAt || todayISO(),
   };
 }
 

@@ -1,8 +1,8 @@
+import { formatDate, generateId, todayISO } from "@/utils/helpers.js";
 import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
 import { NoteModel } from "./note.model.js";
 import { SoundModel } from "./sound.model.js";
-import { generateId } from "@/utils/helpers.js";
 
 export const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
@@ -116,11 +116,9 @@ export const StateManager = {
   },
 
   getTodaySessions() {
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayISO();
     return state.sessions.filter((session) => {
-      const sessionDate = new Date(session.completedAt)
-        .toISOString()
-        .split("T")[0];
+      const sessionDate = formatDate(session.completedAt);
       return sessionDate === today;
     });
   },
@@ -221,19 +219,10 @@ export const StateManager = {
         (activeTask ? activeTask.title : "Untitled Session"),
       type: sessionData.type || state.activeMode,
       durationSeconds: sessionData.durationSeconds || 0,
-      completedAt: new Date().toISOString(),
+      completedAt: todayISO(),
     };
 
     state.sessions.unshift(session);
-
-    if (session.taskId) {
-      const task = state.tasks.find(
-        (t) => String(t.id) === String(session.taskId),
-      );
-      if (task) {
-        task.completedPomodoros = (task.completedPomodoros || 0) + 1;
-      }
-    }
 
     this.save();
     this.notify();

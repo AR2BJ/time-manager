@@ -143,21 +143,31 @@ export const TaskModalComponent = {
                     .map((t) => {
                       const isActive = String(t.id) === activeTaskId;
                       const isDone = t.status === "done";
+
                       return `
                         <div
                           data-task-id="${t.id}"
-                          class="task-item-row group flex items-center justify-between p-3 rounded-2xl transition cursor-pointer border ${
-                            isActive
-                              ? "bg-brand/5 border-brand/60 shadow-xs"
-                              : "bg-surface-2 border-border hover:border-brand/40"
-                          } ${isDone ? "opacity-60" : ""}"
+                          data-is-done="${isDone}"
+                          class="task-item-row group flex items-center justify-between p-3 rounded-2xl transition border ${
+                            isDone
+                              ? "opacity-50 bg-surface-2/60 border-border cursor-not-allowed select-none"
+                              : isActive
+                                ? "bg-brand/5 border-brand/60 shadow-xs cursor-pointer"
+                                : "bg-surface-2 border-border hover:border-brand/40 cursor-pointer"
+                          }"
                         >
-                          <div class="flex items-center gap-2.5 min-w-0">
+                          <div
+                            class="flex items-center gap-2.5 min-w-0 ${
+                              isDone ? "pointer-events-none" : ""
+                            }"
+                          >
                             ${
                               isActive
-                                ? `<span class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center text-[10px] shrink-0 shadow-xs">
-                                     <i class="fa-solid fa-check"></i>
-                                   </span>`
+                                ? `<span
+                                    class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center text-[10px] shrink-0 shadow-xs"
+                                  >
+                                    <i class="fa-solid fa-check"></i>
+                                  </span>`
                                 : ""
                             }
                             <span
@@ -165,44 +175,56 @@ export const TaskModalComponent = {
                                 isActive
                                   ? "text-brand font-bold"
                                   : "text-primary"
-                              } ${isDone ? "line-through" : ""}"
-                              >${t.title}</span
+                              } ${isDone ? "line-through text-muted" : ""}"
                             >
+                              ${t.title}
+                            </span>
                           </div>
 
                           <div class="flex items-center gap-2 shrink-0">
                             <span
                               class="text-[10px] font-bold ${
-                                isActive
-                                  ? "text-brand bg-brand/15 border-brand/30"
-                                  : "text-brand bg-brand/10 border-brand/20"
+                                isDone
+                                  ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+                                  : isActive
+                                    ? "text-brand bg-brand/15 border-brand/30"
+                                    : "text-brand bg-brand/10 border-brand/20"
                               } px-2 py-1.25 rounded-md border"
                             >
                               ${
-                                t.completedPomodoros || 0
-                              }/${t.estimatedPomodoros || 1}
-                              Pomo
+                                isDone
+                                  ? "Completed"
+                                  : `${t.completedPomodoros || 0}/${t.estimatedPomodoros || 1} Pomo`
+                              }
                             </span>
 
-                            <button
-                              type="button"
-                              data-edit-task-id="${t.id}"
-                              class="btn-edit-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-blue-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition text-secondary"
-                              title="Edit Task"
-                            >
-                              <i class="fa-regular fa-pen-to-square text-blue-500/80 text-xs"></i>
-                            </button>
+                            ${
+                              !isDone
+                                ? `
+                                    <button
+                                      type="button"
+                                      data-edit-task-id="${t.id}"
+                                      class="btn-edit-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-blue-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition text-secondary"
+                                      title="Edit Task"
+                                    >
+                                      <i
+                                        class="fa-regular fa-pen-to-square text-blue-500/80 text-xs"
+                                      ></i>
+                                    </button>
 
-                            <button
-                              type="button"
-                              data-delete-task-id="${t.id}"
-                              class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition"
-                              title="Delete Task"
-                            >
-                              <i
-                                class="fa-regular fa-trash-can text-red-500/80 text-xs"
-                              ></i>
-                            </button>
+                                    <button
+                                      type="button"
+                                      data-delete-task-id="${t.id}"
+                                      class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition"
+                                      title="Delete Task"
+                                    >
+                                      <i
+                                        class="fa-regular fa-trash-can text-red-500/80 text-xs"
+                                      ></i>
+                                    </button>
+                                  `
+                                : ""
+                            }
                           </div>
                         </div>
                       `;

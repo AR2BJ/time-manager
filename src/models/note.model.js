@@ -1,4 +1,4 @@
-import { generateId } from "@/utils/helpers";
+import { generateId, todayISO } from "@/utils/helpers";
 
 export const NOTE_STORAGE_KEY = "tm_focus_note_items";
 
@@ -33,7 +33,7 @@ export class NoteModel {
     const newItem = {
       id: generateId(),
       text: text.trim(),
-      createdAt: Date.now(),
+      createdAt: todayISO(),
     };
 
     this.items.unshift(newItem);

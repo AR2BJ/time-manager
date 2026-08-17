@@ -1,6 +1,5 @@
 import { StateManager, state } from "./state.model.js";
-
-import { generateId } from "@/utils/helpers.js";
+import { generateId, todayISO } from "@/utils/helpers.js";
 
 export const TaskModel = {
   getTasks() {
@@ -13,12 +12,6 @@ export const TaskModel = {
       state.tasks.find((t) => String(t.id) === String(state.activeTaskId)) ||
       null
     );
-  },
-
-  setActiveTaskId(taskId) {
-    state.activeTaskId = taskId ? String(taskId) : null;
-    StateManager.save();
-    StateManager.notify();
   },
 
   isTitleDuplicate(title, excludeTaskId = null) {
@@ -41,7 +34,7 @@ export const TaskModel = {
       status: "todo",
       estimatedPomodoros: Number(estimatedPomodoros) || 1,
       completedPomodoros: 0,
-      createdAt: new Date().toISOString(),
+      createdAt: todayISO(),
     };
 
     state.tasks.unshift(newTask);
@@ -55,7 +48,13 @@ export const TaskModel = {
   updateTask(taskId, newTitle, newEstimatedPomodoros) {
     const targetIdStr = String(taskId);
     const task = state.tasks.find((t) => String(t.id) === targetIdStr);
-    if (!task || this.isTitleDuplicate(newTitle, taskId)) return false;
+
+    if (
+      !task ||
+      task.status === "done" ||
+      this.isTitleDuplicate(newTitle, taskId)
+    )
+      return false;
 
     task.title = newTitle.trim();
     task.estimatedPomodoros = Number(newEstimatedPomodoros) || 1;
@@ -63,22 +62,38 @@ export const TaskModel = {
     if (
       task.completedPomodoros < task.estimatedPomodoros &&
       task.status === "done"
-    ) {
+    )
       task.status = "todo";
-    }
 
     StateManager.save();
     StateManager.notify();
     return true;
   },
 
+  setActiveTaskId(taskId) {
+    if (!taskId) {
+      state.activeTaskId = null;
+      StateManager.save();
+      StateManager.notify();
+      return;
+    }
+
+    const task = state.tasks.find((t) => String(t.id) === String(taskId));
+
+    if (!task || task.status === "done") {
+      return;
+    }
+
+    state.activeTaskId = String(taskId);
+    StateManager.save();
+    StateManager.notify();
+  },
+
   autoSelectNextTask() {
     const activeTask = this.getActiveTask();
+    if (!activeTask) return null;
 
-    if (
-      activeTask &&
-      activeTask.completedPomodoros >= activeTask.estimatedPomodoros
-    ) {
+    if (activeTask.completedPomodoros >= activeTask.estimatedPomodoros) {
       activeTask.status = "done";
 
       const nextTask = state.tasks.find(
@@ -86,11 +101,13 @@ export const TaskModel = {
       );
 
       state.activeTaskId = nextTask ? String(nextTask.id) : null;
+
       StateManager.save();
       StateManager.notify();
 
       return nextTask;
     }
+
     return null;
   },
 
@@ -109,6 +126,10 @@ export const TaskModel = {
     if (!taskId) return null;
 
     const targetIdStr = String(taskId);
+    const task = state.tasks.find((t) => String(t.id) === targetIdStr);
+
+    if (!task || task.status === "done") return null;
+
     const taskIndex = state.tasks.findIndex(
       (t) => String(t.id) === targetIdStr,
     );
@@ -120,7 +141,8 @@ export const TaskModel = {
     state.tasks.splice(taskIndex, 1);
 
     if (wasActive) {
-      const remainingTask = state.tasks.find((t) => t.status !== "done");
+      const remainingTask =
+        state.tasks.find((t) => t.status !== "done") || state.tasks[0] || null;
       state.activeTaskId = remainingTask ? String(remainingTask.id) : null;
     }
 

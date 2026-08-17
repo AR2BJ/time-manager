@@ -194,9 +194,14 @@ export const ModalController = {
       }
 
       // Select Task Action
-      const taskRow = e.target.closest(".task-item-row");
-      if (taskRow) {
-        const taskId = taskRow.dataset.taskId;
+      const taskItem = e.target.closest(".task-item-row");
+      if (taskItem) {
+        const isDone = taskItem.dataset.isDone === "true";
+
+        // Ignore clicks on completed tasks
+        if (isDone) return;
+
+        const taskId = taskItem.dataset.taskId;
         TaskModel.setActiveTaskId(taskId);
         this.closeTaskModal();
       }
