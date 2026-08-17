@@ -21,11 +21,22 @@ export const TaskModel = {
     StateManager.notify();
   },
 
-  addTask(title, estimatedPomodoros = 1) {
-    if (!title || !title.trim()) return null;
+  isTitleDuplicate(title, excludeTaskId = null) {
+    const cleanTitle = title.trim().toLowerCase();
+    return state.tasks.some(
+      (t) =>
+        t.title.trim().toLowerCase() === cleanTitle &&
+        String(t.id) !== String(excludeTaskId),
+    );
+  },
+
+  addTask(title, estimatedPomodoros = 1, customId = null) {
+    if (!title || !title.trim() || this.isTitleDuplicate(title, customId)) {
+      return null;
+    }
 
     const newTask = {
-      id: generateId(),
+      id: customId || generateId(),
       title: title.trim(),
       status: "todo",
       estimatedPomodoros: Number(estimatedPomodoros) || 1,
@@ -37,18 +48,94 @@ export const TaskModel = {
     state.activeTaskId = String(newTask.id);
     StateManager.save();
     StateManager.notify();
+
     return newTask;
   },
 
+  updateTask(taskId, newTitle, newEstimatedPomodoros) {
+    const targetIdStr = String(taskId);
+    const task = state.tasks.find((t) => String(t.id) === targetIdStr);
+    if (!task || this.isTitleDuplicate(newTitle, taskId)) return false;
+
+    task.title = newTitle.trim();
+    task.estimatedPomodoros = Number(newEstimatedPomodoros) || 1;
+
+    if (
+      task.completedPomodoros < task.estimatedPomodoros &&
+      task.status === "done"
+    ) {
+      task.status = "todo";
+    }
+
+    StateManager.save();
+    StateManager.notify();
+    return true;
+  },
+
+  autoSelectNextTask() {
+    const activeTask = this.getActiveTask();
+
+    if (
+      activeTask &&
+      activeTask.completedPomodoros >= activeTask.estimatedPomodoros
+    ) {
+      activeTask.status = "done";
+
+      const nextTask = state.tasks.find(
+        (t) => t.status !== "done" && String(t.id) !== String(activeTask.id),
+      );
+
+      state.activeTaskId = nextTask ? String(nextTask.id) : null;
+      StateManager.save();
+      StateManager.notify();
+
+      return nextTask;
+    }
+    return null;
+  },
+
+  incrementCompletedPomodoro(taskId) {
+    const targetIdStr = String(taskId || state.activeTaskId);
+    const task = state.tasks.find((t) => String(t.id) === targetIdStr);
+
+    if (task) {
+      task.completedPomodoros = (task.completedPomodoros || 0) + 1;
+      return this.autoSelectNextTask();
+    }
+    return null;
+  },
+
   deleteTask(taskId) {
-    if (!taskId) return;
+    if (!taskId) return null;
 
     const targetIdStr = String(taskId);
-    state.tasks = state.tasks.filter((t) => String(t.id) !== targetIdStr);
+    const taskIndex = state.tasks.findIndex(
+      (t) => String(t.id) === targetIdStr,
+    );
+    if (taskIndex === -1) return null;
 
-    if (String(state.activeTaskId) === targetIdStr) {
+    const deletedTask = { ...state.tasks[taskIndex] };
+    const wasActive = String(state.activeTaskId) === targetIdStr;
+
+    state.tasks.splice(taskIndex, 1);
+
+    if (wasActive) {
       const remainingTask = state.tasks.find((t) => t.status !== "done");
       state.activeTaskId = remainingTask ? String(remainingTask.id) : null;
+    }
+
+    StateManager.save();
+    StateManager.notify();
+
+    return { deletedTask, taskIndex, wasActive };
+  },
+
+  restoreTask(task, index, restoreAsActive = false) {
+    if (!task) return;
+
+    state.tasks.splice(index, 0, task);
+    if (restoreAsActive) {
+      state.activeTaskId = String(task.id);
     }
 
     StateManager.save();

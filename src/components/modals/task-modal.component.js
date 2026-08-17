@@ -1,10 +1,12 @@
 import { TaskModel } from "@/models/task.model";
 
 export const TaskModalComponent = {
-  render() {
+  render(editingTask = null) {
     const tasks = TaskModel.getTasks();
     const activeTask = TaskModel.getActiveTask();
     const activeTaskId = activeTask ? String(activeTask.id) : null;
+
+    const isEditing = Boolean(editingTask);
 
     return `
       <div
@@ -30,10 +32,14 @@ export const TaskModalComponent = {
               </div>
               <div>
                 <h3 class="text-base font-bold text-primary">
-                  Select Active Task
+                  ${isEditing ? "Edit Task" : "Select Active Task"}
                 </h3>
                 <p class="text-xs text-secondary">
-                  Choose an existing task, manage, or create a new item.
+                  ${
+                    isEditing
+                      ? "Update task details below."
+                      : "Choose an existing task, manage, or create a new item."
+                  }
                 </p>
               </div>
             </div>
@@ -48,7 +54,8 @@ export const TaskModalComponent = {
           </div>
 
           <form
-            id="form-create-task"
+            id="form-task-action"
+            data-edit-id="${isEditing ? editingTask.id : ""}"
             class="pb-4 border-b border-border flex flex-col gap-3 shrink-0"
           >
             <div class="grid grid-cols-2 gap-3">
@@ -57,13 +64,14 @@ export const TaskModalComponent = {
                   for="input-task-title"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Create New Task Title
+                  ${isEditing ? "Task Title" : "Create New Task Title"}
                 </label>
                 <input
                   id="input-task-title"
                   type="text"
                   required
                   maxlength="60"
+                  value="${isEditing ? editingTask.title : ""}"
                   placeholder="E.g., Design System Refactoring"
                   class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-brand transition"
                 />
@@ -79,20 +87,36 @@ export const TaskModalComponent = {
                   id="input-task-pomo"
                   type="text"
                   inputmode="numeric"
-                  value="1"
+                  value="${isEditing ? editingTask.estimatedPomodoros : "1"}"
                   maxlength="2"
                   class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
                 />
               </div>
             </div>
 
-            <div class="flex items-end">
+            <div class="flex items-center gap-2">
               <button
                 type="submit"
-                class="w-full h-10 rounded-xl bg-brand hover:bg-(--color-brand-hover) text-white font-semibold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                class="flex-1 h-10 rounded-xl bg-brand hover:bg-(--color-brand-hover) text-white font-semibold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
               >
-                <i class="fa-regular fa-plus"></i> Add & Select
+                ${
+                  isEditing
+                    ? `<i class="fa-regular fa-check"></i> Save Changes`
+                    : `<i class="fa-regular fa-plus"></i> Add & Select`
+                }
               </button>
+
+              ${
+                isEditing
+                  ? `<button
+                      type="button"
+                      id="btn-cancel-edit"
+                      class="h-10 px-4 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary text-xs font-semibold transition cursor-pointer"
+                     >
+                       Cancel
+                     </button>`
+                  : ""
+              }
             </div>
           </form>
 
@@ -118,6 +142,7 @@ export const TaskModalComponent = {
                 : tasks
                     .map((t) => {
                       const isActive = String(t.id) === activeTaskId;
+                      const isDone = t.status === "done";
                       return `
                         <div
                           data-task-id="${t.id}"
@@ -125,7 +150,7 @@ export const TaskModalComponent = {
                             isActive
                               ? "bg-brand/5 border-brand/60 shadow-xs"
                               : "bg-surface-2 border-border hover:border-brand/40"
-                          }"
+                          } ${isDone ? "opacity-60" : ""}"
                         >
                           <div class="flex items-center gap-2.5 min-w-0">
                             ${
@@ -140,7 +165,7 @@ export const TaskModalComponent = {
                                 isActive
                                   ? "text-brand font-bold"
                                   : "text-primary"
-                              }"
+                              } ${isDone ? "line-through" : ""}"
                               >${t.title}</span
                             >
                           </div>
@@ -158,10 +183,20 @@ export const TaskModalComponent = {
                               }/${t.estimatedPomodoros || 1}
                               Pomo
                             </span>
+
+                            <button
+                              type="button"
+                              data-edit-task-id="${t.id}"
+                              class="btn-edit-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-blue-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition text-secondary"
+                              title="Edit Task"
+                            >
+                              <i class="fa-regular fa-pen-to-square text-blue-500/80 text-xs"></i>
+                            </button>
+
                             <button
                               type="button"
                               data-delete-task-id="${t.id}"
-                              class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer peer transition"
+                              class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition"
                               title="Delete Task"
                             >
                               <i

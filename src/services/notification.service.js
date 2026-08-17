@@ -2,7 +2,7 @@ export const NotificationService = {
   show({
     type,
     message,
-    duration = 4000,
+    duration = 5000,
     undoAction = null,
     icon = null,
     iconColor = "",

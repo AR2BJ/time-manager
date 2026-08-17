@@ -81,7 +81,7 @@ export const ModalController = {
         if (isTaskOpen) {
           e.preventDefault();
           const taskForm = document.querySelector(
-            "#task-modal-wrapper #form-create-task",
+            "#task-modal-wrapper #form-task-action",
           );
           if (taskForm) {
             taskForm.requestSubmit();
@@ -92,15 +92,12 @@ export const ModalController = {
     });
   },
 
-  // ==========================================
-  // TASK MODAL LOGIC (Dynamic Body Injection)
-  // ==========================================
-  openTaskModal() {
+  openTaskModal(editingTask = null) {
     this.closeTaskModal();
 
     const modalWrapper = document.createElement("div");
     modalWrapper.id = "task-modal-wrapper";
-    modalWrapper.innerHTML = TaskModalComponent.render();
+    modalWrapper.innerHTML = TaskModalComponent.render(editingTask);
     document.body.appendChild(modalWrapper);
 
     // Auto Focus on Title Input for Seamless UX
@@ -124,7 +121,7 @@ export const ModalController = {
     const pomoInput = wrapper.querySelector("#input-task-pomo");
     if (pomoInput) {
       pomoInput.addEventListener("input", (e) => {
-        let val = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+        let val = e.target.value.replace(/\D/g, "");
 
         if (val !== "") {
           let num = parseInt(val, 10);
@@ -154,7 +151,27 @@ export const ModalController = {
         return;
       }
 
-      // Direct Delete Action (No Confirmation required)
+      if (e.target.closest("#btn-cancel-edit")) {
+        this.openTaskModal(null);
+        return;
+      }
+
+      const btnEdit = e.target.closest(".btn-edit-task");
+      if (btnEdit) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const taskId = btnEdit.dataset.editTaskId;
+        const targetTask = TaskModel.getTasks().find(
+          (t) => String(t.id) === String(taskId),
+        );
+
+        if (targetTask) {
+          this.openTaskModal(targetTask);
+        }
+        return;
+      }
+
       const btnDelete = e.target.closest(".btn-delete-task");
       if (btnDelete) {
         e.preventDefault();
@@ -185,20 +202,31 @@ export const ModalController = {
       }
     });
 
-    // 3. Form Submit Logic
-    const form = wrapper.querySelector("#form-create-task");
+    const form = wrapper.querySelector("#form-task-action");
     if (form) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const titleInput = wrapper.querySelector("#input-task-title");
         const pomoVal = Number(pomoInput?.value) || 1;
+        const editId = form.dataset.editId;
 
         if (titleInput && titleInput.value.trim()) {
-          const newTask = TaskModel.addTask(titleInput.value.trim(), pomoVal);
-          if (newTask) {
-            TaskModel.setActiveTaskId(newTask.id);
+          if (editId) {
+            const success = TaskModel.updateTask(
+              editId,
+              titleInput.value.trim(),
+              pomoVal,
+            );
+            if (success) {
+              this.closeTaskModal();
+            }
+          } else {
+            const newTask = TaskModel.addTask(titleInput.value.trim(), pomoVal);
+            if (newTask) {
+              TaskModel.setActiveTaskId(newTask.id);
+              this.closeTaskModal();
+            }
           }
-          this.closeTaskModal();
         }
       });
     }
