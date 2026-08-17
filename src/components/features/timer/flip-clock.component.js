@@ -70,9 +70,18 @@ export class FlipClockComponent {
     }
   }
 
-  updateBadge(text) {
+  updateBadge(text, isBreak = false) {
     const badge = this.overlay?.querySelector("#flip-phase-badge");
-    if (badge) badge.textContent = text;
+    if (!badge) return;
+
+    badge.textContent = text;
+    if (isBreak) {
+      badge.className =
+        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs";
+    } else {
+      badge.className =
+        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs";
+    }
   }
 
   updateControls(state) {

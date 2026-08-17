@@ -160,6 +160,10 @@ export class TimerDisplayComponent {
     const { activeMode, timer } = state;
 
     const isPomodoro = activeMode === "pomodoro";
+    const isBreak =
+      isPomodoro &&
+      (timer.currentPhase === "shortBreak" ||
+        timer.currentPhase === "longBreak");
     const displayTime = isPomodoro
       ? formatTime(timer.timeRemaining)
       : formatTime(timer.flowTime);
@@ -175,15 +179,34 @@ export class TimerDisplayComponent {
       const progress = timer.timeRemaining / (timer.duration || 1500);
       const offset = circumference - progress * circumference;
       progressRing.style.strokeDashoffset = `${offset}`;
+
+      if (isBreak) {
+        progressRing.classList.remove("stroke-brand");
+        progressRing.classList.add("stroke-emerald-500");
+      } else {
+        progressRing.classList.remove("stroke-emerald-500");
+        progressRing.classList.add("stroke-brand");
+      }
     }
 
     const phaseBadge = this.container.querySelector("#timer-phase-badge");
     if (phaseBadge) {
-      phaseBadge.textContent = isPomodoro
-        ? timer.currentPhase === "work"
-          ? "Focus Phase"
-          : "Break Phase"
-        : "Flow Mode";
+      if (isPomodoro) {
+        if (isBreak) {
+          phaseBadge.textContent =
+            timer.currentPhase === "shortBreak" ? "Short Break" : "Long Break";
+          phaseBadge.className =
+            "mb-3 rounded-lg bg-emerald-500/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-widest border border-emerald-500/20";
+        } else {
+          phaseBadge.textContent = "Focus Phase";
+          phaseBadge.className =
+            "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
+        }
+      } else {
+        phaseBadge.textContent = "Flow Mode";
+        phaseBadge.className =
+          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
+      }
     }
 
     const toggleBtn = this.container.querySelector("#timer-start-toggle-btn");

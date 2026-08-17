@@ -101,6 +101,10 @@ export const FlipClockController = {
 
     const { activeMode, timer, settings } = StateManager.getState();
     const isPomodoro = activeMode === "pomodoro";
+    const isBreak =
+      isPomodoro &&
+      (timer.currentPhase === "shortBreak" ||
+        timer.currentPhase === "longBreak");
     const totalSeconds = isPomodoro ? timer.timeRemaining : timer.flowTime;
 
     const formatted = formatTime(totalSeconds);
@@ -130,7 +134,7 @@ export const FlipClockController = {
       phaseText = phaseNames[currentPhase] || "Focus Phase";
     }
 
-    flipClockComponent.updateBadge(phaseText);
+    flipClockComponent.updateBadge(phaseText, isBreak);
 
     const controlState =
       timer.isRunning && !timer.isPaused
