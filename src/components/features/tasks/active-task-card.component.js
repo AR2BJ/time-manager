@@ -17,14 +17,19 @@ export const ActiveTaskCardComponent = {
 
       return `
         <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs">
-          <div class="flex flex-col sm:flex-row items-center sm:justify-between mb-4 pb-3 border-b border-border gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
-              <i class="fa-regular fa-bullseye-arrow text-brand"></i>
-              <span>Active Focus Task</span>
-            </span>
+          <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-border">
+            <div 
+              class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer xs:pointer-events-none xs:cursor-default"
+              data-tooltip-title="Active Focus Task"
+            >
+              <i class="fa-regular fa-bullseye-arrow text-brand shrink-0"></i>
+              <span class="text-xs font-bold uppercase tracking-wider text-muted truncate">
+                Active Focus Task
+              </span>
+            </div>
             <button 
               id="btn-select-task" 
-              class="w-full sm:w-auto rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+              class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
             >
               ${buttonText}
             </button>
@@ -50,14 +55,19 @@ export const ActiveTaskCardComponent = {
 
     return `
       <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-border">
-          <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
-            <i class="fa-regular fa-bullseye-arrow text-brand"></i>
-            <span>Active Focus Task</span>
-          </span>
+        <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-border">
+          <div 
+            class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer xs:pointer-events-none xs:cursor-default"
+            data-tooltip-title="Active Focus Task"
+          >
+            <i class="fa-regular fa-bullseye-arrow text-brand shrink-0"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-muted truncate">
+              Active Focus Task
+            </span>
+          </div>
           <button 
             id="btn-select-task" 
-            class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+            class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
           >
             Select
           </button>
@@ -65,7 +75,7 @@ export const ActiveTaskCardComponent = {
 
         <div class="p-3.5 rounded-2xl bg-surface-2 border border-border">
           <div class="flex items-center justify-between gap-3 mb-3">
-            <h4 class="text-sm font-semibold text-primary truncate">${activeTask.title}</h4>
+            <h4 class="text-sm font-semibold text-primary truncate min-w-0 flex-1">${activeTask.title}</h4>
             <span class="shrink-0 text-[11px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded-md border border-brand/20">
               ${completed}/${estimated} Pomo
             </span>

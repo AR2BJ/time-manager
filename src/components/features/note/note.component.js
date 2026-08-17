@@ -31,16 +31,21 @@ export class NoteComponent {
 
     this.container.innerHTML = `
       <div
-        class="flex items-center justify-between pb-2 border-b border-border"
+        class="flex items-center justify-between gap-3 pb-2 border-b border-border"
       >
-        <span
-          class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
+        <div 
+          class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer sm:pointer-events-none sm:cursor-default"
+          data-tooltip-title="Focus Quick Notes"
         >
-          <i class="fa-regular fa-lightbulb text-brand"></i>
-          Focus Quick Notes
-        </span>
+          <i class="fa-regular fa-lightbulb text-brand shrink-0"></i>
+          <span
+            class="text-xs font-bold uppercase tracking-wider text-muted truncate"
+          >
+            Focus Quick Notes
+          </span>
+        </div>
         <span
-          class="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3"
+          class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary"
         >
           ${items.length} items
         </span>

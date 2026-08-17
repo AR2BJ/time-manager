@@ -25,10 +25,12 @@ export class SoundPlayerComponent {
   mount() {
     this.container.innerHTML = `
       <div
-        class="relative w-full bg-surface-2 border border-border rounded-2xl p-3 shadow-sm flex items-center justify-between gap-3 transition-all duration-300"
+        class="relative w-full bg-surface-2 border border-border rounded-2xl p-3 sm:p-3 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 transition-all duration-300"
       >
-        <div class="flex items-center gap-3 min-w-0 flex-1">
-          <div class="relative w-14 h-14 rounded-xl overflow-hidden bg-surface-3 border border-border shrink-0 group">
+        <!-- Top Container for Mobile / Left Container for Desktop -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto min-w-0 flex-1">
+          <!-- Cover Art & Play Action -->
+          <div class="relative w-16 h-16 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-surface-3 border border-border shrink-0 group">
             <img 
               id="player-cover-image" 
               src="" 
@@ -53,28 +55,63 @@ export class SoundPlayerComponent {
             </button>
           </div>
 
-          <div class="flex flex-col min-w-0 gap-1">
+          <!-- Metadata & Duration Section -->
+          <div class="flex flex-col items-center text-center sm:items-start sm:text-left min-w-0 flex-1 w-full gap-1">
             <h4
               id="player-track-title"
-              class="text-sm font-bold text-primary truncate"
+              class="text-xs sm:text-sm font-bold text-primary truncate w-full cursor-pointer sm:pointer-events-none sm:cursor-default"
+              data-tooltip-title="No track selected"
             >
               --
             </h4>
             
-            <div class="flex items-center gap-2 text-xs text-secondary truncate">
-              <span id="player-track-creator" class="truncate">--</span>
-              <span class="inline-block w-1 h-1 rounded-full bg-border shrink-0"></span>
-              
-              <div class="font-mono text-[11px] text-tertiary dir-ltr flex items-center gap-1 shrink-0">
+            <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 w-full justify-center sm:justify-start min-w-0">
+              <span 
+                id="player-track-creator" 
+                class="text-[11px] sm:text-xs text-secondary truncate max-w-full cursor-pointer sm:pointer-events-none sm:cursor-default"
+                data-tooltip-title="Unknown Source"
+              >
+                --
+              </span>
+
+              <span class="hidden sm:inline-block w-1 h-1 rounded-full bg-border shrink-0"></span>
+
+              <div class="font-mono text-[10px] sm:text-[11px] text-tertiary dir-ltr flex items-center gap-0.5 shrink-0">
                 <span id="player-current-time">0:00</span>
-                <span>/</span>
+                <span class="opacity-60">/</span>
                 <span id="player-total-time">0:00</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="relative shrink-0">
+        <!-- Inline Volume (Mobile Layout) -->
+        <div class="flex sm:hidden items-center gap-2.5 w-full pt-2 border-t border-border/40">
+          <button
+            type="button"
+            class="btn-toggle-mute text-secondary hover:text-primary transition shrink-0 cursor-pointer"
+            title="Toggle Mute"
+          >
+            <span class="inline-volume-icon flex items-center justify-center text-xs">
+              <i class="fa-solid fa-volume-high"></i>
+            </span>
+          </button>
+
+          <input
+            type="range"
+            class="volume-slider-input w-full h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand"
+            min="0"
+            max="100"
+            value="50"
+          />
+
+          <span class="volume-text-val text-[10px] font-mono text-tertiary w-7 text-right shrink-0">
+            50%
+          </span>
+        </div>
+
+        <!-- Popover Volume (Desktop Layout) -->
+        <div class="hidden sm:flex relative shrink-0">
           <button
             type="button"
             id="btn-volume-popover-toggle"
@@ -83,7 +120,7 @@ export class SoundPlayerComponent {
           >
             <span
               id="player-volume-icon-slot"
-              class="pointer-events-none flex items-center justify-center"
+              class="pointer-events-none flex items-center justify-center text-sm"
             >
               <i class="fa-solid fa-volume-high"></i>
             </span>
@@ -94,27 +131,21 @@ export class SoundPlayerComponent {
             class="hidden absolute left-1/2 -translate-x-1/2 bottom-12 z-30 flex-col items-center gap-2 p-3 bg-surface border border-border rounded-2xl shadow-xl animate-fade-in w-12"
           >
             <span
-              id="volume-text-val"
-              class="text-[10px] font-bold text-secondary"
+              class="volume-text-val text-[10px] font-bold text-secondary"
             >50%</span>
             <input
               type="range"
-              id="volume-slider"
               min="0"
               max="100"
               value="50"
-              class="w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
+              class="volume-slider-input w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
             />
             <button
               type="button"
-              id="btn-toggle-mute"
-              class="text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
+              class="btn-toggle-mute text-xs text-secondary hover:text-brand transition cursor-pointer pt-1"
               title="Toggle Mute"
             >
-              <span
-                id="popover-mute-icon-slot"
-                class="flex items-center justify-center"
-              >
+              <span class="popover-mute-icon-slot flex items-center justify-center">
                 <i class="fa-solid fa-volume-high"></i>
               </span>
             </button>
@@ -147,10 +178,17 @@ export class SoundPlayerComponent {
     const titleEl = this.container.querySelector("#player-track-title");
     const creatorEl = this.container.querySelector("#player-track-creator");
 
-    if (titleEl)
-      titleEl.textContent = currentTrack?.title || "No track selected";
-    if (creatorEl)
-      creatorEl.textContent = currentTrack?.creator || "Unknown Source";
+    const trackTitle = currentTrack?.title || "No track selected";
+    const trackCreator = currentTrack?.creator || "Unknown Source";
+
+    if (titleEl) {
+      titleEl.textContent = trackTitle;
+      titleEl.dataset.tooltipTitle = trackTitle;
+    }
+    if (creatorEl) {
+      creatorEl.textContent = trackCreator;
+      creatorEl.dataset.tooltipTitle = trackCreator;
+    }
 
     const coverImg = this.container.querySelector("#player-cover-image");
     const coverFallback = this.container.querySelector(
@@ -185,22 +223,13 @@ export class SoundPlayerComponent {
       coverFallback?.classList.remove("hidden");
     }
 
-    // Dynamic Play/Pause/Loading Icon Handler
+    // Dynamic Play/Pause/Loading State
     const playSlot = this.container.querySelector("#btn-play-icon-slot");
     if (playSlot) {
       if (isLoading) {
         playSlot.innerHTML = `
-          <svg
-            viewBox="0 0 16 16"
-            height="48"
-            width="48"
-            class="windows-loading-spinner"
-          >
-            <circle
-              r="7px"
-              cy="8px"
-              cx="8px"
-            ></circle>
+          <svg viewBox="0 0 16 16" height="48" width="48" class="windows-loading-spinner">
+            <circle r="7px" cy="8px" cx="8px"></circle>
           </svg>
         `;
       } else if (isPlaying) {
@@ -210,20 +239,12 @@ export class SoundPlayerComponent {
       }
     }
 
-    // Volume Popover State
+    // Volume UI Sync (Both Mobile & Desktop Inputs)
     const volPopover = this.container.querySelector("#volume-popover");
     if (volPopover) {
       volPopover.classList.toggle("flex", this.isVolumeOpen);
       volPopover.classList.toggle("hidden", !this.isVolumeOpen);
     }
-
-    // Volume Icons
-    const volSlot = this.container.querySelector("#player-volume-icon-slot");
-    const popoverMuteSlot = this.container.querySelector(
-      "#popover-mute-icon-slot",
-    );
-    const volSlider = this.container.querySelector("#volume-slider");
-    const volText = this.container.querySelector("#volume-text-val");
 
     let volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
     if (isMuted || volume === 0) {
@@ -232,19 +253,27 @@ export class SoundPlayerComponent {
       volumeIconHtml = `<i class="fa-solid fa-volume-low"></i>`;
     }
 
+    const volSlot = this.container.querySelector("#player-volume-icon-slot");
     if (volSlot) volSlot.innerHTML = volumeIconHtml;
-    if (popoverMuteSlot) {
-      popoverMuteSlot.innerHTML = isMuted
-        ? `<i class="fa-solid fa-volume-xmark text-rose-500"></i>`
-        : `<i class="fa-solid fa-volume-high"></i>`;
-    }
+
+    this.container
+      .querySelectorAll(".popover-mute-icon-slot, .inline-volume-icon")
+      .forEach((el) => {
+        el.innerHTML = volumeIconHtml;
+      });
 
     const currentDisplayVol = isMuted ? 0 : volume;
-    if (volSlider) {
-      volSlider.value = currentDisplayVol;
-      this.updateSliderFill(volSlider, currentDisplayVol);
-    }
-    if (volText) volText.textContent = `${currentDisplayVol}%`;
+
+    this.container
+      .querySelectorAll(".volume-slider-input")
+      .forEach((slider) => {
+        slider.value = currentDisplayVol;
+        this.updateSliderFill(slider, currentDisplayVol);
+      });
+
+    this.container.querySelectorAll(".volume-text-val").forEach((textEl) => {
+      textEl.textContent = `${currentDisplayVol}%`;
+    });
   }
 
   bindEvents() {
@@ -270,18 +299,21 @@ export class SoundPlayerComponent {
       this.updateUI();
     });
 
-    const volSlider = this.container.querySelector("#volume-slider");
-    volSlider?.addEventListener("input", (e) => {
-      const vol = Number(e.target.value);
-      this.updateSliderFill(e.target, vol);
-      SoundModel.setVolume(vol);
-      soundService.setVolume();
-    });
+    this.container
+      .querySelectorAll(".volume-slider-input")
+      .forEach((slider) => {
+        slider.addEventListener("input", (e) => {
+          const vol = Number(e.target.value);
+          SoundModel.setVolume(vol);
+          soundService.setVolume();
+        });
+      });
 
-    const muteBtn = this.container.querySelector("#btn-toggle-mute");
-    muteBtn?.addEventListener("click", () => {
-      SoundModel.toggleMute();
-      soundService.setVolume();
+    this.container.querySelectorAll(".btn-toggle-mute").forEach((muteBtn) => {
+      muteBtn.addEventListener("click", () => {
+        SoundModel.toggleMute();
+        soundService.setVolume();
+      });
     });
 
     this.onDocumentClick = (e) => {

@@ -288,7 +288,29 @@ class SoundService {
 
     this._initAudioElement();
     const isSameTrack = this.currentTrack?.id === track.id;
+    const isPlaying = this.audioElement && !this.audioElement.paused;
+
+    if (isSameTrack && isPlaying) {
+      return;
+    }
+
     const currentVol = SoundModel.getEffectiveVolume();
+
+    if (isSameTrack && this.audioElement.src) {
+      this.audioElement.volume = currentVol / 100;
+      try {
+        this.playPromise = this.audioElement.play();
+        await this.playPromise;
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Playback resume failed:", err);
+          SoundModel.setLoading(false);
+        }
+      } finally {
+        this.playPromise = null;
+      }
+      return;
+    }
 
     let mediaSourceUrl = track.sourceId;
 

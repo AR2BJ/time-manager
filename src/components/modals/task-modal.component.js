@@ -3,6 +3,8 @@ import { TaskModel } from "@/models/task.model";
 export const TaskModalComponent = {
   render() {
     const tasks = TaskModel.getTasks();
+    const activeTask = TaskModel.getActiveTask();
+    const activeTaskId = activeTask ? String(activeTask.id) : null;
 
     return `
       <div
@@ -114,22 +116,42 @@ export const TaskModalComponent = {
                     </div>
                   </div>`
                 : tasks
-                    .map(
-                      (t) => `
+                    .map((t) => {
+                      const isActive = String(t.id) === activeTaskId;
+                      return `
                         <div
                           data-task-id="${t.id}"
-                          class="task-item-row group flex items-center justify-between p-3 rounded-2xl bg-surface-2 border border-border hover:border-brand/40 transition cursor-pointer"
+                          class="task-item-row group flex items-center justify-between p-3 rounded-2xl transition cursor-pointer border ${
+                            isActive
+                              ? "bg-brand/5 border-brand/60 shadow-xs"
+                              : "bg-surface-2 border-border hover:border-brand/40"
+                          }"
                         >
-                          <div class="flex items-center gap-2 min-w-0">
+                          <div class="flex items-center gap-2.5 min-w-0">
+                            ${
+                              isActive
+                                ? `<span class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center text-[10px] shrink-0 shadow-xs">
+                                     <i class="fa-solid fa-check"></i>
+                                   </span>`
+                                : ""
+                            }
                             <span
-                              class="text-xs font-semibold text-primary truncate"
+                              class="text-xs font-semibold truncate ${
+                                isActive
+                                  ? "text-brand font-bold"
+                                  : "text-primary"
+                              }"
                               >${t.title}</span
                             >
                           </div>
 
                           <div class="flex items-center gap-2 shrink-0">
                             <span
-                              class="text-[10px] font-bold text-brand bg-brand/10 px-2 py-1.25 rounded-md border border-brand/20"
+                              class="text-[10px] font-bold ${
+                                isActive
+                                  ? "text-brand bg-brand/15 border-brand/30"
+                                  : "text-brand bg-brand/10 border-brand/20"
+                              } px-2 py-1.25 rounded-md border"
                             >
                               ${
                                 t.completedPomodoros || 0
@@ -148,8 +170,8 @@ export const TaskModalComponent = {
                             </button>
                           </div>
                         </div>
-                      `,
-                    )
+                      `;
+                    })
                     .join("")
             }
           </div>
