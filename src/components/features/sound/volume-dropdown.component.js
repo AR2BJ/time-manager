@@ -7,6 +7,7 @@ export class VolumeDropdownComponent {
     this.container = null;
     this.isOpen = false;
     this.unsubscribe = null;
+    this.VOLUME_STEP = 5;
     this.onOutsideClick = this.onOutsideClick.bind(this);
   }
 
@@ -37,39 +38,28 @@ export class VolumeDropdownComponent {
     const isMuted = soundState?.isMuted ?? false;
     const currentVal = isMuted ? 0 : volume;
 
-    let iconSvg = "";
+    let iconHtml = "";
     let buttonColorClass = "text-slate-400 hover:text-slate-200";
 
     if (isMuted || volume === 0) {
-      buttonColorClass = "text-rose-500 hover:text-rose-400";
-      iconSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <line x1="23" y1="9" x2="17" y2="15"></line>
-          <line x1="17" y1="9" x2="23" y2="15"></line>
-        </svg>`;
-    } else if (volume < 50) {
-      iconSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>`;
+      buttonColorClass = "text-brand hover:opacity-80";
+      iconHtml = `<i class="fa-solid fa-volume-xmark text-brand"></i>`;
+    } else if (volume <= 33) {
+      iconHtml = `<i class="fa-solid fa-volume-low"></i>`;
+    } else if (volume <= 66) {
+      iconHtml = `<i class="fa-solid fa-volume"></i>`;
     } else {
-      iconSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>`;
+      iconHtml = `<i class="fa-solid fa-volume-high"></i>`;
     }
 
     this.container.innerHTML = `
       <button 
         type="button" 
         id="vol-toggle-btn"
-        class="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 transition-colors duration-200 ${buttonColorClass} focus:outline-none cursor-pointer"
+        class="p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 transition-colors duration-200 ${buttonColorClass} focus:outline-none cursor-pointer flex items-center justify-center min-w-9 min-h-9"
         title="${isMuted ? "Sound is muted" : `Volume: ${volume}%`}"
       >
-        ${iconSvg}
+        ${iconHtml}
       </button>
 
       <div 
@@ -91,8 +81,10 @@ export class VolumeDropdownComponent {
             id="vol-range-input" 
             min="0" 
             max="100" 
+            step="5"
             value="${currentVal}" 
             class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            aria-label="Volume Slider"
           />
 
           <button 
@@ -140,6 +132,30 @@ export class VolumeDropdownComponent {
         }
         if (typeof soundService?.setVolume === "function") {
           soundService.setVolume(val);
+        }
+      }
+    });
+
+    this.container.addEventListener("keydown", (e) => {
+      if (
+        e.target.id === "vol-range-input" &&
+        ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)
+      ) {
+        e.preventDefault();
+        const currentVol = soundState?.volume ?? 50;
+        let targetVol = currentVol;
+
+        if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+          targetVol = Math.min(100, currentVol + this.VOLUME_STEP);
+        } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+          targetVol = Math.max(0, currentVol - this.VOLUME_STEP);
+        }
+
+        if (typeof SoundModel.setVolume === "function") {
+          SoundModel.setVolume(targetVol);
+        }
+        if (typeof soundService?.setVolume === "function") {
+          soundService.setVolume();
         }
       }
     });

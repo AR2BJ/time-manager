@@ -9,6 +9,8 @@ import { getTheme } from "@/services/theme.service.js";
 import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
 
+const VOLUME_STEP = 5;
+
 const updateRangeFill = (inputEl) => {
   if (!inputEl) return;
   const min = Number(inputEl.min) || 0;
@@ -317,6 +319,7 @@ export const SettingsController = {
     const volumeEl = document.getElementById("sett-volume");
     if (volumeEl) {
       updateRangeFill(volumeEl);
+
       volumeEl.addEventListener("input", (e) => {
         const val = Number(e.target.value);
         const display = document.getElementById("sett-volume-val");
@@ -333,6 +336,38 @@ export const SettingsController = {
         }
 
         this.saveAllTimerSettings();
+      });
+
+      volumeEl.addEventListener("keydown", (e) => {
+        if (
+          ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)
+        ) {
+          e.preventDefault();
+          const currentVol = Number(volumeEl.value) || 0;
+          let targetVol = currentVol;
+
+          if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+            targetVol = Math.min(100, currentVol + VOLUME_STEP);
+          } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+            targetVol = Math.max(0, currentVol - VOLUME_STEP);
+          }
+
+          volumeEl.value = targetVol;
+          const display = document.getElementById("sett-volume-val");
+          if (display) display.textContent = `${targetVol}%`;
+
+          updateRangeFill(volumeEl);
+
+          if (typeof SoundModel.setVolume === "function") {
+            SoundModel.setVolume(targetVol);
+          }
+
+          if (typeof soundService?.setVolume === "function") {
+            soundService.setVolume(targetVol);
+          }
+
+          this.saveAllTimerSettings();
+        }
       });
     }
 

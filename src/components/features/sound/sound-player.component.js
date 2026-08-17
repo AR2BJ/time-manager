@@ -7,6 +7,7 @@ export class SoundPlayerComponent {
     this.unsubscribe = null;
     this.isVolumeOpen = false;
     this.progressInterval = null;
+    this.VOLUME_STEP = 5;
   }
 
   render() {
@@ -102,7 +103,9 @@ export class SoundPlayerComponent {
             class="volume-slider-input w-full h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand"
             min="0"
             max="100"
+            step="5"
             value="50"
+            aria-label="Volume Slider"
           />
 
           <span class="volume-text-val text-[10px] font-mono text-tertiary w-7 text-right shrink-0">
@@ -137,8 +140,10 @@ export class SoundPlayerComponent {
               type="range"
               min="0"
               max="100"
+              step="5"
               value="50"
               class="volume-slider-input w-24 h-1.5 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-brand -rotate-90 my-10"
+              aria-label="Volume Slider"
             />
             <button
               type="button"
@@ -246,11 +251,16 @@ export class SoundPlayerComponent {
       volPopover.classList.toggle("hidden", !this.isVolumeOpen);
     }
 
+    // 3 Volume Levels (Low, Medium, High) + Mute State
     let volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
     if (isMuted || volume === 0) {
-      volumeIconHtml = `<i class="fa-solid fa-volume-xmark text-rose-500"></i>`;
-    } else if (volume < 50) {
+      volumeIconHtml = `<i class="fa-solid fa-volume-xmark text-brand"></i>`;
+    } else if (volume <= 33) {
       volumeIconHtml = `<i class="fa-solid fa-volume-low"></i>`;
+    } else if (volume <= 66) {
+      volumeIconHtml = `<i class="fa-solid fa-volume"></i>`;
+    } else {
+      volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
     }
 
     const volSlot = this.container.querySelector("#player-volume-icon-slot");
@@ -302,10 +312,31 @@ export class SoundPlayerComponent {
     this.container
       .querySelectorAll(".volume-slider-input")
       .forEach((slider) => {
+        // Change volume on range input adjustment
         slider.addEventListener("input", (e) => {
           const vol = Number(e.target.value);
           SoundModel.setVolume(vol);
           soundService.setVolume();
+        });
+
+        // Keyboard shortcuts for ArrowUp, ArrowDown, ArrowRight, ArrowLeft
+        slider.addEventListener("keydown", (e) => {
+          if (
+            ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)
+          ) {
+            e.preventDefault();
+            const currentVol = SoundModel.getState().volume;
+            let targetVol = currentVol;
+
+            if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+              targetVol = Math.min(100, currentVol + this.VOLUME_STEP);
+            } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+              targetVol = Math.max(0, currentVol - this.VOLUME_STEP);
+            }
+
+            SoundModel.setVolume(targetVol);
+            soundService.setVolume();
+          }
         });
       });
 

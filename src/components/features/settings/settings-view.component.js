@@ -259,8 +259,10 @@ export const SettingsViewComponent = {
                   id="sett-volume"
                   min="0"
                   max="100"
+                  step="5"
                   value="${settings.volume ?? 80}"
                   class="slider-fill-track w-full h-2 bg-surface-2 rounded-lg appearance-none cursor-pointer accent-brand"
+                  aria-label="Master Volume Control"
                 />
               </div>
 
