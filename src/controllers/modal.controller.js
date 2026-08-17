@@ -187,14 +187,6 @@ export const ModalController = {
         e.stopPropagation();
 
         const taskId = btnDelete.dataset.deleteTaskId;
-        const currentActiveTask = TaskService.getActiveTask();
-
-        if (
-          currentActiveTask &&
-          String(currentActiveTask.id) === String(taskId)
-        ) {
-          TaskService.setActiveTask(null);
-        }
 
         TaskController.deleteTask(taskId);
         return;

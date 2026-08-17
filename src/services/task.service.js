@@ -83,15 +83,33 @@ export const TaskService = {
     const activeTaskId = TaskModel.getActiveTaskId();
     const wasActive = activeTaskId === String(taskId);
 
+    // Track task index within active/todo tasks before deletion
+    const availableTasks = TaskModel.getTasks().filter(
+      (t) => t.status !== "done",
+    );
+    const activeIndexInAvailable = availableTasks.findIndex(
+      (t) => String(t.id) === String(taskId),
+    );
+
     const result = TaskModel.remove(taskId);
     if (!result) return null;
 
     if (wasActive) {
-      const remainingTask =
-        TaskModel.getTasks().find((t) => t.status !== "done") ||
-        TaskModel.getTasks()[0] ||
-        null;
-      TaskModel.setActiveTaskId(remainingTask ? remainingTask.id : null);
+      const remainingTasks = TaskModel.getTasks().filter(
+        (t) => t.status !== "done",
+      );
+
+      if (remainingTasks.length > 0) {
+        // Shift active focus to the next adjacent task, or wrap around to index 0 if it was the last task
+        const nextIndex =
+          activeIndexInAvailable < remainingTasks.length
+            ? activeIndexInAvailable
+            : 0;
+        const nextTask = remainingTasks[nextIndex];
+        TaskModel.setActiveTaskId(nextTask ? nextTask.id : null);
+      } else {
+        TaskModel.setActiveTaskId(null);
+      }
     }
 
     return {
