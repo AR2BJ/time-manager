@@ -6,11 +6,22 @@ const HELP_SHORTCUTS = [
         label: "Switch to Pomodoro Mode",
         icon: "fa-stopwatch",
         keys: [["Alt"], ["P"]],
+        separator: "+",
       },
       {
         label: "Switch to Flow Mode",
         icon: "fa-water",
         keys: [["Alt"], ["F"]],
+        separator: "+",
+      },
+      {
+        label: "Volume up and down",
+        icon: "fa-volume",
+        keys: [
+          ["🠔", "🠖"],
+          ["🠕", "🠗"],
+        ],
+        separator: "or",
       },
       {
         label: "Start / Pause Timer",
@@ -26,16 +37,19 @@ const HELP_SHORTCUTS = [
         label: "Go to Timer View",
         icon: "fa-clock",
         keys: [["Shift"], ["T"]],
+        separator: "+",
       },
       {
         label: "Go to Analytics View",
         icon: "fa-chart-line",
         keys: [["Shift"], ["A"]],
+        separator: "+",
       },
       {
         label: "Go to Setting View",
         icon: "fa-cog",
         keys: [["Shift"], ["S"]],
+        separator: "+",
       },
     ],
   },
@@ -46,16 +60,19 @@ const HELP_SHORTCUTS = [
         label: "Toggle Dark/Light Theme",
         icon: "fa-circle-half-stroke",
         keys: [["Alt"], ["T"]],
+        separator: "+",
       },
       {
         label: "Toggle Navigation Menu",
         icon: "fa-bars",
         keys: [["Alt"], ["N"]],
+        separator: "+",
       },
       {
         label: "Open Reset Data Modal",
         icon: "fa-arrow-rotate-left",
         keys: [["Alt"], ["R"]],
+        separator: "+",
       },
       {
         label: "Close Active Modal / Blur Input",
@@ -97,11 +114,15 @@ export const InfoModalComponent = {
                                 (key) =>
                                   `<kbd class="px-2 py-0.5 text-[10px] font-mono font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">${key}</kbd>`,
                               )
-                              .join("")}
+                              .join(
+                                '<span class="text-[10px] text-muted">/</span>',
+                              )}
                           </div>
                         `,
                       )
-                      .join('<span class="text-[10px] text-muted">+</span>')}
+                      .join(
+                        `<span class="text-[10px] text-muted">${item.separator}</span>`,
+                      )}
                   </div>
                 </div>
               `,
