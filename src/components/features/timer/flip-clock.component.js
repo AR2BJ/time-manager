@@ -1,6 +1,8 @@
 export class FlipClockComponent {
   constructor() {
     this.overlay = null;
+    this.hideTimeout = null;
+    this.isRunning = false;
   }
 
   render() {
@@ -8,14 +10,19 @@ export class FlipClockComponent {
 
     this.overlay = document.createElement("div");
     this.overlay.id = "flip-clock-overlay";
+
     this.overlay.className =
-      "fixed inset-0 z-350 hidden flex flex-col items-center justify-between bg-bg p-4 sm:p-10 max-lg:landscape:p-2 select-none overflow-hidden transition-opacity duration-300 opacity-0";
+      "fixed inset-0 z-[9999] hidden w-screen h-screen flex flex-col items-center justify-between bg-bg select-none overflow-hidden";
 
     this.overlay.innerHTML = `
-      <div class="w-full p-4 max-w-6xl flex items-center justify-between z-20 shrink-0">
+      <div 
+        id="flip-top-bar"
+        class="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
+        style="background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);"
+      >
         <div 
           id="flip-phase-badge" 
-          class="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs"
+          class="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs backdrop-blur-sm"
         >
           FOCUS PHASE
         </div>
@@ -23,32 +30,81 @@ export class FlipClockComponent {
         <button
           id="exit-fullscreen-btn"
           type="button"
-          class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-surface hover:bg-surface-2 text-secondary hover:text-primary transition-all flex items-center justify-center cursor-pointer border border-border active:scale-95"
+          class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white hover:text-white transition-all flex items-center justify-center cursor-pointer border border-white/20 active:scale-95 touch-manipulation"
           title="Exit Fullscreen"
         >
           <i class="fa-regular fa-compress text-xs sm:text-sm pointer-events-none"></i>
         </button>
       </div>
 
-      <div class="my-auto flex-1 flex items-center justify-center gap-3 sm:gap-8 lg:gap-14 max-lg:landscape:gap-4 perspective-1000 w-full max-w-5xl py-2 sm:py-6 max-lg:landscape:py-1">
-        <div id="flip-card-minutes" class="relative w-28 h-36 xs:w-36 xs:h-48 sm:w-64 sm:h-80 lg:w-80 lg:h-104 max-lg:landscape:w-[28vw] max-lg:landscape:h-[52vh] max-lg:landscape:max-w-50 max-lg:landscape:max-h-60 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
+      <div class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0">
+        
+        <div id="flip-card-minutes" class="relative w-[32vw] h-[48vw] max-w-125 max-h-175 min-w-20 min-h-30 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
         </div>
 
-        <div class="text-3xl sm:text-7xl lg:text-9xl max-lg:landscape:text-4xl font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-4 animate-pulse">:</div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
 
-        <div id="flip-card-seconds" class="relative w-28 h-36 xs:w-36 xs:h-48 sm:w-64 sm:h-80 lg:w-80 lg:h-104 max-lg:landscape:w-[28vw] max-lg:landscape:h-[52vh] max-lg:landscape:max-w-50 max-lg:landscape:max-h-60 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
+        <div id="flip-card-seconds" class="relative w-[32vw] h-[48vw] max-w-125 max-h-175 min-w-20 min-h-30 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
         </div>
       </div>
 
       <div 
         id="flip-controls-container" 
-        class="mb-2 sm:mb-8 max-lg:landscape:mb-1 flex items-center justify-center gap-3 sm:gap-4 z-20 rounded-2xl shrink-0"
+        class="absolute bottom-8 sm:bottom-12 left-0 right-0 flex items-center justify-center gap-3 sm:gap-4 z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
+        style="background: none;"
       >
       </div>
     `;
 
     document.body.appendChild(this.overlay);
+
+    let mouseMoveTimeout;
+    const showOnHover = () => {
+      clearTimeout(mouseMoveTimeout);
+      mouseMoveTimeout = setTimeout(() => {
+        this.showControls();
+      }, 10);
+    };
+
+    this.overlay.addEventListener("mousemove", showOnHover);
+    this.overlay.addEventListener("touchstart", () => this.showControls(), {
+      passive: true,
+    });
+
     return this.overlay;
+  }
+
+  showControls() {
+    const topBar = this.overlay?.querySelector("#flip-top-bar");
+    const controls = this.overlay?.querySelector("#flip-controls-container");
+
+    if (!topBar || !controls) return;
+
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+
+    topBar.classList.remove("pointer-events-none");
+    controls.classList.remove("pointer-events-none");
+
+    topBar.classList.remove("opacity-0");
+    topBar.classList.add("opacity-100");
+    controls.classList.remove("opacity-0");
+    controls.classList.add("opacity-100");
+
+    if (this.isRunning) {
+      this.hideTimeout = setTimeout(() => {
+        topBar.classList.add("pointer-events-none");
+        controls.classList.add("pointer-events-none");
+
+        topBar.classList.remove("opacity-100");
+        topBar.classList.add("opacity-0");
+        controls.classList.remove("opacity-100");
+        controls.classList.add("opacity-0");
+        this.hideTimeout = null;
+      }, 3000);
+    }
   }
 
   updateDisplay(mins, secs, prevMins, prevSecs, force = false) {
@@ -77,10 +133,10 @@ export class FlipClockComponent {
     badge.textContent = text;
     if (isBreak) {
       badge.className =
-        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs";
+        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs backdrop-blur-sm";
     } else {
       badge.className =
-        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs";
+        "px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs backdrop-blur-sm";
     }
   }
 
@@ -93,23 +149,34 @@ export class FlipClockComponent {
     if (controlsContainer.dataset.state !== state) {
       controlsContainer.dataset.state = state;
 
+      if (state === "idle" || state === "paused") {
+        this.isRunning = false;
+        this.showControls();
+      } else if (state === "running") {
+        this.isRunning = true;
+        this.showControls();
+      }
+
+      const btnClass =
+        "w-12 h-12 sm:w-16 sm:h-16 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer backdrop-blur-sm touch-manipulation";
+
       if (state === "idle") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-start" type="button" class="w-10 h-10 sm:w-14 sm:h-14 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl bg-brand hover:bg-brand/90 text-primary flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer">
-            <i class="fa-solid fa-play text-base sm:text-xl max-lg:landscape:text-sm pointer-events-none"></i>
+          <button id="btn-flip-start" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-primary">
+            <i class="fa-solid fa-play text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       } else if (state === "running") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-pause" type="button" class="w-10 h-10 sm:w-14 sm:h-14 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl bg-amber-500 hover:bg-amber-600 text-primary flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer">
-            <i class="fa-solid fa-pause text-base sm:text-xl max-lg:landscape:text-sm pointer-events-none"></i>
+          <button id="btn-flip-pause" type="button" class="${btnClass} bg-amber-500 hover:bg-amber-600 text-primary">
+            <i class="fa-solid fa-pause text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       } else if (state === "paused") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-stop" type="button" class="w-10 h-10 sm:w-14 sm:h-14 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl bg-red-500 hover:bg-red-600 text-primary flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer">
-            <i class="fa-solid fa-square text-base sm:text-xl max-lg:landscape:text-sm pointer-events-none"></i>
+          <button id="btn-flip-stop" type="button" class="${btnClass} bg-red-500 hover:bg-red-600 text-primary">
+            <i class="fa-solid fa-square text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>
-          <button id="btn-flip-continue" type="button" class="w-10 h-10 sm:w-14 sm:h-14 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl bg-brand hover:bg-brand/90 text-primary flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer">
-            <i class="fa-solid fa-play text-base sm:text-xl max-lg:landscape:text-sm pointer-events-none"></i>
+          <button id="btn-flip-continue" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-primary">
+            <i class="fa-solid fa-play text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       }
     }
@@ -119,10 +186,10 @@ export class FlipClockComponent {
     if (!cardEl) return;
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${topVal}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${topVal}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${botVal}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${botVal}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-black/80 z-30 shadow-md"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
@@ -141,16 +208,16 @@ export class FlipClockComponent {
 
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${newValue}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${oldValue}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${oldValue}</span>
       </div>
       <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg/60 flex items-end justify-center overflow-hidden z-20">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary translate-y-1/2 leading-none">${oldValue}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${oldValue}</span>
       </div>
       <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
-        <span class="text-6xl xs:text-7xl sm:text-8xl lg:text-9xl xl:text-[10rem] max-lg:landscape:text-8xl font-mono font-black text-primary -translate-y-1/2 leading-none">${newValue}</span>
+        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-bg/80 z-30 shadow-md"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
