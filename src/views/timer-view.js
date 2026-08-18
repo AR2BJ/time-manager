@@ -42,7 +42,7 @@ export class TimerView {
     this.container.innerHTML = `
       <section
         id="timer-view"
-        class="hidden w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-fade-in"
+        class="hidden w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in"
       >
         <div class="w-full grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-4 flex flex-col gap-6">

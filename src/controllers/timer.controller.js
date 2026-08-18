@@ -150,6 +150,7 @@ export const TimerController = {
       "justify-center",
       "items-center",
       "p-3",
+      "mb-6",
     );
 
     if (timeElMobile && !timeElMobile.dataset.initialized) {
