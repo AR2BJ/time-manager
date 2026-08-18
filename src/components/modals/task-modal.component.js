@@ -150,7 +150,7 @@ export const TaskModalComponent = {
                           data-is-done="${isDone}"
                           class="task-item-row group flex items-center justify-between p-3 rounded-2xl transition border ${
                             isDone
-                              ? "opacity-50 bg-surface-2/60 border-border cursor-not-allowed select-none"
+                              ? "bg-surface-2/60 border-border cursor-not-allowed select-none"
                               : isActive
                                 ? "bg-brand/5 border-brand/60 shadow-xs cursor-pointer"
                                 : "bg-surface-2 border-border hover:border-brand/40 cursor-pointer"
@@ -158,7 +158,7 @@ export const TaskModalComponent = {
                         >
                           <div
                             class="flex items-center gap-2.5 min-w-0 ${
-                              isDone ? "pointer-events-none" : ""
+                              isDone ? "opacity-50 pointer-events-none" : ""
                             }"
                           >
                             ${
@@ -189,7 +189,9 @@ export const TaskModalComponent = {
                                   : isActive
                                     ? "text-brand bg-brand/15 border-brand/30"
                                     : "text-brand bg-brand/10 border-brand/20"
-                              } px-2 py-1.25 rounded-md border"
+                              } px-2 py-1.25 rounded-md border ${
+                                isDone ? "opacity-50" : ""
+                              }"
                             >
                               ${
                                 isDone
@@ -211,20 +213,20 @@ export const TaskModalComponent = {
                                         class="fa-regular fa-pen-to-square text-blue-500/80 text-xs"
                                       ></i>
                                     </button>
-
-                                    <button
-                                      type="button"
-                                      data-delete-task-id="${t.id}"
-                                      class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition"
-                                      title="Delete Task"
-                                    >
-                                      <i
-                                        class="fa-regular fa-trash-can text-red-500/80 text-xs"
-                                      ></i>
-                                    </button>
                                   `
                                 : ""
                             }
+
+                            <button
+                              type="button"
+                              data-delete-task-id="${t.id}"
+                              class="btn-delete-task w-7 h-7 rounded-lg bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer transition"
+                              title="Delete Task"
+                            >
+                              <i
+                                class="fa-regular fa-trash-can text-red-500/80 text-xs"
+                              ></i>
+                            </button>
                           </div>
                         </div>
                       `;

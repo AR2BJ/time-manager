@@ -78,38 +78,18 @@ export const TaskService = {
 
   deleteTask(taskId) {
     const task = TaskModel.getById(taskId);
-    if (!task || task.status === "done") return null;
+    if (!task) return null;
 
     const activeTaskId = TaskModel.getActiveTaskId();
-    const wasActive = activeTaskId === String(taskId);
-
-    // Track task index within active/todo tasks before deletion
-    const availableTasks = TaskModel.getTasks().filter(
-      (t) => t.status !== "done",
-    );
-    const activeIndexInAvailable = availableTasks.findIndex(
-      (t) => String(t.id) === String(taskId),
-    );
+    const wasActive = String(activeTaskId) === String(taskId);
 
     const result = TaskModel.remove(taskId);
     if (!result) return null;
 
     if (wasActive) {
-      const remainingTasks = TaskModel.getTasks().filter(
-        (t) => t.status !== "done",
-      );
-
-      if (remainingTasks.length > 0) {
-        // Shift active focus to the next adjacent task, or wrap around to index 0 if it was the last task
-        const nextIndex =
-          activeIndexInAvailable < remainingTasks.length
-            ? activeIndexInAvailable
-            : 0;
-        const nextTask = remainingTasks[nextIndex];
-        TaskModel.setActiveTaskId(nextTask ? nextTask.id : null);
-      } else {
-        TaskModel.setActiveTaskId(null);
-      }
+      const remainingTasks = TaskModel.getTasks();
+      const nextActiveTask = remainingTasks.find((t) => t.status !== "done");
+      TaskModel.setActiveTaskId(nextActiveTask ? nextActiveTask.id : null);
     }
 
     return {
@@ -158,14 +138,10 @@ export const TaskService = {
     if (activeTask.completedPomodoros >= activeTask.estimatedPomodoros) {
       TaskModel.update(activeTask.id, { status: "done" });
 
-      const nextTask = TaskModel.getTasks().find(
-        (t) => t.status !== "done" && String(t.id) !== String(activeTask.id),
-      );
-
+      const nextTask = TaskModel.getTasks().find((t) => t.status !== "done");
       TaskModel.setActiveTaskId(nextTask ? nextTask.id : null);
-      return nextTask;
     }
 
-    return null;
+    return TaskModel.getActiveTaskId();
   },
 };
