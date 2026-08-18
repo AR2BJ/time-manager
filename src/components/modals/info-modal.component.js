@@ -182,13 +182,17 @@ export const InfoModalComponent = {
           </div>
 
           <div class="flex-1 overflow-y-auto pe-1 scrollbar-thin scrollbar-thumb-surface-2" id="help-modal-content">
-            <div id="content-help-safeguard" class="space-y-3">
+            <div id="content-help-safeguard" class="space-y-4">
+              
               <div class="p-4 bg-surface-2 border border-border rounded-2xl">
                 <h4 class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-2 mb-1.5">
                   <i class="fa-regular fa-stopwatch"></i> Pomodoro Technique
                 </h4>
                 <p class="text-xs text-secondary leading-relaxed">
-                  Focus on tasks in scheduled intervals (default 25m) followed by short breaks to maintain peak mental productivity.
+                  A structured timer that alternates between focused work sessions and short breaks. 
+                  The default work duration is 25 minutes (configurable in Settings). 
+                  After 4 completed sessions (configurable), the system automatically transitions to a longer break. 
+                  You do not need to manage the transitions manually.
                 </p>
               </div>
 
@@ -197,9 +201,48 @@ export const InfoModalComponent = {
                   <i class="fa-regular fa-water"></i> Flow Mode
                 </h4>
                 <p class="text-xs text-secondary leading-relaxed">
-                  Work uninterrupted without strict countdown timers. Ideal for deep work continuous productivity sessions.
+                  A continuous count-up timer without break phases. 
+                  The timer runs until you manually pause or stop it. 
+                  No automatic breaks or transitions are triggered. You are in full control of when to start and stop.
                 </p>
               </div>
+
+              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+                <h4 class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-2 mb-1.5">
+                  <i class="fa-regular fa-expand"></i> Immersive Focus View
+                </h4>
+                <p class="text-xs text-secondary leading-relaxed">
+                  A fullscreen view that isolates your focus from distractions. 
+                  The timer is displayed as a flip-clock animation. 
+                  You can start, pause, or resume the session using the Space key or the on-screen buttons.
+                  <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
+                    <i class="fa-regular fa-clock text-brand/70"></i>
+                    Click on the header time to toggle between 12h / 24h format.
+                  </span>
+                </p>
+              </div>
+
+              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+                <h4 class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-2 mb-1.5">
+                  <i class="fa-regular fa-volume-high"></i> Audio & Haptics
+                </h4>
+                <p class="text-xs text-secondary leading-relaxed">
+                  You can configure notification sounds for Pomodoro end and Break end in the Settings panel. 
+                  Adjust the master volume or select a background soundscape to enhance your focus.
+                </p>
+              </div>
+
+              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+                <h4 class="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-2 mb-1.5">
+                  <i class="fa-regular fa-database"></i> Data Management
+                </h4>
+                <p class="text-xs text-secondary leading-relaxed">
+                  All your tasks, sessions, and notes are stored locally on your device. 
+                  Use the Settings panel to export your data as JSON, Markdown, or CSV. 
+                  You can also import a previous backup to restore your workspace.
+                </p>
+              </div>
+
             </div>
 
             <div id="content-help-shortcuts" class="hidden">

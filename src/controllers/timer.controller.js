@@ -15,12 +15,14 @@ import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
 import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
+import { todayISO } from "@/utils/helpers";
 
 export const TimerController = {
   animationFrameId: null,
   flowStartTimestamp: null,
   accumulatedFlowTime: 0,
   timerViewInstance: null,
+  isHour12: false,
 
   init() {
     StateManager.init();
@@ -38,6 +40,7 @@ export const TimerController = {
     this.bindSoundEvents();
     this.bindTimerShortcuts();
     this.bindMenuToggle();
+    this.startHeaderClock();
 
     this.refreshUI();
 
@@ -120,6 +123,104 @@ export const TimerController = {
       e.preventDefault();
       FlipClockController.open();
     });
+  },
+
+  startHeaderClock() {
+    const timeEl = document.getElementById("header-current-time");
+    if (timeEl && !timeEl.dataset.initialized) {
+      timeEl.dataset.initialized = "true";
+      timeEl.innerHTML = `
+        <span class="flex items-center gap-3 px-6 py-1 font-bold text-secondary tracking-wide">
+          <span id="clock-date-part" class="inline">Loading...</span>
+          <span class="text-border inline">|</span>
+          <span id="clock-tabular-nums" class="hover:text-primary cursor-pointer transition">Loading...</span>
+        </span>
+      `;
+
+      const clockTabularNums = document.getElementById("clock-tabular-nums");
+      clockTabularNums?.addEventListener("click", () => {
+        this.isHour12 = !this.isHour12;
+      });
+    }
+
+    const timeElMobile = document.getElementById("mobile-time-container");
+    timeElMobile.classList.add(
+      "flex",
+      "lg:hidden",
+      "justify-center",
+      "items-center",
+      "p-3",
+    );
+
+    if (timeElMobile && !timeElMobile.dataset.initialized) {
+      timeElMobile.dataset.initialized = "true";
+
+      timeElMobile.innerHTML = `
+        <span class="flex items-center gap-1.5 py-1 text-sm font-bold text-secondary tracking-wide">
+          <span id="mobile-clock-date-part" class="inline">Loading...</span>
+          <span class="text-border inline">|</span>
+          <span id="mobile-clock-tabular-nums" class="hover:text-primary cursor-pointer transition">Loading...</span>
+        </span>
+      `;
+
+      const clockTabularNums = document.getElementById(
+        "mobile-clock-tabular-nums",
+      );
+      clockTabularNums?.addEventListener("click", () => {
+        this.isHour12 = !this.isHour12;
+      });
+    }
+
+    const updateClock = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+        hour12: this.isHour12,
+      });
+
+      const dateEl = document.getElementById("clock-date-part");
+      const clickableEl = document.getElementById("clock-tabular-nums");
+      if (dateEl) {
+        dateEl.textContent = timeStr.split(",").slice(0, 3).join(" ");
+      }
+      if (clickableEl) {
+        clickableEl.textContent = timeStr.split(",")[3];
+      }
+
+      const mobileTimeStr = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+        hour12: this.isHour12,
+      });
+
+      const mobileDateEl = document.getElementById("mobile-clock-date-part");
+      const mobileClickableEl = document.getElementById(
+        "mobile-clock-tabular-nums",
+      );
+      if (mobileDateEl) {
+        mobileDateEl.textContent = mobileTimeStr
+          .split(",")
+          .slice(0, 3)
+          .join(" ");
+      }
+      if (mobileClickableEl) {
+        mobileClickableEl.textContent = mobileTimeStr.split(",")[3];
+      }
+    };
+
+    updateClock();
+    setInterval(updateClock, 1000);
   },
 
   startFlowAnimation() {
