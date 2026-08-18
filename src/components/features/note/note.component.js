@@ -100,7 +100,7 @@ export class NoteComponent {
 
                       <button
                         data-action="delete"
-                        class="delete-btn w-6 h-6 rounded-md bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer opacity-0 group-hover:opacity-100 transition"
+                        class="delete-btn w-6 h-6 rounded-md bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer lg:opacity-0 group-hover:opacity-100 transition"
                       >
                         <i
                           class="fa-regular fa-trash-can text-red-500/80 text-xs"

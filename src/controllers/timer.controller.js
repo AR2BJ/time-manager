@@ -269,7 +269,10 @@ export const TimerController = {
         : 1500;
       const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
       const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.textContent = `${mins}:${secs}`;
+      displayEl.innerHTML = `<span
+        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
+        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-2.5">:</span>${secs}</span
+      >`;
 
       if (progressRing) {
         const totalDuration = state.timer.duration || 1500;
@@ -308,7 +311,10 @@ export const TimerController = {
         : 0;
       const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
       const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.textContent = `${mins}:${secs}`;
+      displayEl.innerHTML = `<span
+        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
+        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-2.5">:</span>${secs}</span
+      >`;
 
       if (flowCanvas) {
         if (state.timer.isRunning || state.timer.isPaused) {

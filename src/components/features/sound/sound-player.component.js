@@ -77,7 +77,7 @@ export class SoundPlayerComponent {
 
               <span class="hidden sm:inline-block w-1 h-1 rounded-full bg-border shrink-0"></span>
 
-              <div class="font-mono text-[10px] sm:text-[11px] text-tertiary dir-ltr flex items-center gap-0.5 shrink-0">
+              <div class="text-[10px] sm:text-[11px] text-tertiary dir-ltr flex items-center gap-0.5 shrink-0">
                 <span id="player-current-time">0:00</span>
                 <span class="opacity-60">/</span>
                 <span id="player-total-time">0:00</span>
@@ -108,7 +108,7 @@ export class SoundPlayerComponent {
             aria-label="Volume Slider"
           />
 
-          <span class="volume-text-val text-[10px] font-mono text-tertiary w-7 text-right shrink-0">
+          <span class="volume-text-val text-[10px] text-tertiary w-7 text-right shrink-0">
             50%
           </span>
         </div>

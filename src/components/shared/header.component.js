@@ -25,13 +25,13 @@ export const HeaderComponent = {
           </div>
 
           <h1
-            class="truncate block xs:hidden text-xl font-bold tracking-tight text-primary sm:text-2xl lg:text-3xl cursor-pointer"
+            class="truncate block xs:hidden text-xl font-black tracking-tight text-primary sm:text-2xl lg:text-3xl cursor-pointer"
             data-tooltip-title="Time Manager"
           >
             Time Manager
           </h1>
           <h1
-            class="truncate hidden xs:block text-xl font-bold tracking-tight text-primary sm:text-2xl lg:text-3xl"
+            class="truncate hidden xs:block text-xl font-black tracking-tight text-primary sm:text-2xl lg:text-3xl"
           >
             Time Manager
           </h1>

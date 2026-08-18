@@ -847,7 +847,7 @@ export const DashboardComponent = {
                                     >Subtasks</span
                                   >
                                   <span
-                                    class="font-mono font-bold ${subtaskPercentColor}"
+                                    class="font-bold ${subtaskPercentColor}"
                                     >${subtaskInfo.completedCount}/${subtaskInfo.totalCount}
                                     (${subtaskInfo.percentage}%)</span
                                   >
@@ -868,7 +868,7 @@ export const DashboardComponent = {
                                   >Created</span
                                 >
                                 <span
-                                  class="text-xs font-mono font-medium text-primary"
+                                  class="text-xs font-medium text-primary"
                                   >${time.createdAt || "N/A"}</span
                                 >
                               </div>

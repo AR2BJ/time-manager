@@ -69,7 +69,7 @@ export const NotificationService = {
           undoAction
             ? `<span
                 id="${countdownId}"
-                class="text-xs font-mono ${toastTimerClass} px-1.5 py-0.5 rounded"
+                class="text-xs ${toastTimerClass} px-1.5 py-0.5 rounded"
                 >${duration / 1000}s</span
               >`
             : iconHTML

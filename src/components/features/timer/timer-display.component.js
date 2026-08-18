@@ -116,7 +116,7 @@ export class TimerDisplayComponent {
 
           <span
             id="timer-display"
-            class="font-mono text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold tracking-tighter text-primary my-1"
+            class="font-[Mostin] text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold tracking-tighter text-primary my-1"
           >
             25:00
           </span>

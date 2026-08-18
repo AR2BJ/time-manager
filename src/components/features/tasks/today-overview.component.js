@@ -29,24 +29,24 @@ export const TodayOverviewComponent = {
 
         <div class="grid grid-cols-2 gap-3">
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
-            <span class="block text-2xl font-black text-primary mb-0.5 font-mono">${sessionsDone}</span>
+            <span class="block text-2xl font-black text-primary mb-0.5">${sessionsDone}</span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Sessions Done</span>
           </div>
 
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
-            <span class="block text-2xl font-black text-brand mb-0.5 font-mono">${formattedTime}</span>
+            <span class="block text-2xl font-black text-brand mb-0.5">${formattedTime}</span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Total Focus</span>
           </div>
 
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
-            <span class="text-2xl font-black text-amber-500 mb-0.5 font-mono flex items-center gap-1">
+            <span class="text-2xl font-black text-amber-500 mb-0.5 flex items-center gap-1">
               <i class="fa-solid fa-fire text-xs"></i>${currentStreak}
             </span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Day Streak</span>
           </div>
 
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
-            <span class="block text-2xl font-black text-emerald-500 mb-0.5 font-mono">${goalPercent}%</span>
+            <span class="block text-2xl font-black text-emerald-500 mb-0.5">${goalPercent}%</span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Daily Target</span>
           </div>
 

@@ -17,8 +17,8 @@ export class FlipClockComponent {
     this.overlay.innerHTML = `
       <div 
         id="flip-top-bar"
-        class="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
-        style="background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);"
+        class="absolute top-0 left-0 right-0 p-12 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
+        style="background: linear-gradient(180deg, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 100%);"
       >
         <div 
           id="flip-phase-badge" 
@@ -30,21 +30,21 @@ export class FlipClockComponent {
         <button
           id="exit-fullscreen-btn"
           type="button"
-          class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white hover:text-white transition-all flex items-center justify-center cursor-pointer border border-white/20 active:scale-95 touch-manipulation"
+          class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-black/40 backdrop-blur-sm hover:bg-black text-white hover:text-white transition-all flex items-center justify-center cursor-pointer border border-white/20 active:scale-95 touch-manipulation"
           title="Exit Fullscreen"
         >
-          <i class="fa-regular fa-compress text-xs sm:text-sm pointer-events-none"></i>
+          <i class="fa-regular fa-compress text-sm sm:text-base pointer-events-none"></i>
         </button>
       </div>
 
-      <div class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0">
+      <div class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0 px-10">
         
-        <div id="flip-card-minutes" class="relative w-[32vw] h-[48vw] max-w-125 max-h-175 min-w-20 min-h-30 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
+        <div id="flip-card-minutes" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
         </div>
 
         <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
 
-        <div id="flip-card-seconds" class="relative w-[32vw] h-[48vw] max-w-125 max-h-175 min-w-20 min-h-30 bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
+        <div id="flip-card-seconds" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
         </div>
       </div>
 
@@ -185,13 +185,13 @@ export class FlipClockComponent {
   setCardValues(cardEl, topVal, botVal) {
     if (!cardEl) return;
     cardEl.innerHTML = `
-      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${topVal}</span>
+      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${topVal}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${botVal}</span>
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${botVal}</span>
       </div>
-      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-black/80 z-30 shadow-md"></div>
+      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
       <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-l-full z-30 border-l border-y border-primary/10"></div>
     `;
@@ -207,19 +207,19 @@ export class FlipClockComponent {
     cardEl.dataset.animating = "true";
 
     cardEl.innerHTML = `
-      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-black/60 flex items-end justify-center overflow-hidden">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${newValue}</span>
+      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${oldValue}</span>
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${oldValue}</span>
       </div>
-      <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg/60 flex items-end justify-center overflow-hidden z-20">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary translate-y-1/2 leading-none">${oldValue}</span>
+      <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden z-20">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${oldValue}</span>
       </div>
       <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
-        <span class="text-[20vw] sm:text-[12rem] md:text-[14rem] lg:text-[16rem] font-mono font-black text-primary -translate-y-1/2 leading-none">${newValue}</span>
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${newValue}</span>
       </div>
-      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-bg/80 z-30 shadow-md"></div>
+      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
       <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-l-full z-30 border-l border-y border-primary/10"></div>
     `;
