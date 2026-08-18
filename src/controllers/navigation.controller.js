@@ -12,6 +12,7 @@ export class NavigationController {
 
     StateManager.subscribe(() => {
       this.updateNavigationDOM();
+      TimerController.refreshUI();
     });
   }
 

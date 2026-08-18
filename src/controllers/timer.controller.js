@@ -271,7 +271,7 @@ export const TimerController = {
       const secs = String(totalSeconds % 60).padStart(2, "0");
       displayEl.innerHTML = `<span
         class="tracking-normal flex flex-row justify-center items-center gap-1.5"
-        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-2.5">:</span>${secs}</span
+        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
       >`;
 
       if (progressRing) {
@@ -313,7 +313,7 @@ export const TimerController = {
       const secs = String(totalSeconds % 60).padStart(2, "0");
       displayEl.innerHTML = `<span
         class="tracking-normal flex flex-row justify-center items-center gap-1.5"
-        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-2.5">:</span>${secs}</span
+        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
       >`;
 
       if (flowCanvas) {

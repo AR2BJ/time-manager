@@ -12,16 +12,16 @@ export class FlipClockComponent {
     this.overlay.id = "flip-clock-overlay";
 
     this.overlay.className =
-      "fixed inset-0 z-[9999] hidden w-screen h-screen flex flex-col items-center justify-between bg-bg select-none overflow-hidden";
+      "fixed inset-0 z-400 hidden w-screen h-screen flex flex-col items-center justify-between bg-bg select-none overflow-hidden";
 
     this.overlay.innerHTML = `
-      <div 
+      <div
         id="flip-top-bar"
         class="absolute top-0 left-0 right-0 p-12 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
         style="background: linear-gradient(180deg, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 100%);"
       >
-        <div 
-          id="flip-phase-badge" 
+        <div
+          id="flip-phase-badge"
           class="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand/80 text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-xs backdrop-blur-sm"
         >
           FOCUS PHASE
@@ -33,27 +33,37 @@ export class FlipClockComponent {
           class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-black/40 backdrop-blur-sm hover:bg-black text-white hover:text-white transition-all flex items-center justify-center cursor-pointer border border-white/20 active:scale-95 touch-manipulation"
           title="Exit Fullscreen"
         >
-          <i class="fa-regular fa-compress text-sm sm:text-base pointer-events-none"></i>
+          <i
+            class="fa-regular fa-compress text-sm sm:text-base pointer-events-none"
+          ></i>
         </button>
       </div>
 
-      <div class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0 px-10">
-        
-        <div id="flip-card-minutes" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
+      <div
+        class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0 px-10"
+      >
+        <div
+          id="flip-card-minutes"
+          class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"
+        ></div>
+
+        <div
+          class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6"
+        >
+          :
         </div>
 
-        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
-
-        <div id="flip-card-seconds" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden">
-        </div>
+        <div
+          id="flip-card-seconds"
+          class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"
+        ></div>
       </div>
 
-      <div 
-        id="flip-controls-container" 
+      <div
+        id="flip-controls-container"
         class="absolute bottom-8 sm:bottom-12 left-0 right-0 flex items-center justify-center gap-3 sm:gap-4 z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
         style="background: none;"
-      >
-      </div>
+      ></div>
     `;
 
     document.body.appendChild(this.overlay);
