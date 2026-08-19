@@ -78,16 +78,16 @@ export const TaskModalComponent = {
               </div>
               <div>
                 <label
-                  for="input-task-pomo"
+                  for="input-task-focus-units"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Est. Pomodoros (Max 20)
+                  Est. Units (Max 20)
                 </label>
                 <input
-                  id="input-task-pomo"
+                  id="input-task-focus-units"
                   type="text"
                   inputmode="numeric"
-                  value="${isEditing ? editingTask.estimatedPomodoros : "1"}"
+                  value="${isEditing ? editingTask.estimatedFocusUnits : "1"}"
                   maxlength="2"
                   class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
                 />
@@ -196,7 +196,7 @@ export const TaskModalComponent = {
                               ${
                                 isDone
                                   ? "Completed"
-                                  : `${t.completedPomodoros || 0}/${t.estimatedPomodoros || 1} Pomo`
+                                  : `${t.completedFocusUnits || 0}/${t.estimatedFocusUnits || 1} Units`
                               }
                             </span>
 

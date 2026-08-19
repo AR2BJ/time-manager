@@ -52,10 +52,10 @@ export const SettingsController = {
     if (pomoLen) pomoLen.value = settings.pomodoroWorkTime ?? 25;
 
     const shortBreak = document.getElementById("sett-short-break-len");
-    if (shortBreak) shortBreak.value = settings.shortBreakTime ?? 5;
+    if (shortBreak) shortBreak.value = settings.shortBreakTime ?? 10;
 
     const longBreak = document.getElementById("sett-long-break-len");
-    if (longBreak) longBreak.value = settings.longBreakTime ?? 15;
+    if (longBreak) longBreak.value = settings.longBreakTime ?? 20;
 
     const longInterval = document.getElementById("sett-long-break-interval");
     if (longInterval) longInterval.value = settings.longBreakInterval ?? 4;
@@ -214,21 +214,30 @@ export const SettingsController = {
     const inputs = document.querySelectorAll(".bounded-numeric-input");
 
     inputs.forEach((input) => {
+      const min = Number(input.dataset.min) || 1;
       const max = Number(input.dataset.max) || 99;
 
       input.addEventListener("input", (e) => {
         let val = e.target.value.replace(/\D/g, "");
-        if (val !== "") {
-          let numVal = parseInt(val, 10);
-          if (numVal > max) numVal = max;
-          if (numVal < 1) numVal = 1;
-          val = numVal.toString();
-        }
         e.target.value = val;
       });
 
       input.addEventListener("blur", (e) => {
-        if (!e.target.value) e.target.value = "1";
+        let val = e.target.value.trim();
+
+        if (val === "") {
+          e.target.value = String(min);
+        } else {
+          let numVal = Number(val);
+          if (numVal < min) {
+            e.target.value = String(min);
+          } else if (numVal > max) {
+            e.target.value = String(max);
+          } else {
+            e.target.value = String(numVal);
+          }
+        }
+
         this.saveAllTimerSettings();
       });
     });
@@ -268,9 +277,9 @@ export const SettingsController = {
     const pomodoroWorkTime =
       Number(document.getElementById("sett-pomo-len")?.value) || 25;
     const shortBreakTime =
-      Number(document.getElementById("sett-short-break-len")?.value) || 5;
+      Number(document.getElementById("sett-short-break-len")?.value) || 10;
     const longBreakTime =
-      Number(document.getElementById("sett-long-break-len")?.value) || 15;
+      Number(document.getElementById("sett-long-break-len")?.value) || 20;
     const longBreakInterval =
       Number(document.getElementById("sett-long-break-interval")?.value) || 4;
 
@@ -279,12 +288,12 @@ export const SettingsController = {
     const disableBreaks = this.getToggleState("sett-disable-breaks");
 
     const flowBreakTime =
-      Number(document.getElementById("sett-flow-break-len")?.value) || 10;
+      Number(document.getElementById("sett-flow-break-len")?.value) || 20;
     const autoStartFlowBreaks = this.getToggleState(
       "sett-auto-start-flow-break",
     );
 
-    const volume = Number(document.getElementById("sett-volume")?.value) ?? 80;
+    const volume = Number(document.getElementById("sett-volume")?.value) ?? 50;
     const pomodoroEndSound = this.pomoSoundAutocomplete?.getValue() || "bell";
     const breakEndSound = this.breakSoundAutocomplete?.getValue() || "chime";
 

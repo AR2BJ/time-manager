@@ -244,6 +244,14 @@ export const SettingsImportController = {
       if (disableBreaks)
         settings.disableBreaks = disableBreaks.toLowerCase() === "yes";
 
+      const flowBreakTime = getVal("Flow Break Time");
+      if (flowBreakTime) settings.flowBreakTime = Number(flowBreakTime);
+
+      const autoStartFlowBreak = getVal("Auto Start Flow Break");
+      if (autoStartFlowBreak)
+        settings.autoStartFlowBreaks =
+          autoStartFlowBreak.toLowerCase() === "yes";
+
       const volume = getVal("Volume");
       if (volume) settings.volume = Number(volume);
 
@@ -270,8 +278,12 @@ export const SettingsImportController = {
       const statusMatch = block.match(/-\s*\*\*Status:\*\*\s*(.+)/);
       const priorityMatch = block.match(/-\s*\*\*Priority:\*\*\s*(.+)/);
       const tagsMatch = block.match(/-\s*\*\*Tags:\*\*\s*(.*)/);
-      const estMatch = block.match(/-\s*\*\*Estimated Pomodoros:\*\*\s*(\d+)/);
-      const compMatch = block.match(/-\s*\*\*Completed Pomodoros:\*\*\s*(\d+)/);
+      const estMatch = block.match(
+        /-\s*\*\*Estimated Focus Units:\*\*\s*(\d+)/,
+      );
+      const compMatch = block.match(
+        /-\s*\*\*Completed Focus Units:\*\*\s*(\d+)/,
+      );
       const dueDateMatch = block.match(/-\s*\*\*Due Date:\*\*\s*(.+)/);
       const createdAtMatch = block.match(/-\s*\*\*Created At:\*\*\s*(.+)/);
       const completedAtMatch = block.match(/-\s*\*\*Completed At:\*\*\s*(.+)/);
@@ -291,8 +303,8 @@ export const SettingsImportController = {
           status: statusMatch ? statusMatch[1].trim() : "todo",
           priority: priorityMatch ? priorityMatch[1].trim() : "medium",
           tags: tags,
-          estimatedPomodoros: estMatch ? parseInt(estMatch[1], 10) : 1,
-          completedPomodoros: compMatch ? parseInt(compMatch[1], 10) : 0,
+          estimatedFocusUnits: estMatch ? parseInt(estMatch[1], 10) : 1,
+          completedFocusUnits: compMatch ? parseInt(compMatch[1], 10) : 0,
           dueDate: dueDate === "N/A" ? null : dueDate,
           createdAt: createdAtMatch ? createdAtMatch[1].trim() : todayISO(),
           completedAt: completedAt === "N/A" ? null : completedAt,
@@ -433,6 +445,7 @@ export const SettingsImportController = {
               "shortBreakTime",
               "longBreakTime",
               "longBreakInterval",
+              "flowBreakTime",
               "volume",
             ].includes(key)
           ) {
@@ -442,6 +455,7 @@ export const SettingsImportController = {
               "autoStartBreaks",
               "autoStartPomodoros",
               "disableBreaks",
+              "autoStartFlowBreaks",
               "isMuted",
               "notificationSound",
             ].includes(key)
@@ -461,8 +475,8 @@ export const SettingsImportController = {
             status: cols[2] ? cols[2].trim() : "todo",
             priority: cols[3] ? cols[3].trim() : "medium",
             tags: tagsStr ? tagsStr.split(";").map((t) => t.trim()) : [],
-            estimatedPomodoros: cols[5] ? parseInt(cols[5], 10) : 1,
-            completedPomodoros: cols[6] ? parseInt(cols[6], 10) : 0,
+            estimatedFocusUnits: cols[5] ? parseInt(cols[5], 10) : 1,
+            completedFocusUnits: cols[6] ? parseInt(cols[6], 10) : 0,
             dueDate: cols[7] && cols[7].trim() !== "" ? cols[7].trim() : null,
             createdAt: cols[8] ? cols[8].trim() : todayISO(),
             completedAt:

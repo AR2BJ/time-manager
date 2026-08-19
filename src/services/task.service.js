@@ -22,7 +22,7 @@ export const TaskService = {
     );
   },
 
-  addTask(title, estimatedPomodoros = 1, customId = null) {
+  addTask(title, estimatedFocusUnits = 1, customId = null) {
     if (!title || !title.trim() || this.isTitleDuplicate(title, customId)) {
       return null;
     }
@@ -31,15 +31,15 @@ export const TaskService = {
       id: customId || generateId(),
       title: title.trim(),
       status: "todo",
-      estimatedPomodoros: Number(estimatedPomodoros) || 1,
-      completedPomodoros: 0,
+      estimatedFocusUnits: Number(estimatedFocusUnits) || 1,
+      completedFocusUnits: 0,
       createdAt: todayISO(),
     };
 
     return TaskModel.insert(newTask);
   },
 
-  updateTask(taskId, newTitle, newEstimatedPomodoros) {
+  updateTask(taskId, newTitle, newEstimatedFocusUnits) {
     const task = TaskModel.getById(taskId);
     if (
       !task ||
@@ -51,11 +51,11 @@ export const TaskService = {
 
     const updatedFields = {
       title: newTitle.trim(),
-      estimatedPomodoros: Number(newEstimatedPomodoros) || 1,
+      estimatedFocusUnits: Number(newEstimatedFocusUnits) || 1,
     };
 
     if (
-      task.completedPomodoros < updatedFields.estimatedPomodoros &&
+      task.completedFocusUnits < updatedFields.estimatedFocusUnits &&
       task.status === "done"
     ) {
       updatedFields.status = "todo";
@@ -118,15 +118,15 @@ export const TaskService = {
     return TaskModel.update(taskId, { status: newStatus });
   },
 
-  incrementCompletedPomodoro(taskId) {
+  incrementCompletedFocusUnits(taskId) {
     const activeTaskId = TaskModel.getActiveTaskId();
     const targetId = taskId || activeTaskId;
     const task = TaskModel.getById(targetId);
 
     if (!task) return null;
 
-    const newCompletedCount = (task.completedPomodoros || 0) + 1;
-    TaskModel.update(task.id, { completedPomodoros: newCompletedCount });
+    const newCompletedCount = (task.completedFocusUnits || 0) + 1;
+    TaskModel.update(task.id, { completedFocusUnits: newCompletedCount });
 
     return this.autoSelectNextTask();
   },
@@ -135,7 +135,7 @@ export const TaskService = {
     const activeTask = this.getActiveTask();
     if (!activeTask) return null;
 
-    if (activeTask.completedPomodoros >= activeTask.estimatedPomodoros) {
+    if (activeTask.completedFocusUnits >= activeTask.estimatedFocusUnits) {
       TaskModel.update(activeTask.id, { status: "done" });
 
       const nextTask = TaskModel.getTasks().find((t) => t.status !== "done");

@@ -40,8 +40,8 @@ export const SettingsExportController = {
           status: t.status || "todo",
           priority: t.priority || "low",
           tags: Array.isArray(t.tags) ? t.tags : [],
-          estimatedPomodoros: t.estimatedPomodoros || 1,
-          completedPomodoros: t.completedPomodoros || 0,
+          estimatedFocusUnits: Number(t.estimatedFocusUnits) || 1,
+          completedFocusUnits: Number(t.completedFocusUnits) || 0,
           dueDate: t.dueDate || null,
           createdAt: t.createdAt,
           completedAt: t.completedAt || null,
@@ -107,12 +107,14 @@ export const SettingsExportController = {
     content += `- **Active Mode:** ${state.activeMode || "pomodoro"}\n`;
     content += `- **Pomodoro Session Count:** ${state.timer?.pomodoroSessionCount || 0}\n`;
     content += `- **Pomodoro Work Time:** ${settings.pomodoroWorkTime || 25}\n`;
-    content += `- **Short Break Time:** ${settings.shortBreakTime || 5}\n`;
-    content += `- **Long Break Time:** ${settings.longBreakTime || 15}\n`;
+    content += `- **Short Break Time:** ${settings.shortBreakTime || 10}\n`;
+    content += `- **Long Break Time:** ${settings.longBreakTime || 20}\n`;
     content += `- **Long Break Interval:** ${settings.longBreakInterval || 4}\n`;
     content += `- **Auto Start Breaks:** ${settings.autoStartBreaks ? "Yes" : "No"}\n`;
     content += `- **Auto Start Pomodoros:** ${settings.autoStartPomodoros ? "Yes" : "No"}\n`;
     content += `- **Disable Breaks:** ${settings.disableBreaks ? "Yes" : "No"}\n`;
+    content += `- **Flow Break Time:** ${settings.flowBreakTime || 20}\n`;
+    content += `- **Auto Start Flow Break:** ${settings.autoStartFlowBreaks ? "Yes" : "No"}\n`;
     content += `- **Volume:** ${soundState.volume ?? 50}\n`;
     content += `- **Is Muted:** ${soundState.isMuted ? "Yes" : "No"}\n`;
     content += `- **Pomodoro End Sound:** ${settings.pomodoroEndSound || "none"}\n`;
@@ -131,8 +133,8 @@ export const SettingsExportController = {
         content += `- **Status:** ${task.status || "todo"}\n`;
         content += `- **Priority:** ${task.priority || "medium"}\n`;
         content += `- **Tags:** ${tagsStr}\n`;
-        content += `- **Estimated Pomodoros:** ${task.estimatedPomodoros || 1}\n`;
-        content += `- **Completed Pomodoros:** ${task.completedPomodoros || 0}\n`;
+        content += `- **Estimated Focus Units:** ${task.estimatedFocusUnits || 1}\n`;
+        content += `- **Completed Focus Units:** ${task.completedFocusUnits || 0}\n`;
         content += `- **Due Date:** ${task.dueDate || "N/A"}\n`;
         content += `- **Created At:** ${task.createdAt}\n`;
         content += `- **Completed At:** ${task.completedAt || "N/A"}\n`;
@@ -176,12 +178,14 @@ export const SettingsExportController = {
     content += `activeMode,${escapeCsvValue(state.activeMode || "pomodoro")}\n`;
     content += `pomodoroSessionCount,${escapeCsvValue(state.timer?.pomodoroSessionCount || 0)}\n`;
     content += `pomodoroWorkTime,${escapeCsvValue(settings.pomodoroWorkTime || 25)}\n`;
-    content += `shortBreakTime,${escapeCsvValue(settings.shortBreakTime || 5)}\n`;
-    content += `longBreakTime,${escapeCsvValue(settings.longBreakTime || 15)}\n`;
+    content += `shortBreakTime,${escapeCsvValue(settings.shortBreakTime || 10)}\n`;
+    content += `longBreakTime,${escapeCsvValue(settings.longBreakTime || 20)}\n`;
     content += `longBreakInterval,${escapeCsvValue(settings.longBreakInterval || 4)}\n`;
     content += `autoStartBreaks,${escapeCsvValue(settings.autoStartBreaks ? "true" : "false")}\n`;
     content += `autoStartPomodoros,${escapeCsvValue(settings.autoStartPomodoros ? "true" : "false")}\n`;
     content += `disableBreaks,${escapeCsvValue(settings.disableBreaks ? "true" : "false")}\n`;
+    content += `flowBreakTime,${escapeCsvValue(settings.flowBreakTime || 20)}\n`;
+    content += `autoStartFlowBreaks,${escapeCsvValue(settings.autoStartFlowBreaks ? "true" : "false")}\n`;
     content += `volume,${escapeCsvValue(soundState.volume ?? 50)}\n`;
     content += `isMuted,${escapeCsvValue(soundState.isMuted ? "true" : "false")}\n`;
     content += `pomodoroEndSound,${escapeCsvValue(settings.pomodoroEndSound || "none")}\n`;
@@ -189,10 +193,10 @@ export const SettingsExportController = {
     content += `notificationSound,${escapeCsvValue(settings.notificationSound !== false ? "true" : "false")}\n`;
     content += `currentSoundId,${escapeCsvValue(SoundModel.getCurrentSoundId())}\n\n`;
 
-    content += `[TASKS]\nId,Title,Status,Priority,Tags,Estimated Pomodoros,Completed Pomodoros,Due Date,Created At,Completed At,Description\n`;
+    content += `[TASKS]\nId,Title,Status,Priority,Tags,Estimated Focus Units,Completed Focus Units,Due Date,Created At,Completed At,Description\n`;
     tasks.forEach((t) => {
       const tagsStr = Array.isArray(t.tags) ? t.tags.join(";") : "";
-      content += `${escapeCsvValue(t.id)},${escapeCsvValue(t.title)},${escapeCsvValue(t.status)},${escapeCsvValue(t.priority)},${escapeCsvValue(tagsStr)},${escapeCsvValue(t.estimatedPomodoros)},${escapeCsvValue(t.completedPomodoros)},${escapeCsvValue(t.dueDate)},${escapeCsvValue(t.createdAt)},${escapeCsvValue(t.completedAt)},${escapeCsvValue(t.description)}\n`;
+      content += `${escapeCsvValue(t.id)},${escapeCsvValue(t.title)},${escapeCsvValue(t.status)},${escapeCsvValue(t.priority)},${escapeCsvValue(tagsStr)},${escapeCsvValue(t.estimatedFocusUnits)},${escapeCsvValue(t.completedFocusUnits)},${escapeCsvValue(t.dueDate)},${escapeCsvValue(t.createdAt)},${escapeCsvValue(t.completedAt)},${escapeCsvValue(t.description)}\n`;
     });
 
     content += `\n[SESSIONS]\nId,Task ID,Task Title,Type,Duration Seconds,Target Duration Seconds,Is Flow Mode,Completed At\n`;

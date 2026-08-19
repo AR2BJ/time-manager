@@ -126,12 +126,13 @@ export const SettingsViewComponent = {
                   for="sett-pomo-len"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Pomodoro Length (Max 120m)
+                  Pomodoro Length (20m ~ 120m)
                 </label>
                 <input
                   id="sett-pomo-len"
                   type="text"
                   inputmode="numeric"
+                  data-min="20"
                   data-max="120"
                   value="${settings.pomodoroWorkTime || 25}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
@@ -143,12 +144,13 @@ export const SettingsViewComponent = {
                   for="sett-short-break-len"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Short Break Length (Max 60m)
+                  Short Break Length (10m ~ 60m)
                 </label>
                 <input
                   id="sett-short-break-len"
                   type="text"
                   inputmode="numeric"
+                  data-min="10"
                   data-max="60"
                   value="${settings.shortBreakTime || 5}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
@@ -160,12 +162,13 @@ export const SettingsViewComponent = {
                   for="sett-long-break-len"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Long Break Length (Max 90m)
+                  Long Break Length (15m ~ 90m)
                 </label>
                 <input
                   id="sett-long-break-len"
                   type="text"
                   inputmode="numeric"
+                  data-min="15"
                   data-max="90"
                   value="${settings.longBreakTime || 15}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
@@ -177,12 +180,13 @@ export const SettingsViewComponent = {
                   for="sett-long-break-interval"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  Long Break Interval (Max 20 Pomo)
+                  Long Break Interval (1 ~ 20 Pomo)
                 </label>
                 <input
                   id="sett-long-break-interval"
                   type="text"
                   inputmode="numeric"
+                  data-min="1"
                   data-max="20"
                   value="${settings.longBreakInterval || 4}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
@@ -256,8 +260,9 @@ export const SettingsViewComponent = {
                   id="sett-flow-break-len"
                   type="text"
                   inputmode="numeric"
+                  data-min="20"
                   data-max="120"
-                  value="${settings.flowBreakTime || 30}"
+                  value="${settings.flowBreakTime || 20}"
                   class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
                 />
               </div>

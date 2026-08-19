@@ -6,13 +6,13 @@ import { SoundModel } from "./sound.model.js";
 
 export const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
-  shortBreakTime: 5,
-  longBreakTime: 15,
+  shortBreakTime: 10,
+  longBreakTime: 20,
   longBreakInterval: 4,
   autoStartBreaks: false,
   autoStartPomodoros: false,
   disableBreaks: false,
-  flowBreakTime: 30,
+  flowBreakTime: 20,
   autoStartFlowBreaks: false,
   volume: 50,
   pomodoroEndSound: "none",

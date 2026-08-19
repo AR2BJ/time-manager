@@ -5,6 +5,7 @@ export class NoteComponent {
   constructor() {
     this.container = null;
     this.unsubscribe = null;
+    this.shouldResetInput = false;
   }
 
   render() {
@@ -118,8 +119,12 @@ export class NoteComponent {
 
     const newInput = this.container?.querySelector("#note-input");
     if (newInput && currentFocus) {
-      newInput.value = currentValue;
-      newInput.focus();
+      if (this.shouldResetInput) {
+        newInput.value = "";
+        this.shouldResetInput = false;
+      } else {
+        newInput.value = currentValue;
+      }
     }
   }
 
@@ -129,9 +134,8 @@ export class NoteComponent {
         e.preventDefault();
         const input = this.container.querySelector("#note-input");
         if (input && input.value.trim()) {
+          this.shouldResetInput = true;
           NoteService.addNote(input.value);
-          input.value = "";
-          this.updateUI();
         }
       }
     });
@@ -142,7 +146,6 @@ export class NoteComponent {
 
       if (deleteBtn && itemEl) {
         NoteService.deleteNote(itemEl.dataset.id);
-        this.updateUI();
       }
     });
   }

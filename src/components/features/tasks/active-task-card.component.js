@@ -46,8 +46,8 @@ export const ActiveTaskCardComponent = {
       `;
     }
 
-    const completed = activeTask.completedPomodoros || 0;
-    const estimated = activeTask.estimatedPomodoros || 1;
+    const completed = activeTask.completedFocusUnits || 0;
+    const estimated = activeTask.estimatedFocusUnits || 1;
     const progressPercent = Math.min(
       Math.round((completed / estimated) * 100),
       100,
@@ -77,7 +77,7 @@ export const ActiveTaskCardComponent = {
           <div class="flex items-center justify-between gap-3 mb-3">
             <h4 class="text-sm font-semibold text-primary truncate min-w-0 flex-1">${activeTask.title}</h4>
             <span class="shrink-0 text-[11px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded-md border border-brand/20">
-              ${completed}/${estimated} Pomo
+              ${completed}/${estimated} Units
             </span>
           </div>
 

@@ -127,9 +127,9 @@ export const ModalController = {
 
   bindTaskModalEvents(wrapper) {
     // 1. Validation for Pomodoro Input Field (Strict max 20, digits only)
-    const pomoInput = wrapper.querySelector("#input-task-pomo");
-    if (pomoInput) {
-      pomoInput.addEventListener("input", (e) => {
+    const unitInput = wrapper.querySelector("#input-task-focus-units");
+    if (unitInput) {
+      unitInput.addEventListener("input", (e) => {
         let val = e.target.value.replace(/\D/g, "");
 
         if (val !== "") {
@@ -142,7 +142,7 @@ export const ModalController = {
         e.target.value = val;
       });
 
-      pomoInput.addEventListener("blur", (e) => {
+      unitInput.addEventListener("blur", (e) => {
         if (!e.target.value.trim() || parseInt(e.target.value, 10) < 1) {
           e.target.value = "1";
         }
@@ -211,7 +211,7 @@ export const ModalController = {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const titleInput = wrapper.querySelector("#input-task-title");
-        const pomoVal = Number(pomoInput?.value) || 1;
+        const unitVal = Number(unitInput?.value) || 1;
         const editId = form.dataset.editId;
 
         if (titleInput && titleInput.value.trim()) {
@@ -219,7 +219,7 @@ export const ModalController = {
             const success = TaskController.updateTask(
               editId,
               titleInput.value.trim(),
-              pomoVal,
+              unitVal,
             );
             if (success) {
               this.closeTaskModal();
@@ -227,7 +227,7 @@ export const ModalController = {
           } else {
             const newTask = TaskController.createTask(
               titleInput.value.trim(),
-              pomoVal,
+              unitVal,
             );
             if (newTask) {
               TaskService.setActiveTask(newTask.id);

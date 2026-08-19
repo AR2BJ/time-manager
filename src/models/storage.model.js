@@ -8,8 +8,8 @@ function normalizeTask(task) {
     id: String(task.id || generateId()),
     title: task.title || "Untitled Task",
     status: task.status || "todo",
-    estimatedPomodoros: Number(task.estimatedPomodoros) || 1,
-    completedPomodoros: Number(task.completedPomodoros) || 0,
+    estimatedFocusUnits: Number(task.estimatedFocusUnits) || 1,
+    completedFocusUnits: Number(task.completedFocusUnits) || 0,
     createdAt: task.createdAt || todayISO(),
   };
 }
@@ -64,12 +64,12 @@ function migrateData(data) {
     settings: {
       ...settings,
       pomodoroWorkTime,
-      shortBreakTime: Number(settings.shortBreakTime) || 5,
-      longBreakTime: Number(settings.longBreakTime) || 15,
+      shortBreakTime: Number(settings.shortBreakTime) || 10,
+      longBreakTime: Number(settings.longBreakTime) || 20,
       longBreakInterval: Number(settings.longBreakInterval) || 4,
       autoStartBreaks: Boolean(settings.autoStartBreaks),
       autoStartPomodoros: Boolean(settings.autoStartPomodoros),
-      flowBreakTime: Number(settings.flowBreakTime) || 30,
+      flowBreakTime: Number(settings.flowBreakTime) || 20,
       autoStartFlowBreaks: Boolean(settings.autoStartFlowBreaks),
       notificationSound: settings.notificationSound !== false,
       pomodoroEndSound: settings.pomodoroEndSound || "none",

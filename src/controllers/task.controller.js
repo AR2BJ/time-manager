@@ -7,8 +7,8 @@ export const TaskController = {
     this.bindEvents();
   },
 
-  createTask(title, estimatedPomodoros = 1) {
-    const newTask = TaskService.addTask(title, estimatedPomodoros);
+  createTask(title, estimatedFocusUnits = 1) {
+    const newTask = TaskService.addTask(title, estimatedFocusUnits);
     if (!newTask) return null;
 
     NotificationService.show({
@@ -21,11 +21,11 @@ export const TaskController = {
     return newTask;
   },
 
-  updateTask(taskId, newTitle, newEstimatedPomodoros) {
+  updateTask(taskId, newTitle, newEstimatedFocusUnits) {
     const updatedTask = TaskService.updateTask(
       taskId,
       newTitle,
-      newEstimatedPomodoros,
+      newEstimatedFocusUnits,
     );
     if (updatedTask) {
       NotificationService.show({

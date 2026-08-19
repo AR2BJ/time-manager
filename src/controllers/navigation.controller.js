@@ -90,7 +90,7 @@ export class NavigationController {
         const viewMap = { t: "timer", a: "analytics", s: "settings" };
         if (viewMap[key]) {
           event.preventDefault();
-          StateManager.setView(viewMap[key]);
+          this.setView(viewMap[key]);
         }
       }
 
@@ -159,6 +159,14 @@ export class NavigationController {
         return;
       }
     });
+  }
+
+  static setView(tabType) {
+    StateManager.setView(tabType);
+
+    if (tabType === "analytics") {
+      AnalyticsController.dispatchRender(StateManager.getState().sessions);
+    }
   }
 
   static updateNavigationDOM() {
