@@ -42,7 +42,7 @@ class SoundService {
     const ctx = this._getAudioContext();
     if (!ctx) return;
 
-    const masterVolume = (settings.volume ?? 80) / 100;
+    const masterVolume = (settings.volume ?? 50) / 100;
     if (masterVolume <= 0) return;
 
     const masterGain = ctx.createGain();

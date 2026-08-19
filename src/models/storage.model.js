@@ -67,17 +67,17 @@ function migrateData(data) {
       shortBreakTime: Number(settings.shortBreakTime) || 10,
       longBreakTime: Number(settings.longBreakTime) || 20,
       longBreakInterval: Number(settings.longBreakInterval) || 4,
-      autoStartBreaks: Boolean(settings.autoStartBreaks),
-      autoStartPomodoros: Boolean(settings.autoStartPomodoros),
+      autoStartBreaks: settings.autoStartBreaks !== true,
+      autoStartPomodoros: settings.autoStartPomodoros !== true,
       flowBreakTime: Number(settings.flowBreakTime) || 20,
-      autoStartFlowBreaks: Boolean(settings.autoStartFlowBreaks),
+      autoStartFlowBreaks: settings.autoStartFlowBreaks !== true,
       notificationSound: settings.notificationSound !== false,
       pomodoroEndSound: settings.pomodoroEndSound || "none",
       breakEndSound: settings.breakEndSound || "none",
       currentSoundId:
         settings.currentSoundId || settings.lastSelectedSoundId || "none",
       volume: typeof settings.volume === "number" ? settings.volume : 50,
-      isMuted: Boolean(settings.isMuted),
+      isMuted: settings.isMuted !== true,
     },
   };
 }

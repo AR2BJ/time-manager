@@ -311,7 +311,7 @@ export const SettingsViewComponent = {
                   <span
                     id="sett-volume-val"
                     class="font-bold text-brand"
-                    >${settings.volume ?? 80}%</span
+                    >${settings.volume ?? 50}%</span
                   >
                 </div>
                 <input
@@ -320,7 +320,7 @@ export const SettingsViewComponent = {
                   min="0"
                   max="100"
                   step="5"
-                  value="${settings.volume ?? 80}"
+                  value="${settings.volume ?? 50}"
                   class="slider-fill-track w-full h-2 bg-surface-2 rounded-lg appearance-none cursor-pointer accent-brand"
                   aria-label="Master Volume Control"
                 />

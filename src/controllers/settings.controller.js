@@ -78,6 +78,10 @@ export const SettingsController = {
       Boolean(settings.autoStartBreaks),
     );
     this.setToggleUI("sett-disable-breaks", Boolean(settings.disableBreaks));
+    this.setToggleUI(
+      "sett-auto-start-flow-break",
+      Boolean(settings.autoStartFlowBreaks),
+    );
 
     if (this.pomoSoundAutocomplete) {
       this.pomoSoundAutocomplete.setValue(
