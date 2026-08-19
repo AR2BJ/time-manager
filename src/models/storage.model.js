@@ -3,9 +3,6 @@ import { generateId, todayISO } from "@/utils/helpers.js";
 export const STORAGE_KEY = "time_manager_data";
 export const STORAGE_VERSION = 1;
 
-/**
- * Normalizes a lightweight task entity for Standalone mode
- */
 function normalizeTask(task) {
   return {
     id: String(task.id || generateId()),
@@ -17,9 +14,6 @@ function normalizeTask(task) {
   };
 }
 
-/**
- * Normalizes a completed time session log
- */
 function normalizeSession(session) {
   return {
     id: String(session.id || generateId()),
@@ -31,9 +25,6 @@ function normalizeSession(session) {
   };
 }
 
-/**
- * Normalizes a note entity
- */
 function normalizeNote(note) {
   return {
     id: String(note.id || generateId()),
@@ -42,13 +33,9 @@ function normalizeNote(note) {
   };
 }
 
-/**
- * Normalizes live timer dynamic state for seamless rehydration
- */
 function normalizeTimer(timer, defaultWorkTime = 25) {
   const fallbackSecs = defaultWorkTime * 60;
   return {
-    // If the browser was reloaded during an active tick, safety-pause to prevent time sync issues
     isRunning: false,
     isPaused: Boolean(timer?.isRunning || timer?.isPaused),
     timeRemaining: Number(timer?.timeRemaining) ?? fallbackSecs,
@@ -82,6 +69,8 @@ function migrateData(data) {
       longBreakInterval: Number(settings.longBreakInterval) || 4,
       autoStartBreaks: Boolean(settings.autoStartBreaks),
       autoStartPomodoros: Boolean(settings.autoStartPomodoros),
+      flowBreakTime: Number(settings.flowBreakTime) || 30,
+      autoStartFlowBreaks: Boolean(settings.autoStartFlowBreaks),
       notificationSound: settings.notificationSound !== false,
       pomodoroEndSound: settings.pomodoroEndSound || "none",
       breakEndSound: settings.breakEndSound || "none",

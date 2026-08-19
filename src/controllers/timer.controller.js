@@ -361,7 +361,11 @@ export const TimerController = {
 
     const CIRCUMFERENCE = 879.64;
 
-    if (state.activeMode === "pomodoro") {
+    const isPomodoro = state.activeMode === "pomodoro";
+    const isFlowBreak =
+      state.activeMode === "flow" && state.timer.currentPhase === "break";
+
+    if (isFlowBreak) {
       this.stopFlowAnimation();
       flowCanvas?.classList.add("opacity-0");
       progressRing?.classList.remove("opacity-0");
@@ -387,6 +391,56 @@ export const TimerController = {
         progressRing.style.strokeDasharray = `${CIRCUMFERENCE}`;
         const offset = CIRCUMFERENCE - progressFraction * CIRCUMFERENCE;
         progressRing.style.strokeDashoffset = `${offset}`;
+        progressRing.classList.remove("stroke-brand");
+        progressRing.classList.add("stroke-emerald-500");
+      }
+
+      if (phaseBadge) {
+        phaseBadge.textContent = "Flow Break";
+        phaseBadge.className =
+          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
+      }
+
+      if (subInfo) {
+        subInfo.textContent = "Flow Break in progress";
+      }
+    } else if (isPomodoro) {
+      this.stopFlowAnimation();
+      flowCanvas?.classList.add("opacity-0");
+      progressRing?.classList.remove("opacity-0");
+
+      const totalSeconds = Number.isFinite(state.timer.timeRemaining)
+        ? state.timer.timeRemaining
+        : 1500;
+      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const secs = String(totalSeconds % 60).padStart(2, "0");
+      displayEl.innerHTML = `<span
+        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
+        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
+      >`;
+
+      if (progressRing) {
+        const totalDuration = state.timer.duration || 1500;
+        const elapsedTime = totalDuration - totalSeconds;
+        const progressFraction = Math.min(
+          Math.max(elapsedTime / totalDuration, 0),
+          1,
+        );
+
+        progressRing.style.strokeDasharray = `${CIRCUMFERENCE}`;
+        const offset = CIRCUMFERENCE - progressFraction * CIRCUMFERENCE;
+        progressRing.style.strokeDashoffset = `${offset}`;
+
+        const isBreak =
+          state.timer.currentPhase === "shortBreak" ||
+          state.timer.currentPhase === "longBreak";
+        if (isBreak) {
+          progressRing.classList.remove("stroke-brand");
+          progressRing.classList.add("stroke-emerald-500");
+        } else {
+          progressRing.classList.remove("stroke-emerald-500");
+          progressRing.classList.add("stroke-brand");
+        }
       }
 
       if (phaseBadge) {
@@ -428,8 +482,15 @@ export const TimerController = {
         }
       }
 
-      if (phaseBadge) phaseBadge.textContent = "Flow Mode";
-      if (subInfo) subInfo.textContent = "Continuous Focus Duration";
+      if (phaseBadge) {
+        phaseBadge.textContent = "Flow Mode";
+        phaseBadge.className =
+          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
+      }
+
+      if (subInfo) {
+        subInfo.textContent = "Continuous Focus Duration";
+      }
     }
 
     if (controlsContainer) {
@@ -440,6 +501,10 @@ export const TimerController = {
       if (controlsContainer.dataset.state !== currentControlState) {
         controlsContainer.dataset.state = currentControlState;
 
+        const isFlowBreak =
+          state.activeMode === "flow" && state.timer.currentPhase === "break";
+        const btnText = isFlowBreak ? "Break" : "Focus";
+
         if (currentControlState === "idle") {
           controlsContainer.innerHTML = `
             <button
@@ -447,7 +512,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">Start Focus</span>
+              <span class="pointer-events-none">Start ${btnText}</span>
             </button>
           `;
         } else if (currentControlState === "running") {
@@ -457,7 +522,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-pause pointer-events-none"></i>
-              <span class="pointer-events-none">Pause</span>
+              <span class="pointer-events-none">Pause ${btnText}</span>
             </button>
           `;
         } else if (currentControlState === "paused") {
@@ -476,7 +541,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">Continue</span>
+              <span class="pointer-events-none">Continue ${btnText}</span>
             </button>
           `;
         }

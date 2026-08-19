@@ -164,7 +164,9 @@ export class TimerDisplayComponent {
       isPomodoro &&
       (timer.currentPhase === "shortBreak" ||
         timer.currentPhase === "longBreak");
-    const displayTime = isPomodoro
+    const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
+
+    const displayTime = isFlowBreak
       ? formatTime(timer.timeRemaining)
       : formatTime(timer.flowTime);
 
@@ -174,16 +176,17 @@ export class TimerDisplayComponent {
     }
 
     const progressRing = this.container.querySelector("#timer-progress-ring");
-    if (progressRing && isPomodoro) {
-      const circumference = 879.64;
-      const progress = timer.timeRemaining / (timer.duration || 1500);
-      const offset = circumference - progress * circumference;
-      progressRing.style.strokeDashoffset = `${offset}`;
-
-      if (isBreak) {
+    if (progressRing) {
+      if (isFlowBreak) {
+        progressRing.classList.remove("opacity-0");
+        const circumference = 879.64;
+        const progress = timer.timeRemaining / (timer.duration || 1500);
+        const offset = circumference - progress * circumference;
+        progressRing.style.strokeDashoffset = `${offset}`;
         progressRing.classList.remove("stroke-brand");
         progressRing.classList.add("stroke-emerald-500");
       } else {
+        progressRing.classList.add("opacity-0");
         progressRing.classList.remove("stroke-emerald-500");
         progressRing.classList.add("stroke-brand");
       }
@@ -191,7 +194,11 @@ export class TimerDisplayComponent {
 
     const phaseBadge = this.container.querySelector("#timer-phase-badge");
     if (phaseBadge) {
-      if (isPomodoro) {
+      if (isFlowBreak) {
+        phaseBadge.textContent = "Flow Break";
+        phaseBadge.className =
+          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
+      } else if (isPomodoro) {
         if (isBreak) {
           phaseBadge.textContent =
             timer.currentPhase === "shortBreak" ? "Short Break" : "Long Break";
@@ -216,7 +223,8 @@ export class TimerDisplayComponent {
         toggleBtn.classList.remove("bg-brand", "hover:bg-brand/90");
         toggleBtn.classList.add("bg-amber-500", "hover:bg-amber-600");
       } else {
-        toggleBtn.textContent = isPomodoro ? "Start Focus" : "Start Flow";
+        const btnText = isPomodoro ? "Start Focus" : "Start Flow";
+        toggleBtn.textContent = btnText;
         toggleBtn.classList.remove("bg-amber-500", "hover:bg-amber-600");
         toggleBtn.classList.add("bg-brand", "hover:bg-brand/90");
       }

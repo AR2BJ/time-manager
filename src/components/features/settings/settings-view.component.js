@@ -112,10 +112,10 @@ export const SettingsViewComponent = {
                 <h3
                   class="text-sm sm:text-base font-semibold text-primary truncate"
                 >
-                  Timer Configurations
+                  Pomodoro Configurations
                 </h3>
                 <p class="text-[11px] sm:text-xs text-secondary truncate">
-                  Set durations and cycle bounds for focus sessions.
+                  Set durations and cycle bounds for Pomodoro sessions.
                 </p>
               </div>
             </div>
@@ -218,6 +218,61 @@ export const SettingsViewComponent = {
                 ${SettingsViewComponent.renderToggle(
                   "sett-disable-breaks",
                   settings.disableBreaks,
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-surface rounded-2xl p-4 sm:p-6 flex flex-col gap-4 shadow-sm border border-border"
+          >
+            <div class="flex items-center gap-3 border-b border-border pb-3">
+              <div
+                class="w-8 h-8 rounded-lg bg-brand/10 text-brand flex items-center justify-center shrink-0"
+              >
+                <i class="fa-regular fa-water text-sm"></i>
+              </div>
+              <div class="min-w-0">
+                <h3
+                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                >
+                  Flow Configurations
+                </h3>
+                <p class="text-[11px] sm:text-xs text-secondary truncate">
+                  Configure flow mode breaks and auto-start behavior.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="col-span-2">
+                <label
+                  for="sett-flow-break-len"
+                  class="block text-xs font-semibold text-secondary mb-1 ps-1"
+                >
+                  Flow Break Length (Max 120m)
+                </label>
+                <input
+                  id="sett-flow-break-len"
+                  type="text"
+                  inputmode="numeric"
+                  data-max="120"
+                  value="${settings.flowBreakTime || 30}"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-2 border-t border-border/60">
+              <div
+                class="flex items-center justify-between w-full sm:w-auto gap-6"
+              >
+                <span class="text-xs font-medium text-primary"
+                  >Auto-start Flow Break</span
+                >
+                ${SettingsViewComponent.renderToggle(
+                  "sett-auto-start-flow-break",
+                  settings.autoStartFlowBreaks,
                 )}
               </div>
             </div>

@@ -51,44 +51,16 @@ class TimerService {
     clearInterval(this.timerInterval);
 
     if (state.activeMode === "flow") {
-      StateManager.updateTimerState({
-        isRunning: false,
-        isPaused: false,
-        flowTime: 0,
-      });
+      this._handleFlowStop();
     } else {
-      const durationMap = {
-        work: (state.settings.pomodoroWorkTime || 25) * 60,
-        shortBreak: (state.settings.shortBreakTime || 5) * 60,
-        longBreak: (state.settings.longBreakTime || 15) * 60,
-      };
-
-      const currentPhaseDuration =
-        durationMap[state.timer.currentPhase] || 1500;
-
-      StateManager.updateTimerState({
-        isRunning: false,
-        isPaused: false,
-        timeRemaining: currentPhaseDuration,
-        duration: currentPhaseDuration,
-      });
+      this._onPomodoroComplete();
     }
-
-    soundService.pause();
   }
 
   reset() {
     clearInterval(this.timerInterval);
     StateManager.resetTimer();
     soundService.pause();
-  }
-
-  _tick() {
-    if (state.activeMode === "pomodoro") {
-      this._handlePomodoroTick();
-    } else {
-      this._handleFlowTick();
-    }
   }
 
   _handlePomodoroTick() {
@@ -99,11 +71,6 @@ class TimerService {
     } else {
       StateManager.updateTimerState({ timeRemaining: newTime });
     }
-  }
-
-  _handleFlowTick() {
-    const newFlowTime = (state.timer.flowTime || 0) + 1;
-    StateManager.updateTimerState({ flowTime: newFlowTime });
   }
 
   _onPomodoroComplete() {
@@ -207,24 +174,96 @@ class TimerService {
     window.dispatchEvent(new CustomEvent("pomodoroCompleted"));
   }
 
-  /**
-   * Manual completion trigger for Flow Mode
-   */
-  stopAndSaveFlowSession() {
-    if (state.activeMode !== "flow" || (state.timer.flowTime || 0) < 10) {
-      this.reset();
-      return;
+  _tick() {
+    if (state.activeMode === "pomodoro") {
+      this._handlePomodoroTick();
+    } else if (state.activeMode === "flow") {
+      this._handleFlowTick();
     }
+  }
 
+  _handleFlowTick() {
+    const isBreak = state.timer.currentPhase === "break";
+
+    if (isBreak) {
+      const newTime = state.timer.timeRemaining - 1;
+      if (newTime <= 0) {
+        this._onFlowBreakComplete();
+      } else {
+        StateManager.updateTimerState({ timeRemaining: newTime });
+      }
+    } else {
+      const newFlowTime = (state.timer.flowTime || 0) + 1;
+      StateManager.updateTimerState({ flowTime: newFlowTime });
+    }
+  }
+
+  _onFlowBreakComplete() {
     clearInterval(this.timerInterval);
 
-    // Save Flow session
-    StateManager.addSession({
-      type: "flow",
-      durationSeconds: state.timer.flowTime,
+    const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
+    StateManager.updateTimerState({
+      isRunning: false,
+      isPaused: false,
+      flowTime: 0,
+      currentPhase: "work",
+      timeRemaining: workSecs,
+      duration: workSecs,
     });
 
-    this.reset();
+    NotificationService.show({
+      type: "info",
+      message: "Flow Break has ended! Ready to focus?",
+      icon: "fa-bolt",
+      iconColor: "text-brand",
+    });
+
+    soundService.pause();
+  }
+
+  _handleFlowStop() {
+    const flowTime = state.timer.flowTime || 0;
+
+    if (flowTime >= 10) {
+      StateManager.addSession({
+        type: "flow",
+        durationSeconds: flowTime,
+      });
+
+      NotificationService.show({
+        type: "success",
+        message: `Flow session completed! You focused for ${Math.round(flowTime / 60)} minutes.`,
+        icon: "fa-circle-check",
+        iconColor: "text-emerald-500",
+      });
+    } else {
+      NotificationService.show({
+        type: "info",
+        message:
+          "Flow session was too short (under 10 seconds). No session saved.",
+        icon: "fa-info-circle",
+        iconColor: "text-brand",
+      });
+    }
+
+    const soundToPlay = state.settings.breakEndSound || "chime";
+    soundService.playNotificationSound(soundToPlay);
+
+    const breakSecs = (state.settings.flowBreakTime || 10) * 60;
+    StateManager.updateTimerState({
+      isRunning: false,
+      isPaused: false,
+      flowTime: 0,
+      currentPhase: "break",
+      timeRemaining: breakSecs,
+      duration: breakSecs,
+    });
+
+    if (state.settings.autoStartFlowBreaks) {
+      this.start();
+    } else {
+      soundService.pause();
+    }
   }
 }
 

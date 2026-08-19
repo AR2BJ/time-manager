@@ -278,6 +278,12 @@ export const SettingsController = {
     const autoStartBreaks = this.getToggleState("sett-auto-start-break");
     const disableBreaks = this.getToggleState("sett-disable-breaks");
 
+    const flowBreakTime =
+      Number(document.getElementById("sett-flow-break-len")?.value) || 10;
+    const autoStartFlowBreaks = this.getToggleState(
+      "sett-auto-start-flow-break",
+    );
+
     const volume = Number(document.getElementById("sett-volume")?.value) ?? 80;
     const pomodoroEndSound = this.pomoSoundAutocomplete?.getValue() || "bell";
     const breakEndSound = this.breakSoundAutocomplete?.getValue() || "chime";
@@ -290,6 +296,8 @@ export const SettingsController = {
       autoStartPomodoros,
       autoStartBreaks,
       disableBreaks,
+      flowBreakTime,
+      autoStartFlowBreaks,
       volume,
       pomodoroEndSound,
       breakEndSound,
@@ -304,6 +312,7 @@ export const SettingsController = {
       "sett-auto-start-pomo",
       "sett-auto-start-break",
       "sett-disable-breaks",
+      "sett-auto-start-flow-break",
     ];
 
     genericElements.forEach((id) => {

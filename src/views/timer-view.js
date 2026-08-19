@@ -125,7 +125,8 @@ export class TimerView {
     const { activeMode, timer } = state;
 
     const isPomodoro = activeMode === "pomodoro";
-    const displayTime = isPomodoro
+    const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
+    const displayTime = isFlowBreak
       ? formatTime(timer.timeRemaining)
       : formatTime(timer.flowTime);
 
@@ -134,21 +135,22 @@ export class TimerView {
       timerDisplayEl.textContent = displayTime;
     }
 
-    const progressRing = this.container.querySelector("#timer-progress-ring");
-    if (progressRing && isPomodoro) {
-      const circumference = 879.64;
-      const progress = timer.timeRemaining / (timer.duration || 1500);
-      const offset = circumference - progress * circumference;
-      progressRing.style.strokeDashoffset = `${offset}`;
-    }
-
-    const phaseBadge = this.container.querySelector("#timer-phase-badge");
-    if (phaseBadge) {
-      phaseBadge.textContent = isPomodoro
-        ? timer.currentPhase === "work"
-          ? "Focus Phase"
-          : "Break Phase"
-        : "Flow Mode";
+    const toggleBtn = this.container.querySelector("#timer-start-toggle-btn");
+    if (toggleBtn) {
+      if (timer.isRunning) {
+        toggleBtn.textContent = "Pause";
+        toggleBtn.classList.remove("bg-brand", "hover:bg-brand/90");
+        toggleBtn.classList.add("bg-amber-500", "hover:bg-amber-600");
+      } else {
+        const btnText = isFlowBreak
+          ? "Start Break"
+          : isPomodoro
+            ? "Start Focus"
+            : "Start Flow";
+        toggleBtn.textContent = btnText;
+        toggleBtn.classList.remove("bg-amber-500", "hover:bg-amber-600");
+        toggleBtn.classList.add("bg-brand", "hover:bg-brand/90");
+      }
     }
   }
 

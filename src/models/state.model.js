@@ -12,6 +12,8 @@ export const DEFAULT_SETTINGS = {
   autoStartBreaks: false,
   autoStartPomodoros: false,
   disableBreaks: false,
+  flowBreakTime: 30,
+  autoStartFlowBreaks: false,
   volume: 50,
   pomodoroEndSound: "none",
   breakEndSound: "none",
@@ -113,6 +115,11 @@ export const StateManager = {
   setMode(mode) {
     if (state.activeMode === mode) return;
     state.activeMode = mode;
+    if (mode === "flow") {
+      const defaultFlowTime = 0;
+      state.timer.flowTime = defaultFlowTime;
+      state.timer.currentPhase = "work";
+    }
     this.save();
     this.notify();
   },
@@ -176,8 +183,9 @@ export const StateManager = {
       state.timer.timeRemaining = defaultSecs;
       state.timer.duration = defaultSecs;
       state.timer.currentPhase = "work";
-    } else {
+    } else if (state.activeMode === "flow") {
       state.timer.flowTime = 0;
+      state.timer.currentPhase = "work";
     }
 
     this.save();

@@ -258,7 +258,6 @@ export function renderAnalyticsCharts(
   dashboard.innerHTML = DashboardComponent.render(sessions);
 
   const hasData = Array.isArray(sessions) && sessions.length > 0;
-  console.log(sessions);
 
   if (hasData) {
     const chartBox = document.querySelectorAll('[id^="apex"]');
