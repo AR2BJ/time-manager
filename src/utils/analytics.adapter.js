@@ -1,5 +1,4 @@
 import { formatDate } from "./helpers.js";
-import { state } from "@/models/state.model.js";
 
 const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const monthNames = [
@@ -21,34 +20,13 @@ function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-/**
- * Extracts daily activity counters mapped by ISO date strings (YYYY-MM-DD)
- * using time creation dates and completed subtasks/statuses.
- */
-function getActivityMap(times) {
+function getSessionActivityMap(sessions) {
   const map = {};
 
-  times.forEach((time) => {
-    // Increment activity for creation date
-    if (time.createdAt) {
-      const createdIso = time.createdAt.split("T")[0];
-      map[createdIso] = (map[createdIso] || 0) + 1;
-    }
-
-    // Increment activity for completed subtasks if timestamp exists or default to createdAt
-    if (Array.isArray(time.subtasks)) {
-      time.subtasks.forEach((st) => {
-        if (st.completed) {
-          const dateKey = st.completedAt
-            ? st.completedAt.split("T")[0]
-            : time.createdAt
-              ? time.createdAt.split("T")[0]
-              : null;
-          if (dateKey) {
-            map[dateKey] = (map[dateKey] || 0) + 1;
-          }
-        }
-      });
+  sessions.forEach((session) => {
+    if (session.completedAt) {
+      const dateIso = session.completedAt;
+      map[dateIso] = (map[dateIso] || 0) + 1;
     }
   });
 
@@ -56,13 +34,11 @@ function getActivityMap(times) {
 }
 
 export const AnalyticsAdapter = {
-  generateHeatmapSeries(times = [], view = "weekly") {
-    const activeTimes = times.filter((t) => !t.archived);
-
+  generateHeatmapSeries(sessions = [], view = "weekly") {
     let startDate = new Date();
-    if (activeTimes.length > 0) {
-      const validDates = activeTimes
-        .map((t) => (t.createdAt ? new Date(t.createdAt).getTime() : null))
+    if (sessions.length > 0) {
+      const validDates = sessions
+        .map((s) => (s.completedAt ? new Date(s.completedAt).getTime() : null))
         .filter((time) => time && !isNaN(time));
 
       if (validDates.length > 0) {
@@ -78,7 +54,7 @@ export const AnalyticsAdapter = {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
 
-    const globalActivityMap = getActivityMap(times);
+    const globalActivityMap = getSessionActivityMap(sessions);
 
     // WEEKLY VIEW
     if (view === "weekly") {
@@ -210,12 +186,12 @@ export const AnalyticsAdapter = {
     return [];
   },
 
-  generateWeekdayCounts(times = []) {
+  generateWeekdayCounts(sessions = []) {
     const weekdayCounts = [0, 0, 0, 0, 0, 0, 0];
 
-    times.forEach((time) => {
-      if (time.createdAt) {
-        const dayIndex = new Date(time.createdAt).getDay();
+    sessions.forEach((session) => {
+      if (session.completedAt) {
+        const dayIndex = new Date(session.completedAt).getDay();
         if (dayIndex >= 0 && dayIndex <= 6) {
           weekdayCounts[dayIndex]++;
         }
@@ -223,90 +199,6 @@ export const AnalyticsAdapter = {
     });
 
     return weekdayCounts;
-  },
-
-  generatePriorityCounts(times = []) {
-    const counts = {
-      low: 0,
-      medium: 0,
-      high: 0,
-    };
-
-    const activeTimes = times.filter((t) => !t.archived);
-
-    activeTimes.forEach((time) => {
-      const priority = (time.priority || "low").toLowerCase();
-      if (priority === "high") {
-        counts.high++;
-      } else if (priority === "medium") {
-        counts.medium++;
-      } else {
-        counts.low++;
-      }
-    });
-
-    return [counts.low, counts.medium, counts.high];
-  },
-
-  generateStatusCounts(times = []) {
-    const counts = {
-      todo: 0,
-      in_progress: 0,
-      done: 0,
-      blocked: 0,
-    };
-
-    const activeTimes = times.filter((t) => !t.archived);
-
-    activeTimes.forEach((time) => {
-      const status = time.status || "todo";
-      if (counts.hasOwnProperty(status)) {
-        counts[status]++;
-      } else {
-        counts.todo++;
-      }
-    });
-
-    return [counts.todo, counts.in_progress, counts.done, counts.blocked];
-  },
-
-  generateTagAnalytics(times = []) {
-    const activeTimes = times.filter((t) => !t.archived);
-    const tagStats = {};
-
-    activeTimes.forEach((time) => {
-      const tags = state.tags.filter((t) => time.tags.includes(t.id)) || [];
-      const isDone = time.status === "done";
-
-      tags.forEach((tag) => {
-        if (!tagStats[tag.name]) {
-          tagStats[tag.name] = { total: 0, completed: 0 };
-        }
-        tagStats[tag.name].total += 1;
-        if (isDone) {
-          tagStats[tag.name].completed += 1;
-        }
-      });
-    });
-
-    const sorted = Object.entries(tagStats)
-      .sort((a, b) => b[1].total - a[1].total)
-      .slice(0, 6);
-
-    const categories = sorted.map(([tag]) => tag);
-    const totalSeries = sorted.map(([, stats]) => stats.total);
-    const completedSeries = sorted.map(([, stats]) => stats.completed);
-    const progressRates = sorted.map(([, stats]) =>
-      stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
-    );
-
-    return {
-      categories,
-      totalSeries,
-      completedSeries,
-      progressRates,
-      hasTags: categories.length > 0,
-    };
   },
 
   getColorRanges(view, maxVal = 10, isDark = false) {

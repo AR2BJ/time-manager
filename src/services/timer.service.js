@@ -203,6 +203,8 @@ class TimerService {
         soundService.pause();
       }
     }
+
+    window.dispatchEvent(new CustomEvent("pomodoroCompleted"));
   }
 
   /**

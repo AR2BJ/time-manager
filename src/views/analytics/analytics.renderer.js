@@ -1,23 +1,20 @@
 import { AnalyticsAdapter } from "@/utils/analytics.adapter.js";
-import { AnalyticsController } from "@/controllers/analytics.controller.js";
+import { AnalyticsController } from "@/controllers/analytics.controller";
 import ApexCharts from "apexcharts";
-import { DashboardComponent } from "@/components/features/analytics/dashboard.component.js";
+import { DashboardComponent } from "@/components/features/analytics/dashboard.component";
 
 let heatmapChartInstance = null;
 let barChartInstance = null;
-let priorityChartInstance = null;
-let statusChartInstance = null;
-let tagChartInstance = null;
-let resizeListenerAttached = false;
 let activeHeatmapTab = "weekly";
+let resizeListenerAttached = false;
 
 const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /**
  * Calculates and returns ApexCharts configuration options for Heatmap
  */
-function getHeatmapOptions(times, view) {
-  const heatmapSeries = AnalyticsAdapter.generateHeatmapSeries(times, view);
+function getHeatmapOptions(sessions, view) {
+  const heatmapSeries = AnalyticsAdapter.generateHeatmapSeries(sessions, view);
   const isDark =
     document.documentElement.classList.contains("dark") ||
     localStorage.getItem("theme") === "dark";
@@ -25,9 +22,7 @@ function getHeatmapOptions(times, view) {
 
   const currentTabCounts = heatmapSeries.flatMap((s) => s.data.map((d) => d.y));
   let maxCommit = Math.max(1, ...currentTabCounts);
-  if (view === "weekly") {
-    maxCommit = Math.max(maxCommit, 4);
-  }
+  if (view === "weekly") maxCommit = Math.max(maxCommit, 4);
 
   const ranges = AnalyticsAdapter.getColorRanges(view, maxCommit, isDark);
 
@@ -39,10 +34,7 @@ function getHeatmapOptions(times, view) {
       height: 400,
       toolbar: { show: false },
       fontFamily: "inherit",
-      animations: {
-        enabled: true,
-        speed: 250,
-      },
+      animations: { enabled: true, speed: 250 },
     },
     dataLabels: { enabled: false },
     plotOptions: {
@@ -82,9 +74,7 @@ function getHeatmapOptions(times, view) {
     },
     tooltip: {
       theme: isDark ? "dark" : "light",
-      y: {
-        formatter: (val) => `${val} activity ticks`,
-      },
+      y: { formatter: (val) => `${val} sessions` },
     },
   };
 }
@@ -92,10 +82,10 @@ function getHeatmapOptions(times, view) {
 /**
  * Updates heatmap chart instance safely with new view settings
  */
-export function updateHeatmapChart(times, view) {
+export function updateHeatmapChart(sessions, view) {
   if (!heatmapChartInstance) return;
 
-  const newOptions = getHeatmapOptions(times, view);
+  const newOptions = getHeatmapOptions(sessions, view);
   heatmapChartInstance.updateOptions(newOptions, true, true);
 }
 
@@ -153,7 +143,7 @@ function syncMobileMenuSelection(view) {
 /**
  * Binds desktop and mobile view tab click handlers
  */
-function bindAnalyticsControls(times) {
+function bindAnalyticsControls(sessions) {
   const switcher = document.getElementById("chart-view-switcher");
   if (switcher) {
     switcher.querySelectorAll("[data-view]").forEach((btn) => {
@@ -162,7 +152,7 @@ function bindAnalyticsControls(times) {
         const view = e.currentTarget.dataset.view;
         if (view && view !== activeHeatmapTab) {
           updateTabStyles(view);
-          updateHeatmapChart(times, view);
+          updateHeatmapChart(sessions, view);
         }
       });
     });
@@ -191,7 +181,7 @@ function bindAnalyticsControls(times) {
         const view = event.currentTarget.dataset.view;
         if (view && view !== activeHeatmapTab) {
           updateTabStyles(view);
-          updateHeatmapChart(times, view);
+          updateHeatmapChart(sessions, view);
         }
         mobileMenu.classList.add("hidden");
       });
@@ -232,38 +222,14 @@ function renderNoDataState() {
       title: "Activity Heatmap",
       icon: "fa-table-cells",
       subtitle:
-        "Add times to see your weekly, monthly, and yearly activity trend.",
+        "Complete a Pomodoro or Flow session to see your weekly, monthly, and yearly activity trend.",
     },
     {
       id: "apex-weekday-chart",
       title: "Weekly Activity",
       icon: "fa-calendar-days",
       subtitle:
-        "Your time activity by weekday will appear here once data exists.",
-    },
-    {
-      id: "apex-priority-chart",
-      title: "Priority Breakdown",
-      icon: "fa-chart-pie-simple",
-      subtitle: "Add times with priorities to view the distribution.",
-    },
-    {
-      id: "apex-status-chart",
-      title: "Status Overview",
-      icon: "fa-chart-pie",
-      subtitle: "Time status analytics will appear here after you add times.",
-    },
-    {
-      id: "apex-tag-chart",
-      title: "Tag Performance",
-      icon: "fa-chart-column",
-      subtitle: "Tag-based analytics will be shown once you have tagged times.",
-    },
-    {
-      id: "apex-tag-chart-desktop",
-      title: "Tag Performance",
-      icon: "fa-chart-column",
-      subtitle: "Tag-based analytics will be shown once you have tagged times.",
+        "Your session activity by weekday will appear here once data exists.",
     },
   ];
 
@@ -273,17 +239,13 @@ function renderNoDataState() {
   });
 }
 
-/**
- * Main entry point to render all analytics components and charts
- */
 export function renderAnalyticsCharts(
-  times = [],
+  sessions = [],
   currentHeatmapView = "weekly",
 ) {
   const dashboard = document.getElementById("dashboard");
   if (!dashboard) return;
 
-  // Cleanup existing chart instances before re-rendering DOM
   if (heatmapChartInstance) {
     heatmapChartInstance.destroy();
     heatmapChartInstance = null;
@@ -292,25 +254,13 @@ export function renderAnalyticsCharts(
     barChartInstance.destroy();
     barChartInstance = null;
   }
-  if (priorityChartInstance) {
-    priorityChartInstance.destroy();
-    priorityChartInstance = null;
-  }
-  if (statusChartInstance) {
-    statusChartInstance.destroy();
-    statusChartInstance = null;
-  }
-  if (tagChartInstance) {
-    tagChartInstance.destroy();
-    tagChartInstance = null;
-  }
 
-  // Inject HTML Dashboard template
-  dashboard.innerHTML = DashboardComponent.render(times);
+  dashboard.innerHTML = DashboardComponent.render(sessions);
 
-  const hasTimes = Array.isArray(times) && times.length > 0;
+  const hasData = Array.isArray(sessions) && sessions.length > 0;
+  console.log(sessions);
 
-  if (hasTimes) {
+  if (hasData) {
     const chartBox = document.querySelectorAll('[id^="apex"]');
     const HeatmapSwitcher = document.getElementById("chart-view-switcher");
     const mobileHeatmapSwitcher = document.getElementById(
@@ -328,9 +278,9 @@ export function renderAnalyticsCharts(
   }
 
   AnalyticsController.init();
-  bindAnalyticsControls(times);
+  bindAnalyticsControls(sessions);
 
-  if (!hasTimes) {
+  if (!hasData) {
     const HeatmapSwitcher = document.getElementById("chart-view-switcher");
     const mobileHeatmapSwitcher = document.getElementById(
       "heatmap-mobile-menu-toggle",
@@ -357,12 +307,12 @@ export function renderAnalyticsCharts(
   const axisTextColor = isDark ? "#e2e8f0" : "#222f47";
 
   // Build Heatmap Options
-  const heatmapOptions = getHeatmapOptions(times, currentHeatmapView);
+  const heatmapOptions = getHeatmapOptions(sessions, currentHeatmapView);
 
-  // Build Bar Chart Options
-  const weekdayCounts = AnalyticsAdapter.generateWeekdayCounts(times);
+  const weekdayCounts = AnalyticsAdapter.generateWeekdayCounts(sessions);
+
   const barChartOptions = {
-    series: [{ name: "Times Activity", data: weekdayCounts }],
+    series: [{ name: "Sessions", data: weekdayCounts }],
     chart: {
       id: "weekday-bar",
       type: "bar",
@@ -388,7 +338,7 @@ export function renderAnalyticsCharts(
         fontWeight: "bold",
         colors: [axisTextColor],
       },
-      formatter: (val) => val + " checked",
+      formatter: (val) => val + " sessions",
     },
     xaxis: {
       categories: weekdayNames,
@@ -409,197 +359,8 @@ export function renderAnalyticsCharts(
     tooltip: { theme: isDark ? "dark" : "light" },
   };
 
-  const priorityCounts = AnalyticsAdapter.generatePriorityCounts(times);
-  const priorityChartOptions = {
-    series: priorityCounts,
-    labels: ["Low", "Medium", "High"],
-    chart: {
-      id: "priority-donut",
-      type: "donut",
-      height: 400,
-      fontFamily: "inherit",
-    },
-    colors: ["#9ae600da", "#ffb900da", "#ff6467da"],
-    stroke: {
-      colors: [isDark ? "#1e293b" : "#ffffff"],
-      width: 2,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "0%",
-          labels: {
-            show: false,
-            value: {
-              show: false,
-            },
-          },
-        },
-      },
-    },
-    legend: {
-      position: "bottom",
-      horizontalAlign: "center",
-      labels: {
-        colors: axisTextColor,
-      },
-      itemMargin: {
-        horizontal: 10,
-        vertical: 5,
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val) {
-        return Math.round(val) + "%";
-      },
-    },
-    tooltip: {
-      theme: isDark ? "dark" : "light",
-      y: {
-        formatter: (val) => `${val} times`,
-      },
-    },
-  };
-
-  const statusCounts = AnalyticsAdapter.generateStatusCounts(times);
-  const statusChartOptions = {
-    series: statusCounts,
-    labels: ["To Do", "In Progress", "Done", "Blocked"],
-    chart: {
-      id: "status-donut",
-      type: "donut",
-      height: 400,
-      fontFamily: "inherit",
-    },
-    colors: ["#00bcffda", "#ff8904da", "#00d492da", "#fb64b6da"],
-    stroke: {
-      colors: [isDark ? "#1e293b" : "#ffffff"],
-      width: 2,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "0%",
-          labels: {
-            show: false,
-            value: {
-              show: false,
-            },
-          },
-        },
-      },
-    },
-    legend: {
-      position: "bottom",
-      horizontalAlign: "center",
-      labels: {
-        colors: axisTextColor,
-      },
-      itemMargin: {
-        horizontal: 10,
-        vertical: 5,
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val) {
-        return Math.round(val) + "%";
-      },
-    },
-    tooltip: {
-      theme: isDark ? "dark" : "light",
-      y: {
-        formatter: (val) => `${val} times`,
-      },
-    },
-  };
-
-  const tagData = AnalyticsAdapter.generateTagAnalytics(times);
-
-  const tagChartOptions = {
-    series: [
-      {
-        name: "Total Times",
-        data: tagData.totalSeries,
-      },
-      {
-        name: "Completed Times",
-        data: tagData.completedSeries,
-      },
-    ],
-    chart: {
-      id: "tag-performance-bar",
-      type: "bar",
-      height: 400,
-      fontFamily: "inherit",
-      toolbar: { show: false },
-    },
-    colors: ["#00bcff", "#10b981"],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "60%",
-        borderRadius: 4,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 2,
-      colors: ["transparent"],
-    },
-    xaxis: {
-      categories:
-        tagData.categories.length > 0 ? tagData.categories : ["No Tags"],
-      labels: {
-        style: {
-          colors: axisTextColor,
-          fontSize: "12px",
-          fontWeight: 600,
-        },
-        rotateAlways: true,
-      },
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-    },
-    yaxis: {
-      labels: {
-        style: { colors: axisTextColor, fontSize: "11px" },
-      },
-    },
-    legend: {
-      position: "top",
-      horizontalAlign: "center",
-      labels: { colors: axisTextColor },
-    },
-    grid: {
-      borderColor: isDark ? "#334155" : "#e2e8f0",
-      strokeDashArray: 4,
-    },
-    tooltip: {
-      theme: isDark ? "dark" : "light",
-      y: {
-        formatter: (val, { seriesIndex, dataPointIndex }) => {
-          if (seriesIndex === 1) {
-            const rate = tagData.progressRates[dataPointIndex] || 0;
-            return `${val} completed (${rate}% rate)`;
-          }
-          return `${val} times`;
-        },
-      },
-    },
-  };
-
-  // Mount ApexCharts
   const heatmapEl = document.getElementById("apex-heatmap-chart");
   const barEl = document.getElementById("apex-weekday-chart");
-  const priorityEl = document.getElementById("apex-priority-chart");
-  const statusEl = document.getElementById("apex-status-chart");
-  const tagEl = document.getElementById("apex-tag-chart");
-  const tagDeskEl = document.getElementById("apex-tag-chart-desktop");
 
   if (heatmapEl) {
     heatmapChartInstance = new ApexCharts(heatmapEl, heatmapOptions);
@@ -611,28 +372,5 @@ export function renderAnalyticsCharts(
     barChartInstance.render();
   }
 
-  if (priorityEl) {
-    priorityChartInstance = new ApexCharts(priorityEl, priorityChartOptions);
-    priorityChartInstance.render();
-  }
-
-  if (statusEl) {
-    statusChartInstance = new ApexCharts(statusEl, statusChartOptions);
-    statusChartInstance.render();
-  }
-
-  if (tagEl) {
-    tagChartInstance = new ApexCharts(tagEl, tagChartOptions);
-    tagChartInstance.render();
-  }
-
-  if (tagDeskEl) {
-    tagChartInstance = new ApexCharts(tagDeskEl, tagChartOptions);
-    tagChartInstance.render();
-  }
-
-  // Sync tab slider position in next frame after DOM calculation
-  requestAnimationFrame(() => {
-    updateTabStyles(currentHeatmapView);
-  });
+  requestAnimationFrame(() => updateTabStyles(currentHeatmapView));
 }

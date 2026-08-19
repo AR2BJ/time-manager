@@ -4,7 +4,7 @@ import {
   updateTabStyles,
 } from "@/views/analytics/analytics.renderer.js";
 
-import { StateManager } from "@/models/state.model.js";
+import { StateManager } from "@/models/state.model";
 
 let currentHeatmapView = "weekly";
 
@@ -27,6 +27,13 @@ export const AnalyticsController = {
       const viewType = id.replace("view-btn-", "");
       newBtn.addEventListener("click", () => this.handleTabSwitch(viewType));
     });
+
+    window.addEventListener("pomodoroCompleted", () => {
+      const state = StateManager.getState();
+      if (state.currentView === "analytics") {
+        renderAnalyticsCharts(state.sessions, currentHeatmapView);
+      }
+    });
   },
 
   handleTabSwitch(tab) {
@@ -35,11 +42,11 @@ export const AnalyticsController = {
 
     updateTabStyles(tab);
 
-    const times = StateManager.getTimes();
-    updateHeatmapChart(times, tab);
+    const { sessions } = StateManager.getState();
+    updateHeatmapChart(sessions, tab);
   },
 
-  dispatchRender(times) {
-    renderAnalyticsCharts(times, currentHeatmapView);
+  dispatchRender(sessions) {
+    renderAnalyticsCharts(sessions, currentHeatmapView);
   },
 };

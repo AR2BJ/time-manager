@@ -208,6 +208,8 @@ export const StateManager = {
 
     this.save();
     this.notify();
+
+    window.dispatchEvent(new CustomEvent("notesChanged"));
   },
 
   addSession(sessionData = {}) {

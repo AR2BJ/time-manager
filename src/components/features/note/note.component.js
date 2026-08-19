@@ -14,11 +14,9 @@ export class NoteComponent {
 
     this.updateUI();
 
-    if (!this.unsubscribe) {
-      this.unsubscribe = NoteModel.subscribe(() => this.updateUI());
-    }
-
     this.bindEvents();
+    this.bindExternalUpdates();
+
     return this.container;
   }
 
@@ -26,6 +24,10 @@ export class NoteComponent {
     if (!this.container) return;
 
     const items = NoteModel.getItems();
+
+    const inputEl = this.container?.querySelector("#note-input");
+    const currentFocus = document.activeElement === inputEl;
+    const currentValue = inputEl ? inputEl.value : "";
 
     this.container.innerHTML = `
       <div
@@ -113,6 +115,12 @@ export class NoteComponent {
         }
       </div>
     `;
+
+    const newInput = this.container?.querySelector("#note-input");
+    if (newInput && currentFocus) {
+      newInput.value = currentValue;
+      newInput.focus();
+    }
   }
 
   bindEvents() {
@@ -123,7 +131,7 @@ export class NoteComponent {
         if (input && input.value.trim()) {
           NoteService.addNote(input.value);
           input.value = "";
-          input.focus();
+          this.updateUI();
         }
       }
     });
@@ -134,7 +142,14 @@ export class NoteComponent {
 
       if (deleteBtn && itemEl) {
         NoteService.deleteNote(itemEl.dataset.id);
+        this.updateUI();
       }
+    });
+  }
+
+  bindExternalUpdates() {
+    window.addEventListener("notesChanged", () => {
+      this.updateUI();
     });
   }
 

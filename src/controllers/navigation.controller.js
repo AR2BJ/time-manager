@@ -1,5 +1,6 @@
 import { StateManager, state } from "@/models/state.model.js";
 
+import { AnalyticsController } from "./analytics.controller";
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { TimerController } from "./timer.controller";
 
@@ -41,6 +42,12 @@ export class NavigationController {
 
             desktopBtn?.classList.replace("text-secondary", "text-brand/80");
             mobileBtn?.classList.replace("text-secondary", "text-brand/80");
+
+            if (v === "analytics") {
+              AnalyticsController.dispatchRender(
+                StateManager.getState().sessions,
+              );
+            }
 
             if (v === "timer") {
               TimerController.refreshUI();
@@ -122,6 +129,28 @@ export class NavigationController {
         if (key === "f") {
           dispatchAsyncClick("mode-flow");
           return;
+        }
+        if (["1", "2", "3"].includes(event.key)) {
+          const currentSection = document.querySelector("section:not(.hidden)");
+          if (!currentSection) return;
+
+          if (currentSection.id === "analytics-view") {
+            const chartViewButtons = Array.from(
+              document.querySelectorAll(
+                "#heatmap-mobile-menu button, #chart-view-switcher button, button[data-view]",
+              ),
+            ).filter(
+              (btn) =>
+                !btn.disabled &&
+                window.getComputedStyle(btn).display !== "none",
+            );
+
+            const targetButton = chartViewButtons[parseInt(event.key, 10) - 1];
+            if (targetButton) {
+              event.preventDefault();
+              setTimeout(() => targetButton.click(), 10);
+            }
+          }
         }
       }
 

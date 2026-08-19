@@ -1,6 +1,7 @@
 import { StateManager, state } from "@/models/state.model.js";
 
 import { ActiveTaskCardComponent } from "@/components/features/tasks/active-task-card.component";
+import { AnalyticsController } from "./analytics.controller";
 import { AnalyticsView } from "@/views/analytics-view.js";
 import { DesktopNavComponent } from "@/components/layout/desktop-nav.component.js";
 import { FlipClockController } from "./flip-clock.controller";
@@ -15,7 +16,6 @@ import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
 import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
-import { todayISO } from "@/utils/helpers";
 
 export const TimerController = {
   animationFrameId: null,
@@ -590,6 +590,12 @@ export const TimerController = {
     window.addEventListener("resize", () => {
       this.updateModeStyles(state.activeMode);
     });
+
+    window.currentThemeListener = () => {
+      const allSessions = StateManager.getState().sessions;
+      AnalyticsController.dispatchRender(allSessions);
+    };
+    document.addEventListener("themeChanged", window.currentThemeListener);
   },
 
   renderTaskWidgets() {
