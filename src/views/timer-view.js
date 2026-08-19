@@ -4,7 +4,6 @@ import { SoundPlayerComponent } from "@/components/features/sound/sound-player.c
 import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
 import { StateManager } from "@/models/state.model.js";
 import { TimerDisplayComponent } from "@/components/features/timer/timer-display.component";
-import { formatTime } from "@/utils/helpers.js";
 
 export class TimerView {
   constructor() {
@@ -13,7 +12,6 @@ export class TimerView {
     this.soundPlayer = new SoundPlayerComponent();
     this.soundSelector = new SoundSelectorComponent();
     this.note = new NoteComponent();
-    this.unsubscribeState = null;
     this.unsubscribeSound = null;
   }
 
@@ -22,12 +20,6 @@ export class TimerView {
     if (!this.container) return;
 
     this.mountLayout();
-
-    this.update();
-
-    if (!this.unsubscribeState) {
-      this.unsubscribeState = StateManager.subscribe(() => this.update());
-    }
 
     if (!this.unsubscribeSound) {
       this.unsubscribeSound = SoundModel.subscribe(() => {
@@ -116,44 +108,6 @@ export class TimerView {
     }
   }
 
-  update() {
-    if (!this.container) return;
-
-    this.updateSoundPlayerVisibility();
-
-    const state = StateManager.getState();
-    const { activeMode, timer } = state;
-
-    const isPomodoro = activeMode === "pomodoro";
-    const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
-    const displayTime = isFlowBreak
-      ? formatTime(timer.timeRemaining)
-      : formatTime(timer.flowTime);
-
-    const timerDisplayEl = this.container.querySelector("#timer-display");
-    if (timerDisplayEl) {
-      timerDisplayEl.textContent = displayTime;
-    }
-
-    const toggleBtn = this.container.querySelector("#timer-start-toggle-btn");
-    if (toggleBtn) {
-      if (timer.isRunning) {
-        toggleBtn.textContent = "Pause";
-        toggleBtn.classList.remove("bg-brand", "hover:bg-brand/90");
-        toggleBtn.classList.add("bg-amber-500", "hover:bg-amber-600");
-      } else {
-        const btnText = isFlowBreak
-          ? "Start Break"
-          : isPomodoro
-            ? "Start Focus"
-            : "Start Flow";
-        toggleBtn.textContent = btnText;
-        toggleBtn.classList.remove("bg-amber-500", "hover:bg-amber-600");
-        toggleBtn.classList.add("bg-brand", "hover:bg-brand/90");
-      }
-    }
-  }
-
   bindEvents() {
     this.container.addEventListener("click", (e) => {
       const modeBtn = e.target.closest("[data-mode]");
@@ -166,7 +120,6 @@ export class TimerView {
   }
 
   destroy() {
-    if (this.unsubscribeState) this.unsubscribeState();
     if (this.unsubscribeSound) this.unsubscribeSound();
     if (this.soundPlayer) this.soundPlayer.destroy();
     if (this.soundSelector) this.soundSelector.destroy();

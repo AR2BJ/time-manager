@@ -362,8 +362,12 @@ export const TimerController = {
     const CIRCUMFERENCE = 879.64;
 
     const isPomodoro = state.activeMode === "pomodoro";
-    const isFlowBreak =
-      state.activeMode === "flow" && state.timer.currentPhase === "break";
+    const isFlow = state.activeMode === "flow";
+    const isFlowBreak = isFlow && state.timer.currentPhase === "break";
+    const isPomodoroBreak =
+      isPomodoro &&
+      (state.timer.currentPhase === "shortBreak" ||
+        state.timer.currentPhase === "longBreak");
 
     if (isFlowBreak) {
       this.stopFlowAnimation();
@@ -397,8 +401,6 @@ export const TimerController = {
 
       if (phaseBadge) {
         phaseBadge.textContent = "Flow Break";
-        phaseBadge.className =
-          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
       }
 
       if (subInfo) {
@@ -431,10 +433,7 @@ export const TimerController = {
         const offset = CIRCUMFERENCE - progressFraction * CIRCUMFERENCE;
         progressRing.style.strokeDashoffset = `${offset}`;
 
-        const isBreak =
-          state.timer.currentPhase === "shortBreak" ||
-          state.timer.currentPhase === "longBreak";
-        if (isBreak) {
+        if (isPomodoroBreak) {
           progressRing.classList.remove("stroke-brand");
           progressRing.classList.add("stroke-emerald-500");
         } else {
@@ -459,7 +458,7 @@ export const TimerController = {
       if (subInfo) {
         subInfo.textContent = `Completed Sessions: ${state.timer.pomodoroSessionCount || 0}`;
       }
-    } else if (state.activeMode === "flow") {
+    } else if (isFlow) {
       progressRing?.classList.add("opacity-0");
 
       const totalSeconds = Number.isFinite(state.timer.flowTime)
@@ -484,8 +483,6 @@ export const TimerController = {
 
       if (phaseBadge) {
         phaseBadge.textContent = "Flow Mode";
-        phaseBadge.className =
-          "mb-3 rounded-lg bg-brand/10 px-2 py-0.5 sm:px-4 sm:py-1 text-[8px] xs:text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest border border-brand/20";
       }
 
       if (subInfo) {
@@ -498,52 +495,57 @@ export const TimerController = {
       const currentControlState =
         isRunning && !isPaused ? "running" : isPaused ? "paused" : "idle";
 
-      if (controlsContainer.dataset.state !== currentControlState) {
-        controlsContainer.dataset.state = currentControlState;
+      controlsContainer.dataset.state = currentControlState;
 
-        const isFlowBreak =
-          state.activeMode === "flow" && state.timer.currentPhase === "break";
+      if (currentControlState === "idle") {
+        let btnText = "Start Focus";
 
-        if (currentControlState === "idle") {
-          controlsContainer.innerHTML = `
-            <button
-              id="btn-timer-start"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
-            >
-              <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">${isFlowBreak ? "Start Break" : "Start Focus"}</span>
-            </button>
-          `;
-        } else if (currentControlState === "running") {
-          controlsContainer.innerHTML = `
-            <button
-              id="btn-timer-pause"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
-            >
-              <i class="fa-regular fa-pause pointer-events-none"></i>
-              <span class="pointer-events-none">${isFlowBreak ? "Pause Break" : "Pause"}</span>
-            </button>
-          `;
-        } else if (currentControlState === "paused") {
-          controlsContainer.innerHTML = `
-            <button
-              id="btn-timer-stop"
-              class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
-              title="Stop & Reset"
-            >
-              <i class="fa-regular fa-square pointer-events-none"></i>
-              <span class="pointer-events-none">Stop</span>
-            </button>
-
-            <button
-              id="btn-timer-continue"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
-            >
-              <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">${isFlowBreak ? "Continue Break" : "Continue"}</span>
-            </button>
-          `;
+        if (isPomodoroBreak) {
+          btnText = "Start Break";
+        } else if (isFlowBreak) {
+          btnText = "Start Break";
+        } else if (isFlow) {
+          btnText = "Start Flow";
         }
+
+        controlsContainer.innerHTML = `
+          <button
+            id="btn-timer-start"
+            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+          >
+            <i class="fa-regular fa-play pointer-events-none"></i>
+            <span class="pointer-events-none">${btnText}</span>
+          </button>
+        `;
+      } else if (currentControlState === "running") {
+        controlsContainer.innerHTML = `
+          <button
+            id="btn-timer-pause"
+            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
+          >
+            <i class="fa-regular fa-pause pointer-events-none"></i>
+            <span class="pointer-events-none">Pause</span>
+          </button>
+        `;
+      } else if (currentControlState === "paused") {
+        controlsContainer.innerHTML = `
+          <button
+            id="btn-timer-stop"
+            class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
+            title="Stop & Reset"
+          >
+            <i class="fa-regular fa-square pointer-events-none"></i>
+            <span class="pointer-events-none">Stop</span>
+          </button>
+
+          <button
+            id="btn-timer-continue"
+            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+          >
+            <i class="fa-regular fa-play pointer-events-none"></i>
+            <span class="pointer-events-none">Continue</span>
+          </button>
+        `;
       }
     }
   },
@@ -697,6 +699,7 @@ export const TimerController = {
 
           StateManager.setMode(targetMode);
           StateManager.resetTimer();
+
           this.refreshUI();
         },
       });
@@ -705,6 +708,7 @@ export const TimerController = {
 
     StateManager.setMode(targetMode);
     StateManager.resetTimer();
+
     this.refreshUI();
   },
 

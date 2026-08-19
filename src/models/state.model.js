@@ -115,6 +115,13 @@ export const StateManager = {
   setMode(mode) {
     if (state.activeMode === mode) return;
     state.activeMode = mode;
+
+    if (mode === "pomodoro") {
+      state.timer.currentPhase = "work";
+    } else if (mode === "flow") {
+      state.timer.currentPhase = "work";
+    }
+
     this.save();
     this.notify();
   },

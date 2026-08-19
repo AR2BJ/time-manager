@@ -162,9 +162,6 @@ export class FlipClockComponent {
       if (state === "idle" || state === "paused") {
         this.isRunning = false;
         this.showControls();
-        if (state === "idle") {
-          this.updateDisplay("00", "00", "00", "00", true);
-        }
       } else if (state === "running") {
         this.isRunning = true;
         this.showControls();
