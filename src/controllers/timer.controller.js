@@ -503,7 +503,6 @@ export const TimerController = {
 
         const isFlowBreak =
           state.activeMode === "flow" && state.timer.currentPhase === "break";
-        const btnText = isFlowBreak ? "Break" : "Focus";
 
         if (currentControlState === "idle") {
           controlsContainer.innerHTML = `
@@ -512,7 +511,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">Start ${btnText}</span>
+              <span class="pointer-events-none">${isFlowBreak ? "Start Break" : "Start Focus"}</span>
             </button>
           `;
         } else if (currentControlState === "running") {
@@ -522,7 +521,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-pause pointer-events-none"></i>
-              <span class="pointer-events-none">Pause ${btnText}</span>
+              <span class="pointer-events-none">${isFlowBreak ? "Pause Break" : "Pause"}</span>
             </button>
           `;
         } else if (currentControlState === "paused") {
@@ -541,7 +540,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
-              <span class="pointer-events-none">Continue ${btnText}</span>
+              <span class="pointer-events-none">${isFlowBreak ? "Continue Break" : "Continue"}</span>
             </button>
           `;
         }

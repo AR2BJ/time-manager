@@ -162,6 +162,9 @@ export class FlipClockComponent {
       if (state === "idle" || state === "paused") {
         this.isRunning = false;
         this.showControls();
+        if (state === "idle") {
+          this.updateDisplay("00", "00", "00", "00", true);
+        }
       } else if (state === "running") {
         this.isRunning = true;
         this.showControls();
@@ -169,17 +172,6 @@ export class FlipClockComponent {
 
       const btnClass =
         "w-12 h-12 sm:w-16 sm:h-16 max-lg:landscape:w-10 max-lg:landscape:h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-lg cursor-pointer backdrop-blur-sm touch-manipulation";
-
-      let startText = "Start";
-      let continueText = "Continue";
-
-      if (isFlowBreak) {
-        startText = "Start Break";
-        continueText = "Continue Break";
-      } else {
-        startText = "Start";
-        continueText = "Continue";
-      }
 
       if (state === "idle") {
         controlsContainer.innerHTML = `
@@ -201,6 +193,54 @@ export class FlipClockComponent {
           </button>`;
       }
     }
+  }
+
+  setCardValues(cardEl, topVal, botVal) {
+    if (!cardEl) return;
+    cardEl.innerHTML = `
+      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${topVal}</span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${botVal}</span>
+      </div>
+      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
+      <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
+      <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-l-full z-30 border-l border-y border-primary/10"></div>
+    `;
+  }
+
+  animateCardFlip(cardEl, oldValue, newValue) {
+    if (!cardEl) return;
+    if (cardEl.dataset.animating === "true") {
+      this.setCardValues(cardEl, newValue, newValue);
+      return;
+    }
+
+    cardEl.dataset.animating = "true";
+
+    cardEl.innerHTML = `
+      <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${newValue}</span>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${oldValue}</span>
+      </div>
+      <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden z-20">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${oldValue}</span>
+      </div>
+      <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
+        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${newValue}</span>
+      </div>
+      <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
+      <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
+      <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-l-full z-30 border-l border-y border-primary/10"></div>
+    `;
+
+    setTimeout(() => {
+      this.setCardValues(cardEl, newValue, newValue);
+      delete cardEl.dataset.animating;
+    }, 500);
   }
 }
 

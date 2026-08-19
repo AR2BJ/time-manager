@@ -223,7 +223,11 @@ export class TimerDisplayComponent {
         toggleBtn.classList.remove("bg-brand", "hover:bg-brand/90");
         toggleBtn.classList.add("bg-amber-500", "hover:bg-amber-600");
       } else {
-        const btnText = isPomodoro ? "Start Focus" : "Start Flow";
+        const btnText = isFlowBreak
+          ? "Start Break"
+          : isPomodoro
+            ? "Start Focus"
+            : "Start Flow";
         toggleBtn.textContent = btnText;
         toggleBtn.classList.remove("bg-amber-500", "hover:bg-amber-600");
         toggleBtn.classList.add("bg-brand", "hover:bg-brand/90");

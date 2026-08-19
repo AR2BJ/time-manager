@@ -115,11 +115,6 @@ export const StateManager = {
   setMode(mode) {
     if (state.activeMode === mode) return;
     state.activeMode = mode;
-    if (mode === "flow") {
-      const defaultFlowTime = 0;
-      state.timer.flowTime = defaultFlowTime;
-      state.timer.currentPhase = "work";
-    }
     this.save();
     this.notify();
   },

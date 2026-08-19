@@ -177,7 +177,7 @@ class TimerService {
   _tick() {
     if (state.activeMode === "pomodoro") {
       this._handlePomodoroTick();
-    } else if (state.activeMode === "flow") {
+    } else {
       this._handleFlowTick();
     }
   }
@@ -223,6 +223,21 @@ class TimerService {
 
   _handleFlowStop() {
     const flowTime = state.timer.flowTime || 0;
+    const isBreak = state.timer.currentPhase === "break";
+
+    if (isBreak) {
+      const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
+      StateManager.updateTimerState({
+        isRunning: false,
+        isPaused: false,
+        flowTime: 0,
+        currentPhase: "work",
+        timeRemaining: workSecs,
+        duration: workSecs,
+      });
+      soundService.pause();
+      return;
+    }
 
     if (flowTime >= 10) {
       StateManager.addSession({

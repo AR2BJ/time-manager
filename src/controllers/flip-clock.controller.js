@@ -105,7 +105,9 @@ export const FlipClockController = {
       isPomodoro &&
       (timer.currentPhase === "shortBreak" ||
         timer.currentPhase === "longBreak");
-    const totalSeconds = isPomodoro ? timer.timeRemaining : timer.flowTime;
+    const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
+    const totalSeconds =
+      isPomodoro || isFlowBreak ? timer.timeRemaining : timer.flowTime;
 
     const formatted = formatTime(totalSeconds);
     const [mins, secs] = formatted.split(":");
@@ -121,7 +123,9 @@ export const FlipClockController = {
     this.prevSeconds = secs;
 
     let phaseText = "Flow Mode";
-    if (isPomodoro) {
+    if (isFlowBreak) {
+      phaseText = "Flow Break";
+    } else if (isPomodoro) {
       const currentPhase = timer.currentPhase;
       const isSingleInterval = Number(settings?.longBreakInterval) === 1;
 
@@ -134,7 +138,8 @@ export const FlipClockController = {
       phaseText = phaseNames[currentPhase] || "Focus Phase";
     }
 
-    flipClockComponent.updateBadge(phaseText, isBreak);
+    const isBreakPhase = isFlowBreak || isBreak;
+    flipClockComponent.updateBadge(phaseText, isBreakPhase);
 
     const controlState =
       timer.isRunning && !timer.isPaused
@@ -142,7 +147,7 @@ export const FlipClockController = {
         : timer.isPaused
           ? "paused"
           : "idle";
-    flipClockComponent.updateControls(controlState);
+    flipClockComponent.updateControls(controlState, isFlowBreak);
   },
 
   bindEvents() {
