@@ -494,58 +494,68 @@ export const TimerController = {
       const { isRunning, isPaused } = state.timer;
       const currentControlState =
         isRunning && !isPaused ? "running" : isPaused ? "paused" : "idle";
+      const currentModeState = `${state.activeMode}-${state.timer.currentPhase}`;
 
-      controlsContainer.dataset.state = currentControlState;
+      const wasModeState = controlsContainer.dataset.modeState;
+      const wasControlState = controlsContainer.dataset.state;
 
-      if (currentControlState === "idle") {
-        let btnText = "Start Focus";
+      if (
+        wasModeState !== currentModeState ||
+        wasControlState !== currentControlState
+      ) {
+        controlsContainer.dataset.modeState = currentModeState;
+        controlsContainer.dataset.state = currentControlState;
 
-        if (isPomodoroBreak) {
-          btnText = "Start Break";
-        } else if (isFlowBreak) {
-          btnText = "Start Break";
-        } else if (isFlow) {
-          btnText = "Start Flow";
+        if (currentControlState === "idle") {
+          let btnText = "Start Focus";
+
+          if (isPomodoroBreak) {
+            btnText = "Start Break";
+          } else if (isFlowBreak) {
+            btnText = "Start Break";
+          } else if (isFlow) {
+            btnText = "Start Flow";
+          }
+
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-start"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-regular fa-play pointer-events-none"></i>
+              <span class="pointer-events-none">${btnText}</span>
+            </button>
+          `;
+        } else if (currentControlState === "running") {
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-pause"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-regular fa-pause pointer-events-none"></i>
+              <span class="pointer-events-none">Pause</span>
+            </button>
+          `;
+        } else if (currentControlState === "paused") {
+          controlsContainer.innerHTML = `
+            <button
+              id="btn-timer-stop"
+              class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
+              title="Stop & Reset"
+            >
+              <i class="fa-regular fa-square pointer-events-none"></i>
+              <span class="pointer-events-none">Stop</span>
+            </button>
+
+            <button
+              id="btn-timer-continue"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+            >
+              <i class="fa-regular fa-play pointer-events-none"></i>
+              <span class="pointer-events-none">Continue</span>
+            </button>
+          `;
         }
-
-        controlsContainer.innerHTML = `
-          <button
-            id="btn-timer-start"
-            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
-          >
-            <i class="fa-regular fa-play pointer-events-none"></i>
-            <span class="pointer-events-none">${btnText}</span>
-          </button>
-        `;
-      } else if (currentControlState === "running") {
-        controlsContainer.innerHTML = `
-          <button
-            id="btn-timer-pause"
-            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
-          >
-            <i class="fa-regular fa-pause pointer-events-none"></i>
-            <span class="pointer-events-none">Pause</span>
-          </button>
-        `;
-      } else if (currentControlState === "paused") {
-        controlsContainer.innerHTML = `
-          <button
-            id="btn-timer-stop"
-            class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
-            title="Stop & Reset"
-          >
-            <i class="fa-regular fa-square pointer-events-none"></i>
-            <span class="pointer-events-none">Stop</span>
-          </button>
-
-          <button
-            id="btn-timer-continue"
-            class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
-          >
-            <i class="fa-regular fa-play pointer-events-none"></i>
-            <span class="pointer-events-none">Continue</span>
-          </button>
-        `;
       }
     }
   },
