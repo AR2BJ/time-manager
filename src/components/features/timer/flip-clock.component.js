@@ -3,6 +3,7 @@ export class FlipClockComponent {
     this.overlay = null;
     this.hideTimeout = null;
     this.isRunning = false;
+    this._isThreeCards = false;
   }
 
   render() {
@@ -40,30 +41,17 @@ export class FlipClockComponent {
       </div>
 
       <div
-        class="flex-1 flex items-center justify-center gap-4 sm:gap-8 lg:gap-14 perspective-1000 w-full py-0 px-10"
+        id="flip-clock-digits-container"
+        class="flex-1 flex items-center justify-center gap-5 perspective-1000 w-full py-0 px-10"
       >
-        <div
-          id="flip-card-minutes"
-          class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"
-        ></div>
-
-        <div
-          class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6"
-        >
-          :
-        </div>
-
-        <div
-          id="flip-card-seconds"
-          class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"
-        ></div>
       </div>
 
       <div
         id="flip-controls-container"
         class="absolute bottom-8 sm:bottom-12 left-0 right-0 flex items-center justify-center gap-3 sm:gap-4 z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
         style="background: none;"
-      ></div>
+      >
+      </div>
     `;
 
     document.body.appendChild(this.overlay);
@@ -117,22 +105,69 @@ export class FlipClockComponent {
     }
   }
 
-  updateDisplay(mins, secs, prevMins, prevSecs, force = false) {
-    const minCard = this.overlay?.querySelector("#flip-card-minutes");
-    const secCard = this.overlay?.querySelector("#flip-card-seconds");
+  updateDisplay(hrs, mins, secs, prevHrs, prevMins, prevSecs, force = false) {
+    const container = this.overlay?.querySelector(
+      "#flip-clock-digits-container",
+    );
+    if (!container) return;
 
-    if (!minCard || !secCard) return;
+    const hasHours = parseInt(hrs, 10) > 0;
 
-    if (force || prevMins === null) {
-      this.setCardValues(minCard, mins, mins);
-    } else if (mins !== prevMins) {
-      this.animateCardFlip(minCard, prevMins, mins);
+    if (this._isThreeCards !== hasHours) {
+      this._isThreeCards = hasHours;
+      this._rebuildCardStructure(container, hasHours);
     }
 
-    if (force || prevSecs === null) {
-      this.setCardValues(secCard, secs, secs);
-    } else if (secs !== prevSecs) {
-      this.animateCardFlip(secCard, prevSecs, secs);
+    const hrsCard = container.querySelector("#flip-card-hours");
+    const minCard = container.querySelector("#flip-card-minutes");
+    const secCard = container.querySelector("#flip-card-seconds");
+
+    const fontSizeClass = hasHours
+      ? "text-[10dvw] md:text-[15dvw] lg:text-[20dvw]"
+      : "text-[25dvw] md:text-[30dvw] lg:text-[35dvw]";
+
+    if (hasHours && hrsCard) {
+      if (force || prevHrs === null) {
+        this.setCardValues(hrsCard, hrs, hrs, fontSizeClass);
+      } else if (hrs !== prevHrs) {
+        this.animateCardFlip(hrsCard, prevHrs, hrs, fontSizeClass);
+      }
+    }
+
+    if (minCard) {
+      if (force || prevMins === null) {
+        this.setCardValues(minCard, mins, mins, fontSizeClass);
+      } else if (mins !== prevMins) {
+        this.animateCardFlip(minCard, prevMins, mins, fontSizeClass);
+      }
+    }
+
+    if (secCard) {
+      if (force || prevSecs === null) {
+        this.setCardValues(secCard, secs, secs, fontSizeClass);
+      } else if (secs !== prevSecs) {
+        this.animateCardFlip(secCard, prevSecs, secs, fontSizeClass);
+      }
+    }
+  }
+
+  _rebuildCardStructure(container, hasHours) {
+    container.innerHTML = "";
+
+    if (hasHours) {
+      container.innerHTML = `
+        <div id="flip-card-hours" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div id="flip-card-minutes" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div id="flip-card-seconds" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div id="flip-card-minutes" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div id="flip-card-seconds" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
+      `;
     }
   }
 
@@ -192,14 +227,15 @@ export class FlipClockComponent {
     }
   }
 
-  setCardValues(cardEl, topVal, botVal) {
+  setCardValues(cardEl, topVal, botVal, fontSizeClass) {
     if (!cardEl) return;
+
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${topVal}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${topVal}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${botVal}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${botVal}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
@@ -207,10 +243,10 @@ export class FlipClockComponent {
     `;
   }
 
-  animateCardFlip(cardEl, oldValue, newValue) {
+  animateCardFlip(cardEl, oldValue, newValue, fontSizeClass) {
     if (!cardEl) return;
     if (cardEl.dataset.animating === "true") {
-      this.setCardValues(cardEl, newValue, newValue);
+      this.setCardValues(cardEl, newValue, newValue, fontSizeClass);
       return;
     }
 
@@ -218,16 +254,16 @@ export class FlipClockComponent {
 
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${newValue}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${oldValue}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${oldValue}</span>
       </div>
       <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden z-20">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[54%]">${oldValue}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${oldValue}</span>
       </div>
       <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
-        <span class="text-[25dvw] md:text-[30dvw] font-[Mostin] font-black text-primary translate-y-[-46%]">${newValue}</span>
+        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
@@ -235,7 +271,7 @@ export class FlipClockComponent {
     `;
 
     setTimeout(() => {
-      this.setCardValues(cardEl, newValue, newValue);
+      this.setCardValues(cardEl, newValue, newValue, fontSizeClass);
       delete cardEl.dataset.animating;
     }, 500);
   }

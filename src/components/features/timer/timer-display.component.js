@@ -166,6 +166,19 @@ export class TimerDisplayComponent {
         timer.currentPhase === "longBreak");
     const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
 
+    const totalSeconds = isFlowBreak
+      ? timer.timeRemaining
+      : isPomodoro
+        ? timer.timeRemaining
+        : timer.flowTime;
+
+    const displayTime = formatTime(totalSeconds);
+
+    const timerDisplayEl = this.container.querySelector("#timer-display");
+    if (timerDisplayEl) {
+      timerDisplayEl.textContent = displayTime;
+    }
+
     const phaseBadge = this.container.querySelector("#timer-phase-badge");
     if (phaseBadge) {
       if (isPomodoro) {

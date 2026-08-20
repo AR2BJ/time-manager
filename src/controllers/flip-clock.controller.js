@@ -7,6 +7,7 @@ export const FlipClockController = {
   overlayEl: null,
   wakeLock: null,
   unsubscribeState: null,
+  prevHours: null,
   prevMinutes: null,
   prevSeconds: null,
   eventsBound: false,
@@ -42,6 +43,7 @@ export const FlipClockController = {
       this.unsubscribeState = StateManager.subscribe(() => this.update());
     }
 
+    this.prevHours = null;
     this.prevMinutes = null;
     this.prevSeconds = null;
     this.update(true);
@@ -110,15 +112,31 @@ export const FlipClockController = {
       isPomodoro || isFlowBreak ? timer.timeRemaining : timer.flowTime;
 
     const formatted = formatTime(totalSeconds);
-    const [mins, secs] = formatted.split(":");
+    const parts = formatted.split(":");
+
+    let hrs = "00",
+      mins = "00",
+      secs = "00";
+    if (parts.length === 3) {
+      hrs = parts[0];
+      mins = parts[1];
+      secs = parts[2];
+    } else if (parts.length === 2) {
+      hrs = "00";
+      mins = parts[0];
+      secs = parts[1];
+    }
 
     flipClockComponent.updateDisplay(
+      hrs,
       mins,
       secs,
+      this.prevHours,
       this.prevMinutes,
       this.prevSeconds,
       force,
     );
+    this.prevHours = hrs;
     this.prevMinutes = mins;
     this.prevSeconds = secs;
 
@@ -166,6 +184,7 @@ export const FlipClockController = {
       } else if (btn.id === "btn-flip-pause") {
         timerService.pause();
       } else if (btn.id === "btn-flip-stop") {
+        this.prevHours = null;
         this.prevMinutes = null;
         this.prevSeconds = null;
         timerService.stopAndTransition();

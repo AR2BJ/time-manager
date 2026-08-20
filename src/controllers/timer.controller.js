@@ -14,6 +14,7 @@ import { SoundModel } from "@/models/sound.model.js";
 import { TaskController } from "./task.controller";
 import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
+import { formatTime } from "@/utils/helpers";
 import { soundService } from "@/services/sound.service.js";
 import { timerService } from "@/services/timer.service.js";
 
@@ -377,12 +378,18 @@ export const TimerController = {
       const totalSeconds = Number.isFinite(state.timer.timeRemaining)
         ? state.timer.timeRemaining
         : 1500;
-      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.innerHTML = `<span
-        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
-        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
-      >`;
+      const displayTime = formatTime(totalSeconds);
+      const parts = displayTime.split(":");
+
+      let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
+      parts.forEach((part, index) => {
+        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        if (index < parts.length - 1) {
+          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+        }
+      });
+      timerHtml += `</span>`;
+      displayEl.innerHTML = timerHtml;
 
       if (progressRing) {
         const totalDuration = state.timer.duration || 1500;
@@ -414,12 +421,18 @@ export const TimerController = {
       const totalSeconds = Number.isFinite(state.timer.timeRemaining)
         ? state.timer.timeRemaining
         : 1500;
-      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.innerHTML = `<span
-        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
-        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
-      >`;
+      const displayTime = formatTime(totalSeconds);
+      const parts = displayTime.split(":");
+
+      let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
+      parts.forEach((part, index) => {
+        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        if (index < parts.length - 1) {
+          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+        }
+      });
+      timerHtml += `</span>`;
+      displayEl.innerHTML = timerHtml;
 
       if (progressRing) {
         const totalDuration = state.timer.duration || 1500;
@@ -464,12 +477,18 @@ export const TimerController = {
       const totalSeconds = Number.isFinite(state.timer.flowTime)
         ? state.timer.flowTime
         : 0;
-      const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const secs = String(totalSeconds % 60).padStart(2, "0");
-      displayEl.innerHTML = `<span
-        class="tracking-normal flex flex-row justify-center items-center gap-1.5"
-        >${mins}<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-3.5">:</span>${secs}</span
-      >`;
+      const displayTime = formatTime(totalSeconds);
+      const parts = displayTime.split(":");
+
+      let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
+      parts.forEach((part, index) => {
+        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        if (index < parts.length - 1) {
+          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+        }
+      });
+      timerHtml += `</span>`;
+      displayEl.innerHTML = timerHtml;
 
       if (flowCanvas) {
         if (state.timer.isRunning || state.timer.isPaused) {
