@@ -105,7 +105,8 @@ export const TimerController = {
             actionButton: {
               text: "Create Task",
               icon: "fa-plus",
-              onClick: () => {
+              onClick: async () => {
+                if (document.fullscreenElement) await document.exitFullscreen();
                 ModalController.openTaskModal();
               },
             },
