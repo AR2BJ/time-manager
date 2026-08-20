@@ -207,6 +207,7 @@ export const ModalController = {
       }
     });
 
+    // 4. Submit Action (Create / Update)
     const submitBtn = wrapper.querySelector("#btn-submit-task");
     if (submitBtn) {
       submitBtn.replaceWith(submitBtn.cloneNode(true));
@@ -236,6 +237,22 @@ export const ModalController = {
           if (newTask) {
             TaskService.setActiveTask(newTask.id);
             this.closeTaskModal();
+          }
+        }
+      });
+    }
+
+    const titleInput = wrapper.querySelector("#input-task-title");
+    if (titleInput) {
+      titleInput.addEventListener("keydown", (e) => {
+        // Ctrl+Enter یا Cmd+Enter
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const submitButton = wrapper.querySelector("#btn-submit-task");
+          if (submitButton) {
+            submitButton.click();
           }
         }
       });
