@@ -20,6 +20,8 @@ export const FlipClockController = {
   async open() {
     if (!this.overlayEl) this.init();
 
+    flipClockComponent._isThreeCards = null;
+
     this.overlayEl.classList.remove("hidden");
     void this.overlayEl.offsetWidth;
     this.overlayEl.classList.remove("opacity-0");
@@ -29,7 +31,6 @@ export const FlipClockController = {
         await document.documentElement.requestFullscreen();
       }
 
-      // Auto-rotate and lock screen orientation to landscape on supported devices
       if (screen.orientation && typeof screen.orientation.lock === "function") {
         await screen.orientation.lock("landscape");
       }
@@ -55,7 +56,6 @@ export const FlipClockController = {
     this.overlayEl.classList.add("opacity-0");
     setTimeout(() => this.overlayEl.classList.add("hidden"), 300);
 
-    // Unlock screen orientation when exiting
     if (screen.orientation && typeof screen.orientation.unlock === "function") {
       try {
         screen.orientation.unlock();
@@ -108,8 +108,13 @@ export const FlipClockController = {
       (timer.currentPhase === "shortBreak" ||
         timer.currentPhase === "longBreak");
     const isFlowBreak = activeMode === "flow" && timer.currentPhase === "break";
-    const totalSeconds =
-      isPomodoro || isFlowBreak ? timer.timeRemaining : timer.flowTime;
+
+    let totalSeconds;
+    if (isPomodoro || isFlowBreak) {
+      totalSeconds = timer.timeRemaining;
+    } else {
+      totalSeconds = timer.flowTime;
+    }
 
     const formatted = formatTime(totalSeconds);
     const parts = formatted.split(":");
@@ -127,15 +132,20 @@ export const FlipClockController = {
       secs = parts[1];
     }
 
+    const prevHrs = this.prevHours;
+    const prevMins = this.prevMinutes;
+    const prevSecs = this.prevSeconds;
+
     flipClockComponent.updateDisplay(
       hrs,
       mins,
       secs,
-      this.prevHours,
-      this.prevMinutes,
-      this.prevSeconds,
+      prevHrs,
+      prevMins,
+      prevSecs,
       force,
     );
+
     this.prevHours = hrs;
     this.prevMinutes = mins;
     this.prevSeconds = secs;

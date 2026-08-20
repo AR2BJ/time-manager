@@ -113,7 +113,7 @@ export class FlipClockComponent {
 
     const hasHours = parseInt(hrs, 10) > 0;
 
-    if (this._isThreeCards !== hasHours) {
+    if (this._isThreeCards === null || this._isThreeCards !== hasHours) {
       this._isThreeCards = hasHours;
       this._rebuildCardStructure(container, hasHours);
     }
