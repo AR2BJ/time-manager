@@ -1,3 +1,4 @@
+import { ModalController } from "./modal.controller";
 import { NotificationService } from "@/services/notification.service";
 import { StateManager } from "@/models/state.model.js";
 import { TaskService } from "@/services/task.service";
