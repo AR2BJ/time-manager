@@ -6,6 +6,7 @@ export const NotificationService = {
     undoAction = null,
     icon = null,
     iconColor = "",
+    actionButton = null,
   }) {
     const container = document.getElementById("notification-container");
     if (!container) return;
@@ -88,6 +89,21 @@ export const NotificationService = {
         this.removeToast(toast);
       });
       toast.appendChild(undoBtn);
+    }
+
+    if (actionButton) {
+      const actionBtn = document.createElement("button");
+      actionBtn.className = `min-w-fit h-8 px-3 transition flex items-center justify-center gap-1 cursor-pointer rounded-lg ${toastUndoClass} text-sm font-medium`;
+      actionBtn.innerHTML = `<i class="fa-regular ${actionButton.icon || "fa-arrow-right"} text-xs"></i><span class="text-xs font-semibold">${actionButton.text || "Action"}</span>`;
+
+      actionBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (typeof actionButton.onClick === "function") {
+          actionButton.onClick();
+        }
+        this.removeToast(toast);
+      });
+      toast.appendChild(actionBtn);
     }
 
     container.appendChild(toast);

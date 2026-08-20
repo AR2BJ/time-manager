@@ -9,9 +9,11 @@ import { HeaderComponent } from "@/components/shared/header.component.js";
 import { MobileNavComponent } from "@/components/layout/mobile-nav.component.js";
 import { ModalController } from "./modal.controller";
 import { NoteController } from "./note.controller";
+import { NotificationService } from "@/services/notification.service";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
 import { SoundModel } from "@/models/sound.model.js";
 import { TaskController } from "./task.controller";
+import { TaskService } from "@/services/task.service";
 import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
 import { formatTime } from "@/utils/helpers";
@@ -90,6 +92,27 @@ export const TimerController = {
 
       e.preventDefault();
       e.stopPropagation();
+
+      if (btn.id === "btn-timer-start" || btn.id === "btn-timer-continue") {
+        const activeTask = TaskService.getActiveTask();
+        if (!activeTask) {
+          NotificationService.show({
+            type: "warning",
+            message: "You need an active task to start a focus session.",
+            icon: "fa-bullseye-arrow",
+            iconColor: "text-amber-500",
+            duration: 5000,
+            actionButton: {
+              text: "Create Task",
+              icon: "fa-plus",
+              onClick: () => {
+                ModalController.openTaskModal();
+              },
+            },
+          });
+          return;
+        }
+      }
 
       if (btn.id === "btn-timer-start" || btn.id === "btn-timer-continue") {
         this.flowStartTimestamp = performance.now();

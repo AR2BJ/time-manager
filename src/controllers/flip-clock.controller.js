@@ -1,4 +1,6 @@
+import { NotificationService } from "@/services/notification.service";
 import { StateManager } from "@/models/state.model.js";
+import { TaskService } from "@/services/task.service";
 import { flipClockComponent } from "@/components/features/timer/flip-clock.component.js";
 import { formatTime } from "@/utils/helpers.js";
 import { timerService } from "@/services/timer.service.js";
@@ -188,6 +190,27 @@ export const FlipClockController = {
 
       e.preventDefault();
       e.stopPropagation();
+
+      if (btn.id === "btn-flip-start" || btn.id === "btn-flip-continue") {
+        const activeTask = TaskService.getActiveTask();
+        if (!activeTask) {
+          NotificationService.show({
+            type: "warning",
+            message: "You need an active task to start a focus session.",
+            icon: "fa-bullseye-arrow",
+            iconColor: "text-amber-500",
+            duration: 5000,
+            actionButton: {
+              text: "Create Task",
+              icon: "fa-plus",
+              onClick: () => {
+                ModalController.openTaskModal();
+              },
+            },
+          });
+          return;
+        }
+      }
 
       if (btn.id === "btn-flip-start" || btn.id === "btn-flip-continue") {
         timerService.start();
