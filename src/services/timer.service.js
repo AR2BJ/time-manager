@@ -104,7 +104,7 @@ class TimerService {
 
       NotificationService.show({
         type: "success",
-        message: "Focus session completed! Time for a break.",
+        message: "Focus session completed! Time for a break",
         icon: "fa-circle-check",
         iconColor: "text-emerald-500",
       });
@@ -256,7 +256,7 @@ class TimerService {
 
       NotificationService.show({
         type: "success",
-        message: `Flow session completed! You focused for ${Math.round(flowTime / 60)} minutes.`,
+        message: `Flow session completed! You focused for ${Math.round(flowTime / 60)} minutes`,
         icon: "fa-circle-check",
         iconColor: "text-emerald-500",
       });
@@ -264,7 +264,7 @@ class TimerService {
       NotificationService.show({
         type: "info",
         message:
-          "Flow session was too short (under 10 seconds). No session saved.",
+          "Flow session was too short (under 10 seconds). No session saved",
         icon: "fa-info-circle",
         iconColor: "text-brand",
       });

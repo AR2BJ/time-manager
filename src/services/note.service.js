@@ -22,7 +22,7 @@ export const NoteService = {
     if (createdNote) {
       NotificationService.show({
         type: "success",
-        message: "Note added successfully.",
+        message: "Note added successfully",
         icon: "fa-sticky-note",
         iconColor: "text-emerald-500",
       });
@@ -40,7 +40,7 @@ export const NoteService = {
 
     NotificationService.show({
       type: "error",
-      message: `Note "${deletedNote.text}" removed.`,
+      message: `Note "${deletedNote.text}" removed`,
       undoAction: () => {
         this.restoreNote(deletedNote, index);
       },

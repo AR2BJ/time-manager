@@ -11,7 +11,7 @@ export const TaskController = {
     if (TaskService.isTitleDuplicate(title)) {
       NotificationService.show({
         type: "error",
-        message: "Task has already exist.",
+        message: "Task has already exist",
         icon: "fa-triangle-exclamation",
         iconColor: "text-red-500/80",
         duration: 5000,
@@ -25,7 +25,7 @@ export const TaskController = {
 
     NotificationService.show({
       type: "success",
-      message: `Task "${newTask.title}" created.`,
+      message: `Task "${newTask.title}" created`,
       icon: "fa-plus",
       iconColor: "text-emerald-500",
     });
@@ -42,7 +42,7 @@ export const TaskController = {
     if (updatedTask) {
       NotificationService.show({
         type: "success",
-        message: "Task updated successfully.",
+        message: "Task updated successfully",
         icon: "fa-pen-to-square",
         iconColor: "text-emerald-500",
       });
@@ -64,7 +64,7 @@ export const TaskController = {
 
     NotificationService.show({
       type: "error",
-      message: `Task "${deletedTask.title}" removed.`,
+      message: `Task "${deletedTask.title}" removed`,
       undoAction: () => {
         TaskService.restoreTask(deletedTask, taskIndex, wasActive);
         ModalController.refreshTaskModal();

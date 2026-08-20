@@ -53,7 +53,7 @@ export const SettingsImportController = {
     else {
       NotificationService.show({
         type: "error",
-        message: "Invalid format! Only JSON, MD, or CSV files are permitted.",
+        message: "Invalid format! Only JSON, MD, or CSV files are permitted",
         icon: "fa-triangle-exclamation",
         iconColor: "text-red-500/80",
         duration: 5000,
@@ -159,7 +159,7 @@ export const SettingsImportController = {
 
           NotificationService.show({
             type: "success",
-            message: `Data ledger synchronized successfully.`,
+            message: `Data ledger synchronized successfully`,
             icon: "fa-circle-check",
             iconColor: "text-emerald-500/80",
             duration: 5000,
@@ -168,7 +168,7 @@ export const SettingsImportController = {
           console.error("Parser failure:", err);
           NotificationService.show({
             type: "error",
-            message: "Failed to parse structural integrity of the file.",
+            message: "Failed to parse structural integrity of the file",
             icon: "fa-triangle-exclamation",
             iconColor: "text-red-500/80",
             duration: 5000,

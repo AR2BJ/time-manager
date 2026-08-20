@@ -196,7 +196,7 @@ export const FlipClockController = {
         if (!activeTask) {
           NotificationService.show({
             type: "warning",
-            message: "You need an active task to start a focus session.",
+            message: "You need an active task to start a focus session",
             icon: "fa-bullseye-arrow",
             iconColor: "text-amber-500",
             duration: 5000,

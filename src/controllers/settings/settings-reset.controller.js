@@ -93,7 +93,7 @@ export const SettingsResetController = {
         NotificationService.show({
           type: "error",
           message:
-            "Application synchronization storage and audio settings have been completely reset.",
+            "Application synchronization storage and audio settings have been completely reset",
           duration: 5000,
           undoAction: () => {
             GlobalLoaderService.show(
