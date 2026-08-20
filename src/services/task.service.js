@@ -1,5 +1,7 @@
 import { generateId, todayISO } from "@/utils/helpers.js";
 
+import { ModalController } from "@/controllers/modal.controller";
+import { NotificationService } from "@/services/notification.service.js";
 import { TaskModel } from "@/models/task.model.js";
 import { state } from "@/models/state.model";
 
@@ -16,13 +18,30 @@ export const TaskService = {
   isTitleDuplicate(title) {
     const cleanTitle = title.trim().toLowerCase();
     return TaskModel.getTasks().some(
-      (t) =>
-        t.title.trim().toLowerCase() === cleanTitle
+      (t) => t.title.trim().toLowerCase() === cleanTitle,
     );
   },
 
   addTask(title, estimatedFocusUnits = 1) {
     if (!title || !title.trim()) {
+      NotificationService.show({
+        type: "warning",
+        message: "Task title cannot be empty",
+        icon: "fa-pencil",
+        iconColor: "text-amber-500",
+        duration: 5000,
+      });
+      return null;
+    }
+
+    if (this.isTitleDuplicate(title)) {
+      NotificationService.show({
+        type: "error",
+        message: "A task with this title already exists",
+        icon: "fa-triangle-exclamation",
+        iconColor: "text-red-500/80",
+        duration: 5000,
+      });
       return null;
     }
 
@@ -35,16 +54,46 @@ export const TaskService = {
       createdAt: todayISO(),
     };
 
-    return TaskModel.insert(newTask);
+    const inserted = TaskModel.insert(newTask);
+
+    if (inserted) {
+      NotificationService.show({
+        type: "success",
+        message: `Task "${newTask.title}" created`,
+        icon: "fa-plus",
+        iconColor: "text-emerald-500",
+      });
+      return inserted;
+    }
+
+    return null;
   },
 
   updateTask(taskId, newTitle, newEstimatedFocusUnits) {
     const task = TaskModel.getById(taskId);
-    if (
-      !task ||
-      task.status === "done" ||
-      this.isTitleDuplicate(newTitle, taskId)
-    ) {
+    if (!task || task.status === "done") {
+      return null;
+    }
+
+    if (!newTitle || !newTitle.trim()) {
+      NotificationService.show({
+        type: "warning",
+        message: "Task title cannot be empty",
+        icon: "fa-pencil",
+        iconColor: "text-amber-500",
+        duration: 5000,
+      });
+      return null;
+    }
+
+    if (this.isTitleDuplicate(newTitle)) {
+      NotificationService.show({
+        type: "error",
+        message: "A task with this title already exists",
+        icon: "fa-triangle-exclamation",
+        iconColor: "text-red-500/80",
+        duration: 5000,
+      });
       return null;
     }
 
@@ -60,7 +109,19 @@ export const TaskService = {
       updatedFields.status = "todo";
     }
 
-    return TaskModel.update(taskId, updatedFields);
+    const updated = TaskModel.update(taskId, updatedFields);
+
+    if (updated) {
+      NotificationService.show({
+        type: "success",
+        message: `Task "${updated.title}" updated`,
+        icon: "fa-pen-to-square",
+        iconColor: "text-emerald-500",
+      });
+      return updated;
+    }
+
+    return null;
   },
 
   setActiveTask(taskId) {
@@ -90,6 +151,15 @@ export const TaskService = {
       const nextActiveTask = remainingTasks.find((t) => t.status !== "done");
       TaskModel.setActiveTaskId(nextActiveTask ? nextActiveTask.id : null);
     }
+
+    NotificationService.show({
+      type: "error",
+      message: `Task "${result.deletedTask.title}" removed`,
+      undoAction: () => {
+        TaskService.restoreTask(result.deletedTask, result.index, wasActive);
+        ModalController.refreshTaskModal();
+      },
+    });
 
     return {
       deletedTask: result.deletedTask,

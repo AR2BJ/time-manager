@@ -53,11 +53,7 @@ export const TaskModalComponent = {
             </button>
           </div>
 
-          <form
-            id="form-task-action"
-            data-edit-id="${isEditing ? editingTask.id : ""}"
-            class="pb-4 border-b border-border flex flex-col gap-3 shrink-0"
-          >
+          <div class="pb-4 border-b border-border flex flex-col gap-3 shrink-0">
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label
@@ -69,7 +65,6 @@ export const TaskModalComponent = {
                 <input
                   id="input-task-title"
                   type="text"
-                  required
                   maxlength="60"
                   value="${isEditing ? editingTask.title : ""}"
                   placeholder="E.g., Design System Refactoring"
@@ -96,7 +91,8 @@ export const TaskModalComponent = {
 
             <div class="flex items-center gap-2">
               <button
-                type="submit"
+                id="btn-submit-task"
+                type="button"
                 class="flex-1 h-10 rounded-xl bg-brand hover:bg-(--color-brand-hover) text-white font-semibold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
               >
                 ${
@@ -109,8 +105,8 @@ export const TaskModalComponent = {
               ${
                 isEditing
                   ? `<button
-                      type="button"
                       id="btn-cancel-edit"
+                      type="button"
                       class="h-10 px-4 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary text-xs font-semibold transition cursor-pointer"
                      >
                        Cancel
@@ -118,7 +114,7 @@ export const TaskModalComponent = {
                   : ""
               }
             </div>
-          </form>
+          </div>
 
           <div
             class="flex-1 overflow-y-auto mt-4 pe-1 space-y-2 max-h-48 scrollbar-thin scrollbar-thumb-surface-2"

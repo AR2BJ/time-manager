@@ -149,22 +149,24 @@ export const ModalController = {
       });
     }
 
-    // 2. Dynamic Event Handling
+    // 2. Close Modal & Cancel Edit
+    const closeBtn = wrapper.querySelector("#close-task-modal");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => this.closeTaskModal());
+    }
+
+    const backdrop = wrapper.querySelector("#task-modal-backdrop");
+    if (backdrop) {
+      backdrop.addEventListener("click", () => this.closeTaskModal());
+    }
+
+    const cancelBtn = wrapper.querySelector("#btn-cancel-edit");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => this.openTaskModal(null));
+    }
+
+    // 3. Edit & Delete Tasks (Event Delegation)
     wrapper.addEventListener("click", (e) => {
-      // Close Modal
-      if (
-        e.target.closest("#close-task-modal") ||
-        e.target.closest("#task-modal-backdrop")
-      ) {
-        this.closeTaskModal();
-        return;
-      }
-
-      if (e.target.closest("#btn-cancel-edit")) {
-        this.openTaskModal(null);
-        return;
-      }
-
       const btnEdit = e.target.closest(".btn-edit-task");
       if (btnEdit) {
         e.preventDefault();
@@ -192,7 +194,6 @@ export const ModalController = {
         return;
       }
 
-      // Select Task Action
       const taskItem = e.target.closest(".task-item-row");
       if (taskItem) {
         const isDone = taskItem.dataset.isDone === "true";
@@ -206,33 +207,35 @@ export const ModalController = {
       }
     });
 
-    const form = wrapper.querySelector("#form-task-action");
-    if (form) {
-      form.addEventListener("submit", (e) => {
+    const submitBtn = wrapper.querySelector("#btn-submit-task");
+    if (submitBtn) {
+      submitBtn.replaceWith(submitBtn.cloneNode(true));
+      const freshSubmitBtn = wrapper.querySelector("#btn-submit-task");
+
+      freshSubmitBtn.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
+
         const titleInput = wrapper.querySelector("#input-task-title");
         const unitVal = Number(unitInput?.value) || 1;
-        const editId = form.dataset.editId;
 
-        if (titleInput && titleInput.value.trim()) {
-          if (editId) {
-            const success = TaskController.updateTask(
-              editId,
-              titleInput.value.trim(),
-              unitVal,
-            );
-            if (success) {
-              this.closeTaskModal();
-            }
-          } else {
-            const newTask = TaskController.createTask(
-              titleInput.value.trim(),
-              unitVal,
-            );
-            if (newTask) {
-              TaskService.setActiveTask(newTask.id);
-              this.closeTaskModal();
-            }
+        if (this.editingTask) {
+          const success = TaskController.updateTask(
+            this.editingTask.id,
+            titleInput ? titleInput.value.trim() : "",
+            unitVal,
+          );
+          if (success) {
+            this.closeTaskModal();
+          }
+        } else {
+          const newTask = TaskController.createTask(
+            titleInput ? titleInput.value.trim() : "",
+            unitVal,
+          );
+          if (newTask) {
+            TaskService.setActiveTask(newTask.id);
+            this.closeTaskModal();
           }
         }
       });

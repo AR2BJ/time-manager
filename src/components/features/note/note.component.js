@@ -136,6 +136,8 @@ export class NoteComponent {
         if (input && input.value.trim()) {
           this.shouldResetInput = true;
           NoteService.addNote(input.value);
+        } else {
+          NoteService.addNote("");
         }
       }
     });

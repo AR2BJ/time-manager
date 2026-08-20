@@ -1,5 +1,4 @@
 import { ModalController } from "./modal.controller.js";
-import { NotificationService } from "@/services/notification.service.js";
 import { TaskService } from "@/services/task.service.js";
 
 export const TaskController = {
@@ -8,68 +7,24 @@ export const TaskController = {
   },
 
   createTask(title, estimatedFocusUnits = 1) {
-    if (TaskService.isTitleDuplicate(title)) {
-      NotificationService.show({
-        type: "error",
-        message: "Task has already exist",
-        icon: "fa-triangle-exclamation",
-        iconColor: "text-red-500/80",
-        duration: 5000,
-      });
-
-      return;
-    }
-
-    const newTask = TaskService.addTask(title, estimatedFocusUnits);
-    if (!newTask) return null;
-
-    NotificationService.show({
-      type: "success",
-      message: `Task "${newTask.title}" created`,
-      icon: "fa-plus",
-      iconColor: "text-emerald-500",
-    });
-
-    return newTask;
+    return TaskService.addTask(title, estimatedFocusUnits);
   },
 
   updateTask(taskId, newTitle, newEstimatedFocusUnits) {
-    const updatedTask = TaskService.updateTask(
-      taskId,
-      newTitle,
-      newEstimatedFocusUnits,
-    );
-    if (updatedTask) {
-      NotificationService.show({
-        type: "success",
-        message: "Task updated successfully",
-        icon: "fa-pen-to-square",
-        iconColor: "text-emerald-500",
-      });
-    }
-    return updatedTask;
+    return TaskService.updateTask(taskId, newTitle, newEstimatedFocusUnits);
   },
 
   deleteTask(taskId) {
     const result = TaskService.deleteTask(taskId);
     if (!result) return;
 
-    const { deletedTask, taskIndex, wasActive } = result;
+    const { deletedTask } = result;
 
     if (ModalController.editingTask?.id === deletedTask.id) {
       ModalController.editingTask = null;
     }
 
     ModalController.refreshTaskModal();
-
-    NotificationService.show({
-      type: "error",
-      message: `Task "${deletedTask.title}" removed`,
-      undoAction: () => {
-        TaskService.restoreTask(deletedTask, taskIndex, wasActive);
-        ModalController.refreshTaskModal();
-      },
-    });
   },
 
   bindEvents() {

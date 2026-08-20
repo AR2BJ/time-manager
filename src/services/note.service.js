@@ -9,7 +9,16 @@ export const NoteService = {
   },
 
   addNote(text) {
-    if (!text || !text.trim()) return null;
+    if (!text || !text.trim()) {
+      NotificationService.show({
+        type: "warning",
+        message: "Please write something before adding a note.",
+        icon: "fa-pencil",
+        iconColor: "text-amber-500",
+        duration: 3000,
+      });
+      return null;
+    }
 
     const newNote = {
       id: generateId(),
@@ -22,7 +31,7 @@ export const NoteService = {
     if (createdNote) {
       NotificationService.show({
         type: "success",
-        message: "Note added successfully",
+        message: "Note added successfully.",
         icon: "fa-sticky-note",
         iconColor: "text-emerald-500",
       });
@@ -40,7 +49,7 @@ export const NoteService = {
 
     NotificationService.show({
       type: "error",
-      message: `Note "${deletedNote.text}" removed`,
+      message: `Note "${deletedNote.text}" removed.`,
       undoAction: () => {
         this.restoreNote(deletedNote, index);
       },
