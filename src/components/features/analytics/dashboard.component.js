@@ -202,7 +202,7 @@ export const DashboardComponent = {
           <div class="z-10 mt-3">
             <div class="text-3xl font-black text-primary tracking-tight">
               ${(() => {
-                const days = [0, 0, 0, 0, 0, 0, 0];
+                const days = Array(7).fill(0);
                 sessions.forEach((s) => {
                   const day = new Date(s.completedAt).getDay();
                   if (!isNaN(day)) days[day]++;
@@ -211,7 +211,7 @@ export const DashboardComponent = {
                 const idx = days.indexOf(max);
                 return max > 0
                   ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][idx]
-                  : "-";
+                  : "&#8210";
               })()}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">

@@ -54,7 +54,7 @@ export const SettingsImportController = {
       NotificationService.show({
         type: "error",
         message: "Invalid format! Only JSON, MD, or CSV files are permitted.",
-        icon: "fa-circle-xmark",
+        icon: "fa-triangle-exclamation",
         iconColor: "text-red-500/80",
         duration: 5000,
       });

@@ -190,9 +190,9 @@ export const InfoModalComponent = {
                 </h4>
                 <p class="text-xs text-secondary leading-relaxed">
                   A structured timer that alternates between focused work sessions and short breaks. 
-                  The default work duration is 25 minutes (configurable in Settings). 
-                  After 4 completed sessions (configurable), the system automatically transitions to a longer break. 
-                  You do not need to manage the transitions manually.
+                  When the timer naturally reaches zero, it automatically transitions to the next phase. 
+                  You can also manually <strong class="text-primary">Stop</strong> the timer at any time to skip the current phase and move to the next one. 
+                  After 4 completed sessions (configurable), the system transitions to a longer break.
                 </p>
               </div>
 
@@ -201,9 +201,10 @@ export const InfoModalComponent = {
                   <i class="fa-regular fa-water"></i> Flow Mode
                 </h4>
                 <p class="text-xs text-secondary leading-relaxed">
-                  A continuous count-up timer without break phases. 
+                  A continuous count-up timer designed for deep, uninterrupted work. 
                   The timer runs until you manually pause or stop it. 
-                  No automatic breaks or transitions are triggered. You are in full control of when to start and stop.
+                  When you <strong class="text-primary">Stop</strong> the timer, your session is saved and the system automatically transitions to a <strong class="text-primary">Flow Break</strong>. 
+                  After the Flow Break ends, the timer automatically returns to the main Flow Mode, ready for your next session.
                 </p>
               </div>
 

@@ -237,7 +237,7 @@ export const StateManager = {
       completedAt: todayISO(),
     };
 
-    state.sessions.unshift(session);
+    state.sessions.push(session);
 
     this.save();
     this.notify();

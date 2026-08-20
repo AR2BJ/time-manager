@@ -8,6 +8,18 @@ export const TaskController = {
   },
 
   createTask(title, estimatedFocusUnits = 1) {
+    if (TaskService.isTitleDuplicate(title)) {
+      NotificationService.show({
+        type: "error",
+        message: "Task has already exist.",
+        icon: "fa-triangle-exclamation",
+        iconColor: "text-red-500/80",
+        duration: 5000,
+      });
+
+      return;
+    }
+
     const newTask = TaskService.addTask(title, estimatedFocusUnits);
     if (!newTask) return null;
 

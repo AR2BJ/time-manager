@@ -26,7 +26,7 @@ export const NoteModel = {
     if (!state.notes) {
       state.notes = [];
     }
-    state.notes.unshift(noteData);
+    state.notes.push(noteData);
     this.commit();
     return noteData;
   },

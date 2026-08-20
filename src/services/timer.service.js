@@ -86,6 +86,7 @@ class TimerService {
 
     if (isWorkPhase) {
       const currentTaskId = state.activeTaskId;
+      const currentTask = TaskService.getActiveTask();
 
       if (currentTaskId) {
         TaskService.incrementCompletedFocusUnits(currentTaskId);
@@ -95,6 +96,8 @@ class TimerService {
       const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
 
       StateManager.addSession({
+        taskId: currentTaskId,
+        taskTitle: currentTask ? currentTask.title : "Untitled Session",
         type: "pomodoro",
         durationSeconds: workSecs,
       });
@@ -241,11 +244,12 @@ class TimerService {
 
     if (flowTime >= 1200) {
       StateManager.addSession({
+        taskId: currentTaskId,
+        taskTitle: currentTask ? currentTask.title : "Untitled Session",
         type: "flow",
         durationSeconds: flowTime,
       });
 
-      const currentTaskId = state.activeTaskId;
       if (currentTaskId) {
         TaskService.incrementCompletedFocusUnits(currentTaskId);
       }
@@ -260,7 +264,7 @@ class TimerService {
       NotificationService.show({
         type: "info",
         message:
-          "Flow session was too short (under 20 minutes). No session saved.",
+          "Flow session was too short (under 10 seconds). No session saved.",
         icon: "fa-info-circle",
         iconColor: "text-brand",
       });

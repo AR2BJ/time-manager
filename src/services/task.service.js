@@ -13,22 +13,21 @@ export const TaskService = {
     return activeId ? TaskModel.getById(activeId) : null;
   },
 
-  isTitleDuplicate(title, excludeTaskId = null) {
+  isTitleDuplicate(title) {
     const cleanTitle = title.trim().toLowerCase();
     return TaskModel.getTasks().some(
       (t) =>
-        t.title.trim().toLowerCase() === cleanTitle &&
-        String(t.id) !== String(excludeTaskId),
+        t.title.trim().toLowerCase() === cleanTitle
     );
   },
 
-  addTask(title, estimatedFocusUnits = 1, customId = null) {
-    if (!title || !title.trim() || this.isTitleDuplicate(title, customId)) {
+  addTask(title, estimatedFocusUnits = 1) {
+    if (!title || !title.trim()) {
       return null;
     }
 
     const newTask = {
-      id: customId || generateId(),
+      id: generateId(),
       title: title.trim(),
       status: "todo",
       estimatedFocusUnits: Number(estimatedFocusUnits) || 1,
