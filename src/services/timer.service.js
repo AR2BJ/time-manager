@@ -228,6 +228,14 @@ class TimerService {
     const flowTime = state.timer.flowTime || 0;
     const isBreak = state.timer.currentPhase === "break";
 
+    const isWorkPhase = state.timer.currentPhase === "work";
+
+    const soundToPlay = isWorkPhase
+      ? state.settings.pomodoroEndSound || "bell"
+      : state.settings.breakEndSound || "chime";
+
+    soundService.playNotificationSound(soundToPlay);
+
     if (isBreak) {
       const workSecs = (state.settings.pomodoroWorkTime || 25) * 60;
       StateManager.updateTimerState({
@@ -269,9 +277,6 @@ class TimerService {
         iconColor: "text-brand",
       });
     }
-
-    const soundToPlay = state.settings.breakEndSound || "chime";
-    soundService.playNotificationSound(soundToPlay);
 
     const breakSecs = (state.settings.flowBreakTime || 20) * 60;
     StateManager.updateTimerState({
