@@ -95,7 +95,7 @@ export const TimerController = {
 
       if (btn.id === "btn-timer-start" || btn.id === "btn-timer-continue") {
         const activeTask = TaskService.getActiveTask();
-        if (!activeTask) {
+        if (!activeTask && state.timer.currentPhase === "work") {
           NotificationService.show({
             type: "warning",
             message: "You need an active task to start a focus session",
@@ -693,11 +693,36 @@ export const TimerController = {
     const scrollTopBtn = document.getElementById("scroll-to-top-btn");
 
     if (scrollTopBtn) {
+      let isVisible = false;
+      let hideTimeout;
+
       window.addEventListener("scroll", () => {
-        if (window.scrollY > 400) {
-          scrollTopBtn.classList.replace("hidden", "flex");
+        const scrollThreshold = 600;
+
+        if (window.scrollY > scrollThreshold) {
+          if (!isVisible) {
+            isVisible = true;
+            clearTimeout(hideTimeout);
+            scrollTopBtn.classList.replace("hidden", "flex");
+            requestAnimationFrame(() => {
+              scrollTopBtn.classList.remove("opacity-0", "scale-75");
+              scrollTopBtn.classList.add("opacity-100", "scale-100");
+            });
+          }
         } else {
-          scrollTopBtn.classList.replace("flex", "hidden");
+          if (isVisible) {
+            isVisible = false;
+            requestAnimationFrame(() => {
+              scrollTopBtn.classList.remove("opacity-100", "scale-100");
+              scrollTopBtn.classList.add("opacity-0", "scale-75");
+            });
+
+            hideTimeout = setTimeout(() => {
+              if (!isVisible) {
+                scrollTopBtn.classList.replace("flex", "hidden");
+              }
+            }, 200);
+          }
         }
       });
 
@@ -751,7 +776,7 @@ export const TimerController = {
           this.accumulatedFlowTime = 0;
 
           StateManager.setMode(targetMode);
-          timerService.pause();
+          // timerService.pause();
           StateManager.resetTimer();
 
           this.refreshUI();
