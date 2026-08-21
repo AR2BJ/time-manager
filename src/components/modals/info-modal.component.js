@@ -244,6 +244,18 @@ export const InfoModalComponent = {
                 </p>
               </div>
 
+              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+                <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-2 mb-1.5">
+                  <i class="fa-regular fa-keyboard"></i> Quick Actions & Shortcuts
+                </h4>
+                <p class="text-xs text-secondary leading-relaxed">
+                  <strong class="text-primary">Submit / Confirm:</strong> Use <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Ctrl</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Enter</kbd> (or <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Cmd</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Enter</kbd>) to quickly create a task, save a note, or confirm any modal without clicking the button.
+                  <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
+                    <i class="fa-regular fa-circle-question text-brand/70"></i>
+                    <strong class="text-primary">Escape</strong> closes any active modal or removes focus from the current input field.
+                  </span>
+                </p>
+              </div>
             </div>
 
             <div id="content-help-shortcuts" class="hidden">
