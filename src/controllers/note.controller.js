@@ -3,25 +3,10 @@ import { NoteService } from "@/services/note.service.js";
 export const NoteController = {
   init() {
     this.bindEvents();
+    this.bindNoteEvents();
   },
 
   bindEvents() {
-    // Form submission for adding a new note
-    const noteForm = document.getElementById("form-add-note");
-    if (noteForm) {
-      noteForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const input = document.getElementById("input-note-text");
-        if (!input || !input.value.trim()) return;
-
-        const createdNote = NoteService.addNote(input.value.trim());
-        if (createdNote) {
-          input.value = "";
-        }
-      });
-    }
-
-    // Event delegation for deleting notes
     document.addEventListener("click", (e) => {
       const btnDelete = e.target.closest(".btn-delete-note");
       if (btnDelete) {
@@ -32,5 +17,23 @@ export const NoteController = {
         }
       }
     });
+  },
+
+  bindNoteEvents() {
+    window.addEventListener("deleteNote", (e) => {
+      const noteId = e.detail.id;
+      if (noteId) {
+        NoteService.deleteNote(noteId);
+      }
+    });
+
+    window.addEventListener("submitNote", (e) => {
+      const text = e.detail.text;
+      this.submitNote(text);
+    });
+  },
+
+  submitNote(text) {
+    NoteService.addNote(text.trim());
   },
 };

@@ -264,7 +264,7 @@ class TimerService {
       NotificationService.show({
         type: "info",
         message:
-          "Flow session was too short (under 10 seconds). No session saved",
+          "Flow session was too short (under 10 seconds), No session saved",
         icon: "fa-info-circle",
         iconColor: "text-brand",
       });

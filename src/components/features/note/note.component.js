@@ -1,5 +1,4 @@
 import { NoteModel } from "@/models/note.model.js";
-import { NoteService } from "@/services/note.service.js";
 
 export class NoteComponent {
   constructor() {
@@ -14,9 +13,8 @@ export class NoteComponent {
       "bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-3";
 
     this.updateUI();
-
-    this.bindEvents();
     this.bindExternalUpdates();
+    this.bindEvents();
 
     return this.container;
   }
@@ -35,8 +33,7 @@ export class NoteComponent {
         class="flex items-center justify-between gap-3 pb-2 border-b border-border"
       >
         <div 
-          class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer sm:pointer-events-none sm:cursor-default"
-          data-tooltip-title="Focus Quick Notes"
+          class="flex items-center gap-2 min-w-0 flex-1"
         >
           <i class="fa-regular fa-lightbulb text-brand shrink-0"></i>
           <span
@@ -52,28 +49,23 @@ export class NoteComponent {
         </span>
       </div>
 
-      <form
-        id="note-form"
-        class="relative flex items-center gap-2"
-      >
+      <div class="relative flex items-center gap-2">
         <input
-          type="text"
           id="note-input"
+          type="text"
           placeholder="Catch a distraction or idea..."
           class="w-full bg-surface-2 border border-border/80 rounded-xl p-2.5 pe-20 text-xs text-primary truncate placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
           autocomplete="off"
         />
         <button
-          type="submit"
+          id="btn-submit-note"
           class="absolute right-0 p-2.5 rounded-e-xl bg-brand/10 text-brand/80 transition hover:bg-brand/20 font-semibold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
           <i class="fa-regular fa-plus"></i> Add
         </button>
-      </form>
+      </div>
 
-      <div
-        class="flex flex-col gap-1.5 max-h-52 overflow-y-auto pe-1 scrollbar-thin"
-      >
+      <div class="flex flex-col gap-1.5 max-h-52 overflow-y-auto pe-1 scrollbar-thin">
         ${
           items.length === 0
             ? ` <div
@@ -125,36 +117,57 @@ export class NoteComponent {
       } else {
         newInput.value = currentValue;
       }
+      newInput.focus();
     }
-  }
-
-  bindEvents() {
-    this.container.addEventListener("submit", (e) => {
-      if (e.target.id === "note-form") {
-        e.preventDefault();
-        const input = this.container.querySelector("#note-input");
-        if (input && input.value.trim()) {
-          this.shouldResetInput = true;
-          NoteService.addNote(input.value);
-        } else {
-          NoteService.addNote("");
-        }
-      }
-    });
-
-    this.container.addEventListener("click", (e) => {
-      const deleteBtn = e.target.closest('[data-action="delete"]');
-      const itemEl = e.target.closest("[data-id]");
-
-      if (deleteBtn && itemEl) {
-        NoteService.deleteNote(itemEl.dataset.id);
-      }
-    });
   }
 
   bindExternalUpdates() {
     window.addEventListener("notesChanged", () => {
       this.updateUI();
+    });
+  }
+
+  bindEvents() {
+    this.container.addEventListener("click", (e) => {
+      const deleteBtn = e.target.closest('[data-action="delete"]');
+      const itemEl = e.target.closest("[data-id]");
+
+      if (deleteBtn && itemEl) {
+        window.dispatchEvent(
+          new CustomEvent("deleteNote", { detail: { id: itemEl.dataset.id } }),
+        );
+        return;
+      }
+
+      const addBtn = e.target.closest("#btn-submit-note");
+      if (addBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const input = this.container.querySelector("#note-input");
+        if (input) {
+          this.shouldResetInput = true;
+          window.dispatchEvent(
+            new CustomEvent("submitNote", { detail: { text: input.value } }),
+          );
+        }
+      }
+    });
+
+    this.container.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        const input = this.container.querySelector("#note-input");
+        if (document.activeElement === input) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const addBtn = this.container.querySelector("#btn-submit-note");
+          if (addBtn) {
+            this.shouldResetInput = true;
+            addBtn.click();
+          }
+        }
+      }
     });
   }
 

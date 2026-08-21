@@ -12,10 +12,25 @@ export const NoteService = {
     if (!text || !text.trim()) {
       NotificationService.show({
         type: "warning",
-        message: "Please write something before adding a note.",
+        message: "Please write something before adding a note",
         icon: "fa-pencil",
         iconColor: "text-amber-500",
         duration: 3000,
+      });
+      return null;
+    }
+
+    const allNotes = this.getNotes();
+    const isDuplicate = allNotes.some(
+      (n) => n.text.trim().toLowerCase() === text.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      NotificationService.show({
+        type: "error",
+        message: "A note with this text already exists",
+        icon: "fa-triangle-exclamation",
+        iconColor: "text-red-500/80",
+        duration: 4000,
       });
       return null;
     }
@@ -31,7 +46,7 @@ export const NoteService = {
     if (createdNote) {
       NotificationService.show({
         type: "success",
-        message: "Note added successfully.",
+        message: "Note added successfully",
         icon: "fa-sticky-note",
         iconColor: "text-emerald-500",
       });
@@ -49,7 +64,7 @@ export const NoteService = {
 
     NotificationService.show({
       type: "error",
-      message: `Note "${deletedNote.text}" removed.`,
+      message: `Note "${deletedNote.text}" removed`,
       undoAction: () => {
         this.restoreNote(deletedNote, index);
       },
