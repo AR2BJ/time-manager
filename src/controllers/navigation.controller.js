@@ -95,6 +95,10 @@ export class NavigationController {
       }
 
       if (event.altKey) {
+        if (key === "b") {
+          dispatchAsyncClick("scroll-to-top-btn");
+          return;
+        }
         if (key === "t") {
           dispatchAsyncClick("theme-toggle");
           return;

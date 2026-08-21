@@ -12,7 +12,6 @@ import { NoteController } from "./note.controller";
 import { NotificationService } from "@/services/notification.service";
 import { SettingsViewComponent } from "@/components/features/settings/settings-view.component.js";
 import { SoundModel } from "@/models/sound.model.js";
-import { TaskController } from "./task.controller";
 import { TaskService } from "@/services/task.service";
 import { TimerView } from "@/views/timer-view.js";
 import { TodayOverviewComponent } from "@/components/features/tasks/today-overview.component";
@@ -31,7 +30,6 @@ export const TimerController = {
     StateManager.init();
     timerService.initFromSavedState();
     NoteController.init();
-    TaskController.init();
     ModalController.init();
     FlipClockController.init();
 

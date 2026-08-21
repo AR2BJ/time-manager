@@ -16,6 +16,10 @@ class TimerService {
     }
   }
 
+  isTimerRunning() {
+    return state.timer?.isRunning && !state.timer?.isPaused;
+  }
+
   toggle() {
     if (state.timer.isRunning && !state.timer.isPaused) {
       this.pause();

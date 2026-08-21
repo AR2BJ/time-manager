@@ -4,6 +4,7 @@ import { ModalController } from "@/controllers/modal.controller";
 import { NotificationService } from "@/services/notification.service.js";
 import { TaskModel } from "@/models/task.model.js";
 import { state } from "@/models/state.model";
+import { timerService } from "@/services/timer.service.js";
 
 export const TaskService = {
   getTasks() {
@@ -141,7 +142,24 @@ export const TaskService = {
     if (!task) return null;
 
     const activeTaskId = TaskModel.getActiveTaskId();
-    const wasActive = String(activeTaskId) === String(taskId);
+    const isActive = String(activeTaskId) === String(taskId);
+
+    const todoTasks = TaskModel.getTasks().filter((t) => t.status !== "done");
+    const isOnlyTodoTask = todoTasks.length === 1;
+
+    if (isActive && isOnlyTodoTask && timerService.isTimerRunning()) {
+      NotificationService.show({
+        type: "error",
+        message:
+          "Cannot delete the active task while the timer is running. Stop the timer first.",
+        icon: "fa-triangle-exclamation",
+        iconColor: "text-red-500/80",
+        duration: 5000,
+      });
+      return null;
+    }
+
+    const wasActive = isActive;
 
     const result = TaskModel.remove(taskId);
     if (!result) return null;

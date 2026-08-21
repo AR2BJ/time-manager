@@ -2,10 +2,6 @@ import { ModalController } from "./modal.controller.js";
 import { TaskService } from "@/services/task.service.js";
 
 export const TaskController = {
-  init() {
-    this.bindEvents();
-  },
-
   createTask(title, estimatedFocusUnits = 1) {
     return TaskService.addTask(title, estimatedFocusUnits);
   },
@@ -24,7 +20,8 @@ export const TaskController = {
       ModalController.editingTask = null;
     }
 
-    ModalController.refreshTaskModal();
+    ModalController.closeTaskModal();
+    ModalController.openTaskModal();
   },
 
   bindEvents() {
