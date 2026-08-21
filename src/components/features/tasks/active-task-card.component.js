@@ -4,7 +4,7 @@ export const ActiveTaskCardComponent = {
   render() {
     const activeTask = TaskService.getActiveTask();
     const allTasks = TaskService.getTasks();
-    const hasTasks = allTasks.length > 0;
+    const hasTasks = allTasks.some((t) => t.status !== "done") && allTasks > 0;
 
     if (!activeTask) {
       const buttonText = hasTasks ? "Select" : "Create";

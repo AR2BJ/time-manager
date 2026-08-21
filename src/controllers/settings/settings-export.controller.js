@@ -36,15 +36,10 @@ export const SettingsExportController = {
         tasks: tasks.map((t) => ({
           id: t.id,
           title: t.title,
-          description: t.description || "",
           status: t.status || "todo",
-          priority: t.priority || "low",
-          tags: Array.isArray(t.tags) ? t.tags : [],
           estimatedFocusUnits: Number(t.estimatedFocusUnits) || 1,
           completedFocusUnits: Number(t.completedFocusUnits) || 0,
-          dueDate: t.dueDate || null,
           createdAt: t.createdAt,
-          completedAt: t.completedAt || null,
         })),
         sessions: sessions.map((s) => ({
           id: s.id,
@@ -52,8 +47,6 @@ export const SettingsExportController = {
           taskTitle: s.taskTitle || "Untitled",
           type: s.type || "pomodoro",
           durationSeconds: s.durationSeconds || 0,
-          targetDurationSeconds: s.targetDurationSeconds || 1500,
-          isFlowMode: Boolean(s.isFlowMode),
           completedAt: s.completedAt,
         })),
         notes: notes.map((n) => ({
@@ -127,18 +120,12 @@ export const SettingsExportController = {
       content += `_No tasks defined._\n\n`;
     } else {
       tasks.forEach((task) => {
-        const tagsStr = Array.isArray(task.tags) ? task.tags.join(", ") : "";
         content += `## #️⃣ ${task.id}\n`;
         content += `### 🎯 ${task.title}\n`;
         content += `- **Status:** ${task.status || "todo"}\n`;
-        content += `- **Priority:** ${task.priority || "medium"}\n`;
-        content += `- **Tags:** ${tagsStr}\n`;
         content += `- **Estimated Focus Units:** ${task.estimatedFocusUnits || 1}\n`;
         content += `- **Completed Focus Units:** ${task.completedFocusUnits || 0}\n`;
-        content += `- **Due Date:** ${task.dueDate || "N/A"}\n`;
         content += `- **Created At:** ${task.createdAt}\n`;
-        content += `- **Completed At:** ${task.completedAt || "N/A"}\n`;
-        content += `- **Description:** ${task.description || "None"}\n\n`;
         content += `---\n\n`;
       });
     }
@@ -148,7 +135,7 @@ export const SettingsExportController = {
       content += `_No sessions recorded._\n\n`;
     } else {
       sessions.forEach((s) => {
-        content += `- **ID:** ${s.id} | **Task:** ${s.taskTitle} (Task ID: ${s.taskId || "N/A"}) | **Type:** ${s.type} | **Duration:** ${s.durationSeconds}s / ${s.targetDurationSeconds || 1500}s | **Flow Mode:** ${s.isFlowMode ? "Yes" : "No"} | **Completed At:** ${s.completedAt}\n`;
+        content += `- **ID:** ${s.id} | **Task:** ${s.taskTitle} (Task ID: ${s.taskId || "N/A"}) | **Type:** ${s.type} | **Duration:** ${s.durationSeconds}s | **Completed At:** ${s.completedAt}\n`;
       });
       content += `\n---\n\n`;
     }
@@ -193,15 +180,14 @@ export const SettingsExportController = {
     content += `notificationSound,${escapeCsvValue(settings.notificationSound !== false ? "true" : "false")}\n`;
     content += `currentSoundId,${escapeCsvValue(SoundModel.getCurrentSoundId())}\n\n`;
 
-    content += `[TASKS]\nId,Title,Status,Priority,Tags,Estimated Focus Units,Completed Focus Units,Due Date,Created At,Completed At,Description\n`;
+    content += `[TASKS]\nId,Title,Status,Estimated Focus Units,Completed Focus Units,Created At\n`;
     tasks.forEach((t) => {
-      const tagsStr = Array.isArray(t.tags) ? t.tags.join(";") : "";
-      content += `${escapeCsvValue(t.id)},${escapeCsvValue(t.title)},${escapeCsvValue(t.status)},${escapeCsvValue(t.priority)},${escapeCsvValue(tagsStr)},${escapeCsvValue(t.estimatedFocusUnits)},${escapeCsvValue(t.completedFocusUnits)},${escapeCsvValue(t.dueDate)},${escapeCsvValue(t.createdAt)},${escapeCsvValue(t.completedAt)},${escapeCsvValue(t.description)}\n`;
+      content += `${escapeCsvValue(t.id)},${escapeCsvValue(t.title)},${escapeCsvValue(t.status)},${escapeCsvValue(t.estimatedFocusUnits)},${escapeCsvValue(t.completedFocusUnits)},${escapeCsvValue(t.createdAt)}\n`;
     });
 
-    content += `\n[SESSIONS]\nId,Task ID,Task Title,Type,Duration Seconds,Target Duration Seconds,Is Flow Mode,Completed At\n`;
+    content += `\n[SESSIONS]\nId,Task ID,Task Title,Type,Duration Seconds,Completed At\n`;
     sessions.forEach((s) => {
-      content += `${escapeCsvValue(s.id)},${escapeCsvValue(s.taskId)},${escapeCsvValue(s.taskTitle)},${escapeCsvValue(s.type)},${escapeCsvValue(s.durationSeconds)},${escapeCsvValue(s.targetDurationSeconds || 1500)},${escapeCsvValue(s.isFlowMode ? "true" : "false")},${escapeCsvValue(s.completedAt)}\n`;
+      content += `${escapeCsvValue(s.id)},${escapeCsvValue(s.taskId)},${escapeCsvValue(s.taskTitle)},${escapeCsvValue(s.type)},${escapeCsvValue(s.durationSeconds)},${escapeCsvValue(s.completedAt)}\n`;
     });
 
     content += `\n[NOTES]\nId,Text,Created At\n`;

@@ -2,6 +2,8 @@ import { StateManager, state } from "@/models/state.model.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NoteController } from "../note.controller";
+import { NoteModel } from "@/models/note.model";
+import { NoteService } from "@/services/note.service";
 import { NotificationService } from "@/services/notification.service.js";
 import { STORAGE_KEY } from "@/models/storage.model.js";
 import { SoundModel } from "@/models/sound.model.js";
@@ -114,6 +116,7 @@ export const SettingsResetController = {
                 state.timer = previousState.timer;
 
                 SoundModel.init(previousState.settings);
+                NoteService.restoreNotes(previousState.notes);
                 NoteController.init();
 
                 StateManager.setView("timer");

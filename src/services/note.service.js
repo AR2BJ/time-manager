@@ -80,4 +80,10 @@ export const NoteService = {
     NoteModel.insertAt(note, index);
     window.dispatchEvent(new CustomEvent("notesChanged"));
   },
+
+  restoreNotes(notes) {
+    if (!Array.isArray(notes)) return;
+    NoteModel.setItems(notes);
+    window.dispatchEvent(new CustomEvent("notesChanged"));
+  },
 };

@@ -2,7 +2,7 @@ import { StateManager, state } from "@/models/state.model.js";
 import { generateId, todayISO } from "@/utils/helpers.js";
 
 import { GlobalLoaderService } from "@/services/loader.service.js";
-import { NoteModel } from "@/models/note.model.js";
+import { NoteService } from "@/services/note.service";
 import { NotificationService } from "@/services/notification.service.js";
 import { SoundModel } from "@/models/sound.model.js";
 import { TimerController } from "../timer.controller";
@@ -155,7 +155,7 @@ export const SettingsImportController = {
           StateManager.save();
           StateManager.notify();
 
-          NoteModel.setItems(importedNotes);
+          NoteService.restoreNotes(importedNotes);
 
           NotificationService.show({
             type: "success",
@@ -276,42 +276,22 @@ export const SettingsImportController = {
       const idMatch = block.match(/## #️⃣\s*(.+)/);
       const titleMatch = block.match(/### 🎯\s*(.+)/);
       const statusMatch = block.match(/-\s*\*\*Status:\*\*\s*(.+)/);
-      const priorityMatch = block.match(/-\s*\*\*Priority:\*\*\s*(.+)/);
-      const tagsMatch = block.match(/-\s*\*\*Tags:\*\*\s*(.*)/);
       const estMatch = block.match(
         /-\s*\*\*Estimated Focus Units:\*\*\s*(\d+)/,
       );
       const compMatch = block.match(
         /-\s*\*\*Completed Focus Units:\*\*\s*(\d+)/,
       );
-      const dueDateMatch = block.match(/-\s*\*\*Due Date:\*\*\s*(.+)/);
       const createdAtMatch = block.match(/-\s*\*\*Created At:\*\*\s*(.+)/);
-      const completedAtMatch = block.match(/-\s*\*\*Completed At:\*\*\s*(.+)/);
-      const descMatch = block.match(/-\s*\*\*Description:\*\*\s*(.*)/);
 
       if (idMatch && titleMatch) {
-        const rawTags = tagsMatch ? tagsMatch[1].trim() : "";
-        const tags = rawTags ? rawTags.split(",").map((t) => t.trim()) : [];
-        const dueDate = dueDateMatch ? dueDateMatch[1].trim() : null;
-        const completedAt = completedAtMatch
-          ? completedAtMatch[1].trim()
-          : null;
-
         tasks.push({
           id: idMatch[1].trim(),
           title: titleMatch[1].trim(),
           status: statusMatch ? statusMatch[1].trim() : "todo",
-          priority: priorityMatch ? priorityMatch[1].trim() : "medium",
-          tags: tags,
           estimatedFocusUnits: estMatch ? parseInt(estMatch[1], 10) : 1,
           completedFocusUnits: compMatch ? parseInt(compMatch[1], 10) : 0,
-          dueDate: dueDate === "N/A" ? null : dueDate,
           createdAt: createdAtMatch ? createdAtMatch[1].trim() : todayISO(),
-          completedAt: completedAt === "N/A" ? null : completedAt,
-          description:
-            descMatch && descMatch[1].trim() !== "None"
-              ? descMatch[1].trim()
-              : "",
         });
       }
     });
@@ -321,7 +301,7 @@ export const SettingsImportController = {
       const sessionLines = sessionSection.match(/- \*\*ID:\*\*\s*(.+)/g);
       sessionLines?.forEach((line) => {
         const match = line.match(
-          /- \*\*ID:\*\*\s*(.+?)\s*\|\s*\*\*Task:\*\*\s*(.+?)\s*\(Task ID:\s*(.+?)\)\s*\|\s*\*\*Type:\*\*\s*(.+?)\s*\|\s*\*\*Duration:\*\*\s*(\d+)s\s*\/\s*(\d+)s\s*\|\s*\*\*Flow Mode:\*\*\s*(.+?)\s*\|\s*\*\*Completed At:\*\*\s*(.+)/,
+          /- \*\*ID:\*\*\s*(.+?)\s*\|\s*\*\*Task:\*\*\s*(.+?)\s*\(Task ID:\s*(.+?)\)\s*\|\s*\*\*Type:\*\*\s*(.+?)\s*\|\s*\*\*Duration:\*\*\s*(\d+)s\s*\|\s*\*\*Completed At:\*\*\s*(.+)/,
         );
         if (match) {
           sessions.push({
@@ -330,9 +310,7 @@ export const SettingsImportController = {
             taskId: match[3].trim() === "N/A" ? null : match[3].trim(),
             type: match[4].trim(),
             durationSeconds: parseInt(match[5], 10) || 0,
-            targetDurationSeconds: parseInt(match[6], 10) || 1500,
-            isFlowMode: match[7].trim().toLowerCase() === "yes",
-            completedAt: match[8].trim(),
+            completedAt: match[6].trim(),
           });
         }
       });
@@ -468,20 +446,13 @@ export const SettingsImportController = {
       } else if (currentSection === "TASKS") {
         if (cols[0] === "Id" && cols[1] === "Title") continue;
         if (cols.length >= 2) {
-          const tagsStr = cols[4] ? cols[4].trim() : "";
           tasks.push({
             id: cols[0] ? cols[0].trim() : generateId(),
             title: cols[1] ? cols[1].trim() : "Untitled Task",
             status: cols[2] ? cols[2].trim() : "todo",
-            priority: cols[3] ? cols[3].trim() : "medium",
-            tags: tagsStr ? tagsStr.split(";").map((t) => t.trim()) : [],
-            estimatedFocusUnits: cols[5] ? parseInt(cols[5], 10) : 1,
-            completedFocusUnits: cols[6] ? parseInt(cols[6], 10) : 0,
-            dueDate: cols[7] && cols[7].trim() !== "" ? cols[7].trim() : null,
-            createdAt: cols[8] ? cols[8].trim() : todayISO(),
-            completedAt:
-              cols[9] && cols[9].trim() !== "" ? cols[9].trim() : null,
-            description: cols[10] ? cols[10].trim() : "",
+            estimatedFocusUnits: cols[3] ? parseInt(cols[3], 10) : 1,
+            completedFocusUnits: cols[4] ? parseInt(cols[4], 10) : 0,
+            createdAt: cols[5] ? cols[5].trim() : todayISO(),
           });
         }
       } else if (currentSection === "SESSIONS") {
@@ -494,11 +465,7 @@ export const SettingsImportController = {
             taskTitle: cols[2] ? cols[2].trim() : "Untitled",
             type: cols[3] ? cols[3].trim() : "pomodoro",
             durationSeconds: cols[4] ? parseInt(cols[4], 10) : 0,
-            targetDurationSeconds: cols[5] ? parseInt(cols[5], 10) : 1500,
-            isFlowMode: cols[6]
-              ? cols[6].trim().toLowerCase() === "true"
-              : false,
-            completedAt: cols[7] ? cols[7].trim() : todayISO(),
+            completedAt: cols[5] ? cols[5].trim() : todayISO(),
           });
         }
       } else if (currentSection === "NOTES") {
