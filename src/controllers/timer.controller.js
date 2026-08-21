@@ -776,7 +776,7 @@ export const TimerController = {
           this.accumulatedFlowTime = 0;
 
           StateManager.setMode(targetMode);
-          // timerService.pause();
+          timerService.pause();
           StateManager.resetTimer();
 
           this.refreshUI();
