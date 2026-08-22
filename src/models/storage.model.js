@@ -1,6 +1,6 @@
 import { generateId, todayISO } from "@/utils/helpers.js";
 
-export const STORAGE_KEY = "time_manager_data";
+export const STORAGE_KEY = "time_manager";
 export const STORAGE_VERSION = 1;
 
 function normalizeTask(task) {
