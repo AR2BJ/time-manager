@@ -29,7 +29,7 @@ export const ActiveTaskCardComponent = {
             </div>
             <button 
               id="btn-select-task" 
-              class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+              class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-color hover:bg-surface-3 transition cursor-pointer"
             >
               ${buttonText}
             </button>
@@ -39,7 +39,7 @@ export const ActiveTaskCardComponent = {
             id="box-empty-task"
             class="p-3.5 rounded-2xl bg-surface-2 border border-dashed border-border cursor-pointer hover:border-brand/50 transition text-center"
           >
-            <p class="text-sm font-semibold text-primary mb-1">${boxTitle}</p>
+            <p class="text-sm font-semibold text-color mb-1">${boxTitle}</p>
             <p class="text-[11px] text-muted">${boxSubtitle}</p>
           </div>
         </div>
@@ -67,7 +67,7 @@ export const ActiveTaskCardComponent = {
           </div>
           <button 
             id="btn-select-task" 
-            class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-primary hover:bg-surface-3 transition cursor-pointer"
+            class="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-semibold text-secondary hover:text-color hover:bg-surface-3 transition cursor-pointer"
           >
             Select
           </button>
@@ -75,7 +75,7 @@ export const ActiveTaskCardComponent = {
 
         <div class="p-3.5 rounded-2xl bg-surface-2 border border-border">
           <div class="flex items-center justify-between gap-3 mb-3">
-            <h4 class="text-sm font-semibold text-primary truncate min-w-0 flex-1">${activeTask.title}</h4>
+            <h4 class="text-sm font-semibold text-color truncate min-w-0 flex-1">${activeTask.title}</h4>
             <span class="shrink-0 text-[11px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded-md border border-brand/20">
               ${completed}/${estimated} Units
             </span>

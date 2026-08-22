@@ -31,7 +31,7 @@ export const TaskModalComponent = {
                 <i class="fa-regular fa-bullseye-arrow"></i>
               </div>
               <div>
-                <h3 class="text-base font-bold text-primary">
+                <h3 class="text-base font-bold text-color">
                   ${isEditing ? "Edit Task" : "Select Active Task"}
                 </h3>
                 <p class="text-xs text-secondary">
@@ -47,7 +47,7 @@ export const TaskModalComponent = {
             <button
               id="close-task-modal"
               type="button"
-              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
+              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
             >
               <i class="fa-regular fa-xmark text-sm"></i>
             </button>
@@ -68,7 +68,7 @@ export const TaskModalComponent = {
                   maxlength="60"
                   value="${isEditing ? editingTask.title : ""}"
                   placeholder="E.g., Design System Refactoring"
-                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary placeholder:text-muted focus:outline-none focus:border-brand transition"
+                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color placeholder:text-muted focus:outline-none focus:border-brand transition"
                 />
               </div>
               <div>
@@ -84,7 +84,7 @@ export const TaskModalComponent = {
                   inputmode="numeric"
                   value="${isEditing ? editingTask.estimatedFocusUnits : "1"}"
                   maxlength="2"
-                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
             </div>
@@ -168,9 +168,7 @@ export const TaskModalComponent = {
                             }
                             <span
                               class="text-xs font-semibold truncate ${
-                                isActive
-                                  ? "text-brand font-bold"
-                                  : "text-primary"
+                                isActive ? "text-brand font-bold" : "text-color"
                               } ${isDone ? "line-through text-muted" : ""}"
                             >
                               ${t.title}

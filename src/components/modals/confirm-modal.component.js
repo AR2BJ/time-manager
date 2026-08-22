@@ -17,7 +17,7 @@ export const ConfirmModalComponent = {
             <i id="confirm-modal-icon" class="fa-regular fa-triangle-exclamation"></i>
           </div>
 
-          <h3 id="confirm-modal-title" class="text-base font-bold text-primary mb-1">
+          <h3 id="confirm-modal-title" class="text-base font-bold text-color mb-1">
             ${title || "Are you sure?"}
           </h3>
 
@@ -29,7 +29,7 @@ export const ConfirmModalComponent = {
             <button
               id="btn-cancel-confirm"
               type="button"
-              class="h-10 rounded-xl bg-surface-2 border border-border text-secondary hover:text-primary font-semibold text-xs transition cursor-pointer"
+              class="h-10 rounded-xl bg-surface-2 border border-border text-secondary hover:text-color font-semibold text-xs transition cursor-pointer"
             >
               Cancel
             </button>

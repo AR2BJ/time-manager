@@ -60,7 +60,7 @@ export class SoundPlayerComponent {
           <div class="flex flex-col items-center text-center sm:items-start sm:text-left min-w-0 flex-1 w-full gap-1">
             <h4
               id="player-track-title"
-              class="text-xs sm:text-sm font-bold text-primary truncate w-full cursor-pointer sm:pointer-events-none sm:cursor-default"
+              class="text-xs sm:text-sm font-bold text-color truncate w-full cursor-pointer sm:pointer-events-none sm:cursor-default"
               data-tooltip-title="No track selected"
             >
               --
@@ -90,7 +90,7 @@ export class SoundPlayerComponent {
         <div class="flex sm:hidden items-center gap-2.5 w-full pt-2 border-t border-border/40">
           <button
             type="button"
-            class="btn-toggle-mute text-secondary hover:text-primary transition shrink-0 cursor-pointer"
+            class="btn-toggle-mute text-secondary hover:text-color transition shrink-0 cursor-pointer"
             title="Toggle Mute"
           >
             <span class="inline-volume-icon flex items-center justify-center text-xs">
@@ -118,7 +118,7 @@ export class SoundPlayerComponent {
           <button
             type="button"
             id="btn-volume-popover-toggle"
-            class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
+            class="w-9 h-9 rounded-xl bg-surface hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
             title="Volume Control"
           >
             <span

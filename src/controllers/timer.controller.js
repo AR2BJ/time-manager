@@ -183,7 +183,7 @@ export const TimerController = {
         <span class="flex items-center gap-1.5 py-1 text-sm font-bold text-secondary tracking-wide">
           <span id="mobile-clock-date-part" class="inline">Loading...</span>
           <span class="text-border inline">|</span>
-          <span id="mobile-clock-tabular-nums" class="hover:text-primary cursor-pointer transition">Loading...</span>
+          <span id="mobile-clock-tabular-nums" class="hover:text-color cursor-pointer transition">Loading...</span>
         </span>
       `;
 
@@ -405,9 +405,9 @@ export const TimerController = {
 
       let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
       parts.forEach((part, index) => {
-        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        timerHtml += `<span class="digit-color font-[Mostin] font-black text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
         if (index < parts.length - 1) {
-          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+          timerHtml += `<span class="digit-color font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
         }
       });
       timerHtml += `</span>`;
@@ -448,9 +448,9 @@ export const TimerController = {
 
       let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
       parts.forEach((part, index) => {
-        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        timerHtml += `<span class="digit-color font-[Mostin] font-black text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
         if (index < parts.length - 1) {
-          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+          timerHtml += `<span class="digit-color font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
         }
       });
       timerHtml += `</span>`;
@@ -504,9 +504,9 @@ export const TimerController = {
 
       let timerHtml = `<span class="flex flex-row justify-center items-center gap-1.5">`;
       parts.forEach((part, index) => {
-        timerHtml += `<span class="font-[Mostin] font-black text-primary text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
+        timerHtml += `<span class="font-[Mostin] font-black text-color text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl tracking-normal">${part}</span>`;
         if (index < parts.length - 1) {
-          timerHtml += `<span class="font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
+          timerHtml += `<span class="digit-color font-['Roboto_Condensed'] text-lg xs:text-xl sm:text-2xl md:text-3xl xl:text-4xl 2xl:text-5xl pb-1.5 sm:pb-3">:</span>`;
         }
       });
       timerHtml += `</span>`;
@@ -561,7 +561,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-start"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">${btnText}</span>
@@ -571,7 +571,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-pause"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-pause pointer-events-none"></i>
               <span class="pointer-events-none">Pause</span>
@@ -581,7 +581,7 @@ export const TimerController = {
           controlsContainer.innerHTML = `
             <button
               id="btn-timer-stop"
-              class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
               title="Stop & Reset"
             >
               <i class="fa-regular fa-square pointer-events-none"></i>
@@ -590,7 +590,7 @@ export const TimerController = {
 
             <button
               id="btn-timer-continue"
-              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-primary hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
+              class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
               <i class="fa-regular fa-play pointer-events-none"></i>
               <span class="pointer-events-none">Continue</span>

@@ -111,12 +111,12 @@ export function updateTabStyles(tab) {
     tab === "monthly" ? btnMonthly : tab === "yearly" ? btnYearly : btnWeekly;
 
   buttons.forEach((btn) => {
-    btn.classList.remove("text-primary", "font-black");
+    btn.classList.remove("text-(--color-btn-primary-text)", "font-black");
     btn.classList.add("text-secondary");
   });
 
   activeButton.classList.remove("text-secondary");
-  activeButton.classList.add("text-primary", "font-black");
+  activeButton.classList.add("text-(--color-btn-primary-text)", "font-black");
 
   const switcherRect = switcher.getBoundingClientRect();
   const activeRect = activeButton.getBoundingClientRect();
@@ -203,7 +203,7 @@ function renderChartEmptyState(chartEl, title, icon, subtitle) {
       <div class="max-w-xs">
         <i class="text-4xl mb-3 fa-regular ${icon} text-brand/60"></i>
         <div
-          class="mb-2 text-lg font-semibold text-primary"
+          class="mb-2 text-lg font-semibold text-color"
         >
           ${title}
         </div>

@@ -24,7 +24,7 @@ export const GlobalLoaderService = {
 
           <div class="flex flex-col items-center gap-1 text-center">
             <h3
-              class="text-base sm:text-lg font-bold text-primary tracking-tight"
+              class="text-base sm:text-lg font-bold text-color tracking-tight"
             >
               System Processing
             </h3>

@@ -54,7 +54,7 @@ export class NoteComponent {
           id="note-input"
           type="text"
           placeholder="Catch a distraction or idea..."
-          class="w-full bg-surface-2 border border-border/80 rounded-xl p-2.5 pe-20 text-xs text-primary truncate placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
+          class="w-full bg-surface-2 border border-border/80 rounded-xl p-2.5 pe-20 text-xs text-color truncate placeholder:text-muted/60 focus:outline-none focus:border-brand/60 transition-colors"
           autocomplete="off"
         />
         <button
@@ -88,7 +88,7 @@ export class NoteComponent {
                       class="group flex items-center justify-between gap-2 p-2 rounded-xl bg-surface-2 border border-border/60 hover:border-border transition-all"
                     >
                       <span
-                        class="text-xs text-primary font-normal leading-snug wrap-break-word flex-1 ps-1"
+                        class="text-xs text-color font-normal leading-snug wrap-break-word flex-1 ps-1"
                       >
                         ${this.escapeHtml(item.text)}
                       </span>

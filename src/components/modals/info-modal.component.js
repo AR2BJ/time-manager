@@ -112,7 +112,7 @@ export const InfoModalComponent = {
                             ${keyGroup
                               .map(
                                 (key) =>
-                                  `<kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">${key}</kbd>`,
+                                  `<kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">${key}</kbd>`,
                               )
                               .join(
                                 '<span class="text-[10px] text-muted">/</span>',
@@ -153,14 +153,14 @@ export const InfoModalComponent = {
                 <i class="fa-regular fa-circle-question"></i>
               </div>
               <div>
-                <h3 class="text-base font-bold text-primary">Time Manager Guide</h3>
+                <h3 class="text-base font-bold text-color">Time Manager Guide</h3>
                 <p class="text-xs text-secondary">Shortcuts and workflow overview.</p>
               </div>
             </div>
             <button
               id="close-help-modal"
               type="button"
-              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-primary flex items-center justify-center transition cursor-pointer"
+              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
             >
               <i class="fa-regular fa-xmark text-sm"></i>
             </button>
@@ -175,7 +175,7 @@ export const InfoModalComponent = {
             </button>
             <button
               id="tab-help-shortcuts"
-              class="flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-primary transition cursor-pointer"
+              class="flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer"
             >
               <i class="fa-regular fa-keyboard me-1.5"></i> Shortcuts
             </button>
@@ -191,7 +191,7 @@ export const InfoModalComponent = {
                 <p class="text-xs text-secondary leading-relaxed">
                   A structured timer that alternates between focused work sessions and short breaks. 
                   When the timer naturally reaches zero, it automatically transitions to the next phase. 
-                  You can also manually <strong class="text-primary">Stop</strong> the timer at any time to skip the current phase and move to the next one. 
+                  You can also manually <strong class="text-color">Stop</strong> the timer at any time to skip the current phase and move to the next one. 
                   After 4 completed sessions (configurable), the system transitions to a longer break.
                 </p>
               </div>
@@ -203,7 +203,7 @@ export const InfoModalComponent = {
                 <p class="text-xs text-secondary leading-relaxed">
                   A continuous count-up timer designed for deep, uninterrupted work. 
                   The timer runs until you manually pause or stop it. 
-                  When you <strong class="text-primary">Stop</strong> the timer, your session is saved and the system automatically transitions to a <strong class="text-primary">Flow Break</strong>. 
+                  When you <strong class="text-color">Stop</strong> the timer, your session is saved and the system automatically transitions to a <strong class="text-color">Flow Break</strong>. 
                   After the Flow Break ends, the timer automatically returns to the main Flow Mode, ready for your next session.
                 </p>
               </div>
@@ -249,10 +249,10 @@ export const InfoModalComponent = {
                   <i class="fa-regular fa-keyboard"></i> Quick Actions & Shortcuts
                 </h4>
                 <p class="text-xs text-secondary leading-relaxed">
-                  <strong class="text-primary">Submit / Confirm:</strong> Use <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Ctrl</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Enter</kbd> (or <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Cmd</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-primary bg-surface border border-border rounded-md shadow-2xs">Enter</kbd>) to quickly create a task, save a note, or confirm any modal without clicking the button.
+                  <strong class="text-color">Submit / Confirm:</strong> Use <kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">Ctrl</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">Enter</kbd> (or <kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">Cmd</kbd> + <kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">Enter</kbd>) to quickly create a task, save a note, or confirm any modal without clicking the button.
                   <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
                     <i class="fa-regular fa-circle-question text-brand/70"></i>
-                    <strong class="text-primary">Escape</strong> closes any active modal or removes focus from the current input field.
+                    <strong class="text-color">Escape</strong> closes any active modal or removes focus from the current input field.
                   </span>
                 </p>
               </div>

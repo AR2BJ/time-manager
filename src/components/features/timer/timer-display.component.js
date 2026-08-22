@@ -62,7 +62,7 @@ export class TimerDisplayComponent {
         <button
           id="open-fullscreen-btn"
           type="button"
-          class="absolute top-1 right-1 sm:top-6 sm:right-6 z-30 backdrop-blur-md duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-surface hover:bg-surface-2  text-secondary hover:text-primary transition flex items-center justify-center cursor-pointer border border-border active:scale-95"
+          class="absolute top-1 right-1 sm:top-6 sm:right-6 z-30 backdrop-blur-md duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-surface hover:bg-surface-2  text-secondary hover:text-color transition flex items-center justify-center cursor-pointer border border-border active:scale-95"
           title="Enter Fullscreen Focus"
         >
           <i
@@ -116,7 +116,7 @@ export class TimerDisplayComponent {
 
           <span
             id="timer-display"
-            class="font-[Mostin] text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold tracking-tighter text-primary my-1"
+            class="font-[Mostin] text-2xl xs:text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold tracking-tighter text-color my-1"
           >
             25:00
           </span>

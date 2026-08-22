@@ -70,7 +70,7 @@ export class AutocompleteComponent {
             id="autocomplete-container-${uuid}"
             class="${
               this.options.containerClass
-            } relative min-h-10 w-full flex flex-wrap items-center content-start gap-1.5 rounded-xl border border-border bg-surface-2 p-1.75 pe-10 transition group cursor-pointer text-sm text-primary placeholder:text-secondary/70 focus-within:border-brand/80 focus-within:outline-none"
+            } relative min-h-10 w-full flex flex-wrap items-center content-start gap-1.5 rounded-xl border border-border bg-surface-2 p-1.75 pe-10 transition group cursor-pointer text-sm text-color placeholder:text-secondary/70 focus-within:border-brand/80 focus-within:outline-none"
           >
             <div
               id="autocomplete-chips-${uuid}"
@@ -87,7 +87,7 @@ export class AutocompleteComponent {
               }"
               class="${
                 this.options.inputClass
-              } flex-1 min-w-25 ps-2 pe-10 truncate bg-transparent text-sm text-primary placeholder:text-secondary/70 outline-none pb-0.5 h-7 cursor-pointer focus:outline-none"
+              } flex-1 min-w-25 ps-2 pe-10 truncate bg-transparent text-sm text-color placeholder:text-secondary/70 outline-none pb-0.5 h-7 cursor-pointer focus:outline-none"
               autocomplete="off"
             />
 
@@ -105,7 +105,7 @@ export class AutocompleteComponent {
             <button
               type="button"
               id="autocomplete-arrow-${uuid}"
-              class="absolute right-3 top-1/2 -translate-y-1/2 flex text-secondary hover:text-primary transition duration-200 pointer-events-none z-10"
+              class="absolute right-3 top-1/2 -translate-y-1/2 flex text-secondary hover:text-color transition duration-200 pointer-events-none z-10"
               tabindex="-1"
             >
               <i
@@ -375,7 +375,7 @@ export class AutocompleteComponent {
           return `
             <div
               data-value="${this.getItemValue(item)}"
-              class="autocomplete-item px-3.5 py-2 text-xs font-medium text-primary hover:bg-brand/10 hover:text-brand cursor-pointer flex items-center justify-between transition border-b border-border/30 last:border-none ${
+              class="autocomplete-item px-3.5 py-2 text-xs font-medium text-color hover:bg-brand/10 hover:text-brand cursor-pointer flex items-center justify-between transition border-b border-border/30 last:border-none ${
                 isSelected ? "bg-brand/10 text-brand/80" : ""
               }"
             >

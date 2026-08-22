@@ -286,7 +286,7 @@ export const DashboardComponent = {
           >
             <div>
               <h4
-                class="text-lg font-bold text-primary flex items-center gap-2"
+                class="text-lg font-bold text-color flex items-center gap-2"
               >
                 <i class="fa-regular fa-chart-network text-brand/80 text-xl"></i>
                 Activity Heatmap
@@ -299,7 +299,7 @@ export const DashboardComponent = {
             <div class="relative flex items-center justify-end">
               <button
                 id="heatmap-mobile-menu-toggle"
-                class="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-surface text-secondary hover:text-primary transition shadow-sm cursor-pointer"
+                class="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-surface text-secondary hover:text-color transition shadow-sm cursor-pointer"
                 aria-label="Open view menu"
               >
                 <i class="fa-regular fa-ellipsis-vertical text-lg"></i>
@@ -378,7 +378,7 @@ export const DashboardComponent = {
         >
           <div>
             <h4
-              class="text-lg font-bold text-primary flex items-center gap-2"
+              class="text-lg font-bold text-color flex items-center gap-2"
             >
               <i
                 class="fa-regular fa-chart-simple text-amber-400 text-xl"
@@ -410,7 +410,7 @@ export const DashboardComponent = {
           >
             <div>
               <h4
-                class="text-lg font-bold text-primary flex items-center gap-2"
+                class="text-lg font-bold text-color flex items-center gap-2"
               >
                 <i class="fa-regular fa-clock text-brand/80 text-xl"></i>
                 Session History
@@ -438,7 +438,7 @@ export const DashboardComponent = {
                           class="fa-regular fa-clock text-brand/60"
                         ></i>
                       </div>
-                      <h2 class="text-2xl font-bold text-primary">
+                      <h2 class="text-2xl font-bold text-color">
                         No sessions yet
                       </h2>
                       <p class="mt-3 text-secondary max-w-sm mx-auto">
@@ -479,7 +479,7 @@ export const DashboardComponent = {
                               </span>
                             </div>
 
-                            <div class="flex items-center gap-2 text-[13px] font-bold text-primary">
+                            <div class="flex items-center gap-2 text-[13px] font-bold text-color">
                               ${session.taskTitle}
                             </div>
 
@@ -502,7 +502,7 @@ export const DashboardComponent = {
                                 >Completed</span
                               >
                               <span
-                                class="text-xs font-mono font-medium text-primary"
+                                class="text-xs font-mono font-medium text-color"
                                 >${session.completedAt}</span
                               >
                             </div>

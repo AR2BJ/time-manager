@@ -320,14 +320,14 @@ export const ModalController = {
           tabSafeguard.className =
             "flex-1 py-2 text-xs font-bold rounded-lg bg-brand text-white transition cursor-pointer";
           tabShortcuts.className =
-            "flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-primary transition cursor-pointer";
+            "flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer";
           contentSafeguard.classList.remove("hidden");
           contentShortcuts.classList.add("hidden");
         } else {
           tabShortcuts.className =
             "flex-1 py-2 text-xs font-bold rounded-lg bg-brand text-white transition cursor-pointer";
           tabSafeguard.className =
-            "flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-primary transition cursor-pointer";
+            "flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer";
           contentShortcuts.classList.remove("hidden");
           contentSafeguard.classList.add("hidden");
         }

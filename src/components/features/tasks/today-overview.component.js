@@ -82,7 +82,7 @@ export const TodayOverviewComponent = {
 
         <div class="grid grid-cols-2 gap-3">
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
-            <span class="block text-2xl font-black text-primary mb-0.5">${sessionsDone}</span>
+            <span class="block text-2xl font-black text-color mb-0.5">${sessionsDone}</span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Sessions Done</span>
           </div>
 

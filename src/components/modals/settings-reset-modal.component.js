@@ -15,7 +15,7 @@ export const SettingsResetComponent = {
           </div>
 
           <div class="text-center flex flex-col gap-1">
-            <h3 class="text-lg font-bold text-primary">
+            <h3 class="text-lg font-bold text-color">
               Are you absolutely sure?
             </h3>
             <p class="text-sm text-secondary">
@@ -27,7 +27,7 @@ export const SettingsResetComponent = {
           <div class="grid grid-cols-2 gap-3 mt-2">
             <button
               id="cancel-settings-reset"
-              class="px-4 py-2.5 rounded-xl bg-surface-3 hover:border-primary  text-secondary hover:text-primary! font-medium text-sm transition border border-border cursor-pointer"
+              class="px-4 py-2.5 rounded-xl bg-surface-3 hover:border-primary  text-secondary hover:text-color! font-medium text-sm transition border border-border cursor-pointer"
             >
               Cancel
             </button>

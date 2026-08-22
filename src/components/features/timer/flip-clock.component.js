@@ -18,8 +18,7 @@ export class FlipClockComponent {
     this.overlay.innerHTML = `
       <div
         id="flip-top-bar"
-        class="absolute top-0 left-0 right-0 p-12 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
-        style="background: linear-gradient(180deg, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 100%);"
+        class="flip-background-shadow absolute top-0 left-0 right-0 p-12 flex items-center justify-between z-50 opacity-0 transition-opacity duration-300 pointer-events-none"
       >
         <div
           id="flip-phase-badge"
@@ -157,15 +156,15 @@ export class FlipClockComponent {
     if (hasHours) {
       container.innerHTML = `
         <div id="flip-card-hours" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
-        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-color/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
         <div id="flip-card-minutes" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
-        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-color/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
         <div id="flip-card-seconds" class="relative w-1/3 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
       `;
     } else {
       container.innerHTML = `
         <div id="flip-card-minutes" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
-        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-primary/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
+        <div class="text-5xl sm:text-8xl lg:text-[12rem] font-black text-color/30 select-none flex items-center justify-center pb-2 sm:pb-6">:</div>
         <div id="flip-card-seconds" class="relative w-1/2 h-[40dvw] lg:h-[50dvw] bg-surface rounded-2xl sm:rounded-3xl shadow-2xl border border-border/10 flex flex-col overflow-hidden"></div>
       `;
     }
@@ -207,20 +206,20 @@ export class FlipClockComponent {
 
       if (state === "idle") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-start" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-primary">
+          <button id="btn-flip-start" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-(--color-btn-primary-text)">
             <i class="fa-solid fa-play text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       } else if (state === "running") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-pause" type="button" class="${btnClass} bg-amber-500 hover:bg-amber-600 text-primary">
+          <button id="btn-flip-pause" type="button" class="${btnClass} bg-amber-500 hover:bg-amber-600 text-(--color-btn-primary-text)">
             <i class="fa-solid fa-pause text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       } else if (state === "paused") {
         controlsContainer.innerHTML = `
-          <button id="btn-flip-stop" type="button" class="${btnClass} bg-red-500 hover:bg-red-600 text-primary">
+          <button id="btn-flip-stop" type="button" class="${btnClass} bg-red-500 hover:bg-red-600 text-(--color-btn-primary-text)">
             <i class="fa-solid fa-square text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>
-          <button id="btn-flip-continue" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-primary">
+          <button id="btn-flip-continue" type="button" class="${btnClass} bg-brand hover:bg-brand/90 text-(--color-btn-primary-text)">
             <i class="fa-solid fa-play text-xl sm:text-2xl max-lg:landscape:text-sm pointer-events-none"></i>
           </button>`;
       }
@@ -232,10 +231,10 @@ export class FlipClockComponent {
 
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${topVal}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[54%]">${topVal}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${botVal}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[-46%]">${botVal}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>
@@ -254,16 +253,16 @@ export class FlipClockComponent {
 
     cardEl.innerHTML = `
       <div class="absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${newValue}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[54%]">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${oldValue}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[-46%]">${oldValue}</span>
       </div>
       <div class="flip-leaf-top absolute inset-x-0 top-0 h-1/2 bg-surface rounded-t-2xl sm:rounded-t-3xl border-b border-bg flex items-end justify-center overflow-hidden z-20">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[54%]">${oldValue}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[54%]">${oldValue}</span>
       </div>
       <div class="flip-leaf-bottom absolute inset-x-0 bottom-0 h-1/2 bg-surface rounded-b-2xl sm:rounded-b-3xl flex items-start justify-center overflow-hidden z-20">
-        <span class="${fontSizeClass} font-[Mostin] font-black text-primary translate-y-[-46%]">${newValue}</span>
+        <span class="digit-color ${fontSizeClass} font-[Mostin] font-black translate-y-[-46%]">${newValue}</span>
       </div>
       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 sm:h-1 bg-bg z-30 shadow-sm rounded-full"></div>
       <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3.5 max-lg:landscape:w-2 h-5 sm:h-7 max-lg:landscape:h-4 bg-bg rounded-r-full z-30 border-r border-y border-primary/10"></div>

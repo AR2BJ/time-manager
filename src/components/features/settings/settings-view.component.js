@@ -39,7 +39,7 @@ export const SettingsViewComponent = {
         >
           <div class="flex flex-col gap-1 px-1">
             <h1
-              class="text-xl sm:text-2xl font-bold text-primary tracking-tight"
+              class="text-xl sm:text-2xl font-bold text-color tracking-tight"
             >
               Application Settings
             </h1>
@@ -59,7 +59,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Appearance Theme
                 </h3>
@@ -110,7 +110,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Pomodoro Configurations
                 </h3>
@@ -135,7 +135,7 @@ export const SettingsViewComponent = {
                   data-min="25"
                   data-max="200"
                   value="${settings.pomodoroWorkTime || 25}"
-                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
 
@@ -153,7 +153,7 @@ export const SettingsViewComponent = {
                   data-min="5"
                   data-max="40"
                   value="${settings.shortBreakTime || 5}"
-                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
 
@@ -171,7 +171,7 @@ export const SettingsViewComponent = {
                   data-min="15"
                   data-max="120"
                   value="${settings.longBreakTime || 15}"
-                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
 
@@ -189,14 +189,14 @@ export const SettingsViewComponent = {
                   data-min="1"
                   data-max="20"
                   value="${settings.longBreakInterval || 4}"
-                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
             </div>
 
             <div class="flex flex-col gap-3 pt-2 border-t border-border/60">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-primary"
+                <span class="text-xs font-medium text-color"
                   >Auto-start Next Pomodoro</span
                 >
                 ${SettingsViewComponent.renderToggle(
@@ -206,7 +206,7 @@ export const SettingsViewComponent = {
               </div>
 
               <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-primary"
+                <span class="text-xs font-medium text-color"
                   >Auto-start Break</span
                 >
                 ${SettingsViewComponent.renderToggle(
@@ -216,7 +216,7 @@ export const SettingsViewComponent = {
               </div>
 
               <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-primary"
+                <span class="text-xs font-medium text-color"
                   >Disable Breaks</span
                 >
                 ${SettingsViewComponent.renderToggle(
@@ -238,7 +238,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Flow Configurations
                 </h3>
@@ -263,7 +263,7 @@ export const SettingsViewComponent = {
                   data-min="15"
                   data-max="120"
                   value="${settings.flowBreakTime || 15}"
-                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-primary focus:outline-none focus:border-brand transition"
+                  class="bounded-numeric-input w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color focus:outline-none focus:border-brand transition"
                 />
               </div>
             </div>
@@ -272,7 +272,7 @@ export const SettingsViewComponent = {
               <div
                 class="flex items-center justify-between w-full sm:w-auto gap-6"
               >
-                <span class="text-xs font-medium text-primary"
+                <span class="text-xs font-medium text-color"
                   >Auto-start Flow Break</span
                 >
                 ${SettingsViewComponent.renderToggle(
@@ -294,7 +294,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Audio & Haptics
                 </h3>
@@ -307,7 +307,7 @@ export const SettingsViewComponent = {
             <div class="flex flex-col gap-4">
               <div class="flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-xs">
-                  <span class="font-medium text-primary">Volume</span>
+                  <span class="font-medium text-color">Volume</span>
                   <span
                     id="sett-volume-val"
                     class="font-bold text-brand"
@@ -348,7 +348,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Data Backup & Synchronization
                 </h3>
@@ -368,7 +368,7 @@ export const SettingsViewComponent = {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <button
                   id="sett-export-json-btn"
-                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-primary text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
+                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-color text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
                 >
                   <i
                     class="fa-regular fa-file-code text-amber-500/80 text-sm group-hover:scale-105 transition"
@@ -377,7 +377,7 @@ export const SettingsViewComponent = {
                 </button>
                 <button
                   id="sett-export-md-btn"
-                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-primary text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
+                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-color text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
                 >
                   <i
                     class="fa-brands fa-markdown text-indigo-500/80 text-sm group-hover:scale-105 transition"
@@ -386,7 +386,7 @@ export const SettingsViewComponent = {
                 </button>
                 <button
                   id="sett-export-csv-btn"
-                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-primary text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
+                  class="w-full px-3 py-2.5 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-color text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer group"
                 >
                   <i
                     class="fa-regular fa-table text-emerald-500/80 text-sm group-hover:scale-105 transition"
@@ -410,7 +410,7 @@ export const SettingsViewComponent = {
                 <i
                   class="fa-regular fa-cloud-arrow-up text-lg sm:text-xl text-secondary group-hover:text-brand/80 transition animate-pulse"
                 ></i>
-                <span class="text-xs font-semibold text-primary px-2">
+                <span class="text-xs font-semibold text-color px-2">
                   Drag & drop file here or
                   <span class="text-brand/80 font-bold"
                     >browse local files</span
@@ -441,7 +441,7 @@ export const SettingsViewComponent = {
               </div>
               <div class="min-w-0">
                 <h3
-                  class="text-sm sm:text-base font-semibold text-primary truncate"
+                  class="text-sm sm:text-base font-semibold text-color truncate"
                 >
                   Storage & Factory Reset
                 </h3>
