@@ -118,7 +118,10 @@ export const InfoModalComponent = {
                             ${keyGroup
                               .map(
                                 (key) =>
-                                  `<kbd class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs">${key}</kbd>`,
+                                  `<kbd
+                                    class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
+                                    >${key}</kbd
+                                  >`,
                               )
                               .join(
                                 '<span class="text-[10px] text-muted">/</span>',
