@@ -15,7 +15,7 @@
 <p align="center">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-6.x-646CFF?style=flat-square&logo=vite" />
   <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES2026-F7DF1E?style=flat-square&logo=javascript" />
-  <img alt="Storage" src="https://img.shields.io/badge/Storage-LocalStorage-4FC3F7?style=flat-square" />
+  <img alt="LocalStorage" src="https://img.shields.io/badge/Storage-LocalStorage-4FC3F7?style=flat-square" />
   <img alt="Responsive" src="https://img.shields.io/badge/Responsive-Desktop%20%26%20Mobile-34A853?style=flat-square" />
   <img alt="License" src="https://img.shields.io/badge/License-MIT-00599C?style=flat-square" />
 </p>
@@ -24,39 +24,58 @@
 
 # Time Manager
 
-A modern, lightweight time management web application designed to help users organize daily responsibilities, stay productive, and monitor progress through a clean and responsive interface.
+A lightweight productivity web app designed to help users focus on their tasks, manage work sessions, keep daily notes, and monitor their progress through a clean and responsive interface.
 
 ## Overview
 
-Time Manager is a frontend-focused productivity app that allows users to manage times, review their workload from different perspectives, and keep everything organized without relying on any backend service. All data is stored locally in the browser using LocalStorage, ensuring a fast and private experience.
+Time Manager is a frontend-only application built for personal productivity. It combines task management, a visual timer, notes, sound alerts, analytics, and settings into a single browser-based experience. All application data is stored locally in the browser using LocalStorage, which keeps the app fast, private, and independent from any backend service.
 
-## Key Features
+## Features
 
-- Create, edit, complete, and delete times
-- Organize times through a structured time-based interface
-- View times in multiple perspectives such as calendar and matrix views
-- Explore progress through an analytics-oriented dashboard
-- Customize the experience with settings and theme support
-- Maintain personal data locally for fast access and privacy
+- Create, edit, complete, and delete tasks
+- Track active work with a focused timer workflow
+- View a daily overview of current tasks and progress
+- Add and manage personal notes
+- Customize sound alerts and volume
+- Review productivity data in an analytics dashboard
+- Switch themes and adjust app settings
+- Import, export, and reset saved data
+- Use the app responsively on desktop and mobile screens
 
-## Project Goals
+## Core Functionalities
 
-This project was developed to demonstrate:
+### Timer and Focus Workflow
 
-- modular frontend architecture
-- clean separation of concerns
-- browser-based persistence
-- responsive UI design
-- practical time-management workflows
+The app includes a timer system with task-based focus sessions, start/pause/reset controls, and visual progress feedback. A flip-clock style display gives the timer a more polished and modern look.
+
+### Task Management
+
+Users can manage tasks throughout the day by creating new items, updating existing ones, marking them complete, and viewing today’s workload in a dedicated overview panel.
+
+### Notes
+
+The project includes a note feature for storing short reminders, quick ideas, and daily planning information. Notes are persisted locally so they remain available across sessions.
+
+### Sound and Notifications
+
+A sound system is included for timer completion alerts, with selectable sound options and volume control to personalize the experience.
+
+### Analytics
+
+The analytics section provides an overview of productivity-related activity, helping users review performance and identify task patterns.
+
+### Settings and Data Management
+
+The app includes settings support for theme customization and data controls such as importing, exporting, and resetting stored state.
 
 ## Technology Stack
 
 - Vite
 - Vanilla JavaScript
-- Custom CSS styling
+- Custom CSS
 - Font Awesome
 - LocalStorage for persistence
-- Feature-based frontend modularity
+- Modular frontend architecture
 
 ## Project Structure
 
@@ -67,14 +86,16 @@ time-manager/
 ├── src/
 │   ├── app/
 │   ├── assets/
-│   │   └── css/
+│   │   ├── css/
+│   │   └── font/
 │   ├── components/
 │   │   ├── features/
 │   │   │   ├── analytics/
-│   │   │   ├── calendar/
-│   │   │   ├── matrix/
+│   │   │   ├── note/
 │   │   │   ├── settings/
-│   │   │   └── times/
+│   │   │   ├── sound/
+│   │   │   ├── tasks/
+│   │   │   └── timer/
 │   │   ├── layout/
 │   │   ├── modals/
 │   │   ├── shared/
@@ -86,30 +107,37 @@ time-manager/
 │   └── views/
 ├── vendor/
 │   └── fontawesome/
+├── index.html
+├── jsconfig.json
 ├── package.json
 ├── vite.config.js
-└── jsconfig.json
+├── LICENSE
+├── README.md
+├── .gitignore
+└── public/
 ```
 
 ## Architecture
 
-The application follows a structured frontend architecture based on clear separation between presentation, behavior, and state:
+The app follows a modular frontend structure with responsibilities separated into clear areas:
 
-- `app/` — application bootstrap and global configuration
-- `components/` — reusable UI blocks and feature-specific modules
-- `controllers/` — event handling and workflow coordination
-- `models/` — application state and persistence layer
-- `services/` — reusable business logic and side-effect abstractions
-- `views/` — page-level rendering and visual composition
+- `app/` — app bootstrap and theme setup
+- `components/` — UI blocks and feature-specific interfaces
+- `controllers/` — event handling and coordination
+- `models/` — application state and persistence models
+- `services/` — timer, sound, theme, note, and storage logic
+- `views/` — rendering and presentation layers
+- `utils/` — helpers and adapters
 
-This organization improves maintainability, readability, and extensibility while preserving a lightweight implementation.
+This structure keeps the codebase easier to maintain, extend, and debug as the project grows.
 
 ## Demo
 
-A visual demonstration of the interface is available in:
+A visual demo is available in:
 
 ```text
 /public/picture/demo.gif
+/public/picture/logo-2.png
 ```
 
 ## Installation
@@ -149,26 +177,40 @@ npm run preview
 
 ## Usage
 
-1. Launch the application in a browser.
-2. Create and organize the times you need to manage.
-3. Review times from different views such as calendar and matrix.
-4. Use the analytics dashboard to monitor your progress.
-5. Adjust the app settings and theme according to your preference.
+1. Open the app in your browser.
+2. Create or select a task.
+3. Start the timer for a focused work session.
+4. Use your notes for reminders or quick planning.
+5. Adjust sound and volume preferences.
+6. Review analytics to monitor your activity.
+7. Customize settings and theme to match your workflow.
+
+## Data Storage
+
+The app stores user data locally in the browser using `LocalStorage`, including:
+
+- tasks
+- notes
+- settings
+- sound preferences
+- theme choice
+- app state
 
 ## Roadmap
 
-Potential future enhancements include:
+Potential future improvements include:
 
-- richer analytics and progress insights
-- time filtering and search improvements
-- drag-and-drop time organization
-- reminders and notifications
-- data import/export support
+- richer analytics views and filters
+- recurring task support
+- drag-and-drop task organization
+- reminder notifications
+- more advanced data export/import tools
+- expanded theme and customization options
 
 ## License
 
-This project is licensed under the [MIT license](https://github.com/AR2BJ/time-manager/blob/dev/LICENSE).
+This project is licensed under the [MIT License](https://github.com/AR2BJ/time-manager/blob/dev/LICENSE).
 
 ## Contributing
 
-Contributions are welcome. If you would like to improve the UI, extend analytics, or refine the system architecture, please feel free to open a pull request or submit an issue.
+Contributions are welcome. If you want to improve the timer flow, extend the analytics, add new features, or refine the architecture, feel free to open a pull request or submit an issue.
