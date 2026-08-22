@@ -52,13 +52,16 @@ export const SettingsController = {
     if (pomoLen) pomoLen.value = settings.pomodoroWorkTime ?? 25;
 
     const shortBreak = document.getElementById("sett-short-break-len");
-    if (shortBreak) shortBreak.value = settings.shortBreakTime ?? 10;
+    if (shortBreak) shortBreak.value = settings.shortBreakTime ?? 5;
 
     const longBreak = document.getElementById("sett-long-break-len");
-    if (longBreak) longBreak.value = settings.longBreakTime ?? 20;
+    if (longBreak) longBreak.value = settings.longBreakTime ?? 15;
 
     const longInterval = document.getElementById("sett-long-break-interval");
     if (longInterval) longInterval.value = settings.longBreakInterval ?? 4;
+
+    const flowBreak = document.getElementById("sett-flow-break-len");
+    if (flowBreak) flowBreak.value = settings.flowBreakTime ?? 15;
 
     const volume = document.getElementById("sett-volume");
     if (volume) {
@@ -281,9 +284,9 @@ export const SettingsController = {
     const pomodoroWorkTime =
       Number(document.getElementById("sett-pomo-len")?.value) || 25;
     const shortBreakTime =
-      Number(document.getElementById("sett-short-break-len")?.value) || 10;
+      Number(document.getElementById("sett-short-break-len")?.value) || 5;
     const longBreakTime =
-      Number(document.getElementById("sett-long-break-len")?.value) || 20;
+      Number(document.getElementById("sett-long-break-len")?.value) || 15;
     const longBreakInterval =
       Number(document.getElementById("sett-long-break-interval")?.value) || 4;
 
@@ -292,7 +295,7 @@ export const SettingsController = {
     const disableBreaks = this.getToggleState("sett-disable-breaks");
 
     const flowBreakTime =
-      Number(document.getElementById("sett-flow-break-len")?.value) || 20;
+      Number(document.getElementById("sett-flow-break-len")?.value) || 15;
     const autoStartFlowBreaks = this.getToggleState(
       "sett-auto-start-flow-break",
     );

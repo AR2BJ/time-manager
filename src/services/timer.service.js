@@ -254,7 +254,7 @@ class TimerService {
       return;
     }
 
-    if (flowTime >= 1200) {
+    if (flowTime >= 1500) {
       StateManager.addSession({
         taskId: currentTaskId,
         taskTitle: currentTask ? currentTask.title : "Untitled Session",
@@ -276,13 +276,13 @@ class TimerService {
       NotificationService.show({
         type: "info",
         message:
-          "Flow session was too short (under 10 seconds), No session saved",
+          "Flow session was too short (under 25 minutes), No session saved",
         icon: "fa-info-circle",
         iconColor: "text-brand",
       });
     }
 
-    const breakSecs = (state.settings.flowBreakTime || 20) * 60;
+    const breakSecs = (state.settings.flowBreakTime || 15) * 60;
     StateManager.updateTimerState({
       isRunning: false,
       isPaused: false,

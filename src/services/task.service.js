@@ -16,10 +16,12 @@ export const TaskService = {
     return activeId ? TaskModel.getById(activeId) : null;
   },
 
-  isTitleDuplicate(title) {
+  isTitleDuplicate(title, excludeTaskId = null) {
     const cleanTitle = title.trim().toLowerCase();
     return TaskModel.getTasks().some(
-      (t) => t.title.trim().toLowerCase() === cleanTitle,
+      (t) =>
+        String(t.id) !== String(excludeTaskId) &&
+        t.title.trim().toLowerCase() === cleanTitle,
     );
   },
 
@@ -87,7 +89,7 @@ export const TaskService = {
       return null;
     }
 
-    if (this.isTitleDuplicate(newTitle)) {
+    if (this.isTitleDuplicate(newTitle, taskId)) {
       NotificationService.show({
         type: "error",
         message: "A task with this title already exists",

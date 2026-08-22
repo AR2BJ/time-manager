@@ -15,6 +15,11 @@ const HELP_SHORTCUTS = [
         separator: "+",
       },
       {
+        label: "Start / Pause Timer",
+        icon: "fa-play-pause",
+        keys: [["Space"]],
+      },
+      {
         label: "Volume up and down",
         icon: "fa-volume",
         keys: [
@@ -22,11 +27,6 @@ const HELP_SHORTCUTS = [
           ["🠕", "🠗"],
         ],
         separator: "or",
-      },
-      {
-        label: "Start / Pause Timer",
-        icon: "fa-play-pause",
-        keys: [["Space"]],
       },
     ],
   },
