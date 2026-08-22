@@ -210,19 +210,19 @@ export const AnalyticsAdapter = {
         {
           from: 1,
           to: Math.ceil(safeMax * 0.2),
-          color: isDark ? "#064e3b" : "#dcfae9",
+          color: isDark ? "#10b981" : "#93f3d3",
           name: "low",
         },
         {
           from: Math.ceil(safeMax * 0.2) + 1,
           to: Math.ceil(safeMax * 0.5),
-          color: isDark ? "#047857" : "#9be9a8",
+          color: isDark ? "#09704e" : "#72a795",
           name: "medium",
         },
         {
           from: Math.ceil(safeMax * 0.5) + 1,
           to: safeMax,
-          color: "#10b981",
+          color: "#053d2a",
           name: "high",
         },
       ];
@@ -235,19 +235,19 @@ export const AnalyticsAdapter = {
         {
           from: 1,
           to: step,
-          color: isDark ? "#064e3b" : "#dcfae9",
+          color: isDark ? "#10b981" : "#93f3d3",
           name: "low",
         },
         {
           from: step + 1,
           to: step * 2,
-          color: isDark ? "#047857" : "#9be9a8",
+          color: isDark ? "#09704e" : "#72a795",
           name: "medium",
         },
         {
           from: step * 2 + 1,
           to: safeMax,
-          color: "#10b981",
+          color: "#053d2a",
           name: "high",
         },
       ];

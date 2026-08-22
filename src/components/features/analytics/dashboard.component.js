@@ -74,7 +74,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-brand tracking-tight">
               ${totalSessions}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
@@ -100,7 +100,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-emerald-400 tracking-tight">
               ${formattedTotalFocus}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
@@ -113,7 +113,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-amber-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-fire absolute -right-4 -bottom-6 text-[10rem] text-amber-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-solid fa-fire absolute -right-4 -bottom-6 text-[10rem] text-yellow-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -121,12 +121,12 @@ export const DashboardComponent = {
               >Current Streak</span
             >
             <span
-              class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20"
+              class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
               >${currentStreak} Days</span
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-amber-400 tracking-tight">
+            <div class="text-3xl font-black text-yellow-400 tracking-tight">
               ${currentStreak}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
@@ -152,7 +152,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-indigo-400 tracking-tight">
               ${totalPomos}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
@@ -200,7 +200,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-rose-400 tracking-tight">
               ${(() => {
                 const days = Array(7).fill(0);
                 sessions.forEach((s) => {
@@ -237,7 +237,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-sky-400 tracking-tight">
               ${formatTime(todayTotalSeconds)}
             </div>
             <p class="text-[11px] text-secondary/80 font-medium mt-1">
@@ -247,10 +247,10 @@ export const DashboardComponent = {
         </div>
 
         <div
-          class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-teal-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
+          class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-orange-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-arrow-right-arrow-left absolute -right-4 -bottom-6 text-[10rem] text-teal-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="fa-solid fa-arrow-right-arrow-left absolute -right-4 -bottom-6 text-[10rem] text-orange-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -259,7 +259,7 @@ export const DashboardComponent = {
             >
           </div>
           <div class="z-10 mt-3">
-            <div class="text-3xl font-black text-primary tracking-tight">
+            <div class="text-3xl font-black text-orange-400 tracking-tight">
               ${(() => {
                 const p = sessions.filter((s) => s.type === "pomodoro").length;
                 const f = sessions.filter((s) => s.type === "flow").length;
