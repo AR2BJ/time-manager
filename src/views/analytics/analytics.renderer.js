@@ -8,7 +8,7 @@ let barChartInstance = null;
 let activeHeatmapTab = "weekly";
 let resizeListenerAttached = false;
 
-const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const weekdayNames = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
 /**
  * Calculates and returns ApexCharts configuration options for Heatmap

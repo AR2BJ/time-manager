@@ -402,7 +402,7 @@ export const DashboardComponent = {
       </div>
 
       <div
-        class="w-full col-span-2 sm:col-span-full mt-4 bg-surface-2 rounded-2xl"
+        class="w-full col-span-2 sm:col-span-full mt-4 bg-surface-2 border border-border/70 rounded-2xl"
       >
         <div class="w-full col-span-full bg-surface-2 rounded-2xl p-6">
           <div
