@@ -7,6 +7,7 @@ export const NotificationService = {
     icon = null,
     iconColor = "",
     actionButton = null,
+    closable = true,
   }) {
     const container = document.getElementById("notification-container");
     if (!container) return;
@@ -44,6 +45,24 @@ export const NotificationService = {
       warning: "text-amber-800/80 dark:text-amber-500",
       info: "text-brand/80 dark:text-brand",
     };
+    const typeCloseBgMap = {
+      success: "bg-emerald-600/60",
+      error: "bg-red-600/60",
+      warning: "bg-amber-600/60",
+      info: "bg-brand/60",
+    };
+    const typeCloseBorderMap = {
+      success: "border-emerald-600/60",
+      error: "border-red-600/60",
+      warning: "border-amber-600/60",
+      info: "border-brand/60",
+    };
+    const typeCloseTextMap = {
+      success: "text-white",
+      error: "text-white",
+      warning: "text-white",
+      info: "text-white",
+    };
 
     const toastTextClass = typeTextColorMap[type] || "text-emerald-500/80";
     const toastTimerClass = typeTimerMap[type] || "bg-emerald-700/20";
@@ -52,11 +71,15 @@ export const NotificationService = {
     const toastTypeClass = typeClassMap[type] || "border-border bg-surface/95";
     const toastIconColor =
       iconColor || typeIconColorMap[type] || "text-emerald-500";
+    const closeBgClass = typeCloseBgMap[type] || "bg-gray-600";
+    const closeBorderClass = typeCloseBorderMap[type] || "border-gray-600";
+    const closeTextClass = typeCloseTextMap[type] || "text-white";
 
     const toast = document.createElement("div");
     toast.className = `animate-slide-up ${toastTypeClass} backdrop-blur-md
     rounded-2xl px-5 py-3.5 shadow-2xl flex flex-row justify-between
-    items-center gap-4 transition-all duration-300 transform w-full`;
+    items-center gap-4 transition-all duration-300 transform w-full relative
+    group`;
 
     const countdownId = `toast-cd-${Math.random().toString(36).slice(2, 11)}`;
 
@@ -79,9 +102,32 @@ export const NotificationService = {
       </div>
     `;
 
+    if (closable) {
+      const closeBtn = document.createElement("button");
+      closeBtn.className = `absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full flex flex-row justify-center items-center 
+        ${closeBgClass} ${closeBorderClass} border-2
+        flex items-center justify-center
+        transition-all duration-200 hover:scale-110 active:scale-95
+        shadow-lg
+        ${closeTextClass}
+        focus:outline-none
+        opacity-0 group-hover:opacity-100 group-hover:cursor-pointer
+        pointer-events-none group-hover:pointer-events-auto`;
+      closeBtn.setAttribute("aria-label", "Close notification");
+      closeBtn.innerHTML = `<i class="fa-regular fa-xmark text-xs"></i>`;
+
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.removeToast(toast);
+      });
+
+      toast.appendChild(closeBtn);
+    }
+
     if (undoAction) {
       const undoBtn = document.createElement("button");
       undoBtn.className = `h-8 px-3 transition flex items-center justify-center gap-1 cursor-pointer rounded-lg ${toastUndoClass} text-sm font-medium`;
+
       undoBtn.innerHTML = `<i class="fa-regular fa-rotate-left text-xs"></i><span class="text-xs font-semibold">Undo</span>`;
 
       undoBtn.addEventListener("click", () => {
