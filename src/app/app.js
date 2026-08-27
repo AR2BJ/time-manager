@@ -1,3 +1,5 @@
+import "@/vendor/fontawesome/js/all";
+
 import { GlobalLoaderService } from "@/services/loader.service.js";
 import { NavigationController } from "@/controllers/navigation.controller.js";
 import { SettingsController } from "@/controllers/settings.controller";

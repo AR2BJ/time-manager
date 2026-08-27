@@ -1,6 +1,11 @@
-import { getTheme, setTheme, toggleTheme } from "@/services/theme.service.js";
+import {
+  applyTheme,
+  getTheme,
+  setTheme,
+  toggleTheme,
+} from "@/services/theme.service.js";
 
-import { GlobalLoaderService } from "@/services/loader.service.js";
+import { GlobalLoaderService } from "@/services/loader.service";
 
 export const ThemeController = {
   updateIcon(theme) {
@@ -19,8 +24,10 @@ export const ThemeController = {
   },
 
   init() {
-    setTheme(getTheme());
-    this.updateIcon(getTheme());
+    const currentTheme = getTheme();
+    setTheme(currentTheme);
+    this.updateIcon(currentTheme);
+
     const btn = document.getElementById("theme-toggle");
 
     btn?.addEventListener("click", (e) => {
@@ -50,6 +57,18 @@ export const ThemeController = {
           GlobalLoaderService.hide();
         }
       }, 40);
+    });
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === "theme") {
+        const newTheme = e.newValue || "dark";
+        applyTheme(newTheme);
+        this.updateIcon(newTheme);
+
+        document.dispatchEvent(
+          new CustomEvent("themeChanged", { detail: { theme: newTheme } }),
+        );
+      }
     });
   },
 };

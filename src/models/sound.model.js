@@ -1,4 +1,5 @@
-import { StateManager, state } from "./state.model";
+import { StateManager, state } from "./state.model.js";
+import { TIME_MANAGER_EVENTS, eventBus } from "@/services/event-bus.service.js";
 
 import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
 
@@ -20,20 +21,16 @@ export const SoundModel = {
   init(savedSettings = {}) {
     soundState.isPlaying = false;
     soundState.isLoading = false;
-    soundState.isMuted = false;
+    soundState.isMuted = Boolean(savedSettings.isMuted);
 
     const savedTrackId = savedSettings.currentSoundId;
-    if (savedTrackId) {
-      soundState.currentSoundId = savedTrackId;
-    } else {
-      soundState.currentSoundId = "none";
-    }
+    soundState.currentSoundId = savedTrackId || "none";
 
     soundState.volume =
-      typeof savedSettings.volume === "number" && savedSettings.volume > 0
+      typeof savedSettings.volume === "number" && savedSettings.volume >= 0
         ? savedSettings.volume
         : 50;
-    soundState.previousVolume = soundState.volume;
+    soundState.previousVolume = soundState.volume > 0 ? soundState.volume : 50;
 
     this.notify();
     return soundState;
@@ -52,6 +49,12 @@ export const SoundModel = {
 
   notify() {
     listeners.forEach((listener) => listener(soundState));
+
+    eventBus.emit(TIME_MANAGER_EVENTS.SOUND_CHANGED, {
+      currentSoundId: soundState.currentSoundId,
+      volume: this.getEffectiveVolume(),
+      soundState: { ...soundState },
+    });
   },
 
   getCurrentTrack() {
@@ -59,11 +62,10 @@ export const SoundModel = {
       return null;
     }
 
-    const foundTrack = soundState.trackList.find(
-      (t) => t.id === soundState.currentSoundId,
+    return (
+      soundState.trackList.find((t) => t.id === soundState.currentSoundId) ||
+      null
     );
-
-    return foundTrack || null;
   },
 
   getCurrentSoundId() {
@@ -106,17 +108,18 @@ export const SoundModel = {
     const targetId = soundId || "none";
     soundState.currentSoundId = targetId;
 
-    StateManager.updateSettings({
-      ...state.settings,
-      currentSoundId: targetId,
-    });
+    if (typeof StateManager?.updateSettings === "function") {
+      StateManager.updateSettings({ currentSoundId: targetId });
+    }
 
+    eventBus.emit(TIME_MANAGER_EVENTS.SOUND_TRACK_CHANGED, targetId);
     this.notify();
   },
 
   setVolume(volume) {
     const numericVol = Math.max(0, Math.min(100, Number(volume)));
     soundState.volume = numericVol;
+
     if (numericVol > 0) {
       soundState.isMuted = false;
       soundState.previousVolume = numericVol;
@@ -126,10 +129,15 @@ export const SoundModel = {
 
     if (typeof StateManager?.updateSettings === "function") {
       StateManager.updateSettings({
-        volume: soundState.isMuted ? 0 : numericVol,
+        volume: numericVol,
+        isMuted: soundState.isMuted,
       });
     }
 
+    eventBus.emit(
+      TIME_MANAGER_EVENTS.SOUND_VOLUME_CHANGED,
+      this.getEffectiveVolume(),
+    );
     this.notify();
   },
 
@@ -145,10 +153,15 @@ export const SoundModel = {
 
     if (typeof StateManager?.updateSettings === "function") {
       StateManager.updateSettings({
-        volume: soundState.isMuted ? 0 : soundState.volume,
+        volume: soundState.volume,
+        isMuted: soundState.isMuted,
       });
     }
 
+    eventBus.emit(
+      TIME_MANAGER_EVENTS.SOUND_VOLUME_CHANGED,
+      this.getEffectiveVolume(),
+    );
     this.notify();
   },
 
@@ -160,6 +173,5 @@ export const SoundModel = {
     soundState.previousVolume = 50;
 
     this.setSoundTrack("none");
-    this.notify();
   },
 };

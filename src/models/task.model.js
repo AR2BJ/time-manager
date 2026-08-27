@@ -52,6 +52,5 @@ export const TaskModel = {
 
   commit() {
     StateManager.save();
-    StateManager.notify();
   },
 };

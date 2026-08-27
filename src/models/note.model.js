@@ -5,7 +5,6 @@ export const NoteModel = {
     return state.notes || [];
   },
 
-  // Legacy Alias for getNotes
   getItems() {
     return this.getNotes();
   },
@@ -23,18 +22,14 @@ export const NoteModel = {
   },
 
   insert(noteData) {
-    if (!state.notes) {
-      state.notes = [];
-    }
+    if (!state.notes) state.notes = [];
     state.notes.push(noteData);
     this.commit();
     return noteData;
   },
 
   insertAt(noteData, index) {
-    if (!state.notes) {
-      state.notes = [];
-    }
+    if (!state.notes) state.notes = [];
     state.notes.splice(index, 0, noteData);
     this.commit();
   },
@@ -51,25 +46,12 @@ export const NoteModel = {
     return { deletedNote, index };
   },
 
-  // Legacy Alias for remove
   deleteItem(noteId) {
     return this.remove(noteId);
   },
 
-  // ==========================================
-  // STATE SYNC & BACKWARD COMPATIBILITY API
-  // ==========================================
   commit() {
     StateManager.save();
-    StateManager.notify();
-  },
-
-  saveAndNotify() {
-    this.commit();
-  },
-
-  notify() {
-    StateManager.notify();
   },
 
   subscribe(listener) {

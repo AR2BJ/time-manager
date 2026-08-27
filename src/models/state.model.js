@@ -1,5 +1,12 @@
+// src/models/state.model.js
+
+import {
+  STORAGE_KEY,
+  loadFromStorage,
+  saveToStorage,
+} from "./storage.model.js";
+import { TIME_MANAGER_EVENTS, eventBus } from "@/services/event-bus.service.js";
 import { formatDate, generateId, todayISO } from "@/utils/helpers.js";
-import { loadFromStorage, saveToStorage } from "./storage.model.js";
 
 import { NoteModel } from "./note.model.js";
 import { SoundModel } from "./sound.model.js";
@@ -44,9 +51,19 @@ const listeners = new Set();
 let isInitialized = false;
 
 export const StateManager = {
+  _rawCache: "",
+
   init() {
     if (isInitialized) return state;
 
+    this.reloadFromStorage(false);
+    this.setupReactiveEngine();
+
+    isInitialized = true;
+    return state;
+  },
+
+  reloadFromStorage(notify = true) {
     const saved = loadFromStorage();
     if (saved) {
       state.activeMode = saved.activeMode || "pomodoro";
@@ -88,8 +105,49 @@ export const StateManager = {
       state.activeTaskId = firstTask ? String(firstTask.id) : null;
     }
 
-    isInitialized = true;
-    return state;
+    this._rawCache = localStorage.getItem(STORAGE_KEY) || "";
+
+    if (notify) {
+      this.notify();
+      this.dispatchStateEvents();
+    }
+  },
+
+  dispatchStateEvents() {
+    eventBus.emit(TIME_MANAGER_EVENTS.TASKS_CHANGED, state.tasks);
+    eventBus.emit(TIME_MANAGER_EVENTS.NOTES_CHANGED, state.notes);
+    eventBus.emit(TIME_MANAGER_EVENTS.SESSIONS_CHANGED, state.sessions);
+    eventBus.emit(TIME_MANAGER_EVENTS.SETTINGS_CHANGED, state.settings);
+    eventBus.emit(TIME_MANAGER_EVENTS.TIMER_CHANGED, state.timer);
+
+    const currentSoundId = state.settings.currentSoundId || "none";
+    const volume = state.settings.volume ?? 50;
+
+    eventBus.emit(TIME_MANAGER_EVENTS.SOUND_TRACK_CHANGED, currentSoundId);
+    eventBus.emit(TIME_MANAGER_EVENTS.SOUND_VOLUME_CHANGED, volume);
+    eventBus.emit(TIME_MANAGER_EVENTS.SOUND_CHANGED, {
+      currentSoundId,
+      volume,
+      soundState: SoundModel.getState(),
+    });
+
+    eventBus.emit(TIME_MANAGER_EVENTS.STORE_CHANGED, state);
+  },
+
+  setupReactiveEngine() {
+    window.addEventListener("storage", (event) => {
+      if (event.key === STORAGE_KEY) {
+        this.reloadFromStorage(true);
+      }
+    });
+
+    setInterval(() => {
+      const currentRaw = localStorage.getItem(STORAGE_KEY) || "";
+      if (currentRaw !== this._rawCache) {
+        this._rawCache = currentRaw;
+        this.reloadFromStorage(true);
+      }
+    }, 300);
   },
 
   getState() {
@@ -116,14 +174,11 @@ export const StateManager = {
     if (state.activeMode === mode) return;
     state.activeMode = mode;
 
-    if (mode === "pomodoro") {
-      state.timer.currentPhase = "work";
-    } else if (mode === "flow") {
+    if (mode === "pomodoro" || mode === "flow") {
       state.timer.currentPhase = "work";
     }
 
     this.save();
-    this.notify();
   },
 
   getTodaySessions() {
@@ -149,7 +204,6 @@ export const StateManager = {
   updateTimerState(newTimerState) {
     state.timer = { ...state.timer, ...newTimerState };
     this.save();
-    this.notify();
   },
 
   updateSettings(newSettings = {}) {
@@ -173,7 +227,6 @@ export const StateManager = {
     }
 
     this.save();
-    this.notify();
   },
 
   resetTimer() {
@@ -191,7 +244,6 @@ export const StateManager = {
     }
 
     this.save();
-    this.notify();
   },
 
   resetToDefaults() {
@@ -217,7 +269,6 @@ export const StateManager = {
     NoteModel.reset();
 
     this.save();
-    this.notify();
 
     window.dispatchEvent(new CustomEvent("notesChanged"));
   },
@@ -240,7 +291,6 @@ export const StateManager = {
     state.sessions.push(session);
 
     this.save();
-    this.notify();
   },
 
   save() {
@@ -263,5 +313,9 @@ export const StateManager = {
       timer: state.timer,
       settings: state.settings,
     });
+
+    this._rawCache = localStorage.getItem(STORAGE_KEY) || "";
+    this.notify();
+    this.dispatchStateEvents();
   },
 };
