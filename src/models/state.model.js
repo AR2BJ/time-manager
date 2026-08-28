@@ -1,5 +1,3 @@
-// src/models/state.model.js
-
 import {
   STORAGE_KEY,
   loadFromStorage,

@@ -1,5 +1,3 @@
-// src/services/event-bus.service.js
-
 export const TIME_MANAGER_EVENTS = {
   STORE_CHANGED: "time_manager:store:changed",
   TASKS_CHANGED: "time_manager:tasks:changed",
