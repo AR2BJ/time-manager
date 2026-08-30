@@ -22,19 +22,36 @@ export const TaskModalComponent = {
           class="relative w-full max-w-xl bg-surface border border-border rounded-3xl p-6 shadow-2xl flex flex-col max-h-[85dvh]"
         >
           <div
-            class="flex items-center justify-between border-b border-border pb-4 mb-4 shrink-0"
+            class="flex items-center justify-between border-b border-border pb-4 mb-4 shrink-0 gap-3"
           >
-            <div class="flex items-center gap-3">
+            <div class="min-w-0 flex-1 flex items-center gap-3">
               <div
                 class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-base shrink-0"
               >
                 <i class="fa-regular fa-bullseye-arrow"></i>
               </div>
-              <div>
-                <h3 class="text-base font-bold text-color">
-                  ${isEditing ? "Edit Task" : "Select Active Task"}
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-color truncate">
+                  ${isEditing ? "Edit Task" : "Select Task"}
                 </h3>
-                <p class="text-xs text-secondary">
+                <p class="hidden sm:block text-xs text-secondary truncate">
+                  ${
+                    isEditing
+                      ? "Update task details below."
+                      : "Choose an existing task, manage, or create a new item."
+                  }
+                </p>
+                <p
+                  class="block sm:hidden text-xs text-secondary truncate ${
+                    !isEditing ? "cursor-pointer" : ""
+                  }"
+                  ${
+                    !isEditing
+                      ? `data-tooltip-title="Choose an existing task, manage,
+                      or create a new item."`
+                      : ""
+                  }
+                >
                   ${
                     isEditing
                       ? "Update task details below."
@@ -47,7 +64,7 @@ export const TaskModalComponent = {
             <button
               id="close-task-modal"
               type="button"
-              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
+              class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer shrink-0"
             >
               <i class="fa-regular fa-xmark text-sm"></i>
             </button>
@@ -60,7 +77,7 @@ export const TaskModalComponent = {
                   for="input-task-title"
                   class="block text-xs font-semibold text-secondary mb-1 ps-1"
                 >
-                  ${isEditing ? "Task Title" : "Create New Task Title"}
+                  Task Title
                 </label>
                 <input
                   id="input-task-title"
@@ -68,7 +85,7 @@ export const TaskModalComponent = {
                   maxlength="60"
                   value="${isEditing ? editingTask.title : ""}"
                   placeholder="E.g., Design System Refactoring"
-                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color placeholder:text-muted focus:outline-none focus:border-brand transition"
+                  class="w-full h-10 rounded-xl bg-surface-2 border border-border px-3 text-xs text-color placeholder:text-muted focus:outline-none focus:border-brand min-w-10 truncate transition"
                 />
               </div>
               <div>

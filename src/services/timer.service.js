@@ -229,6 +229,9 @@ class TimerService {
   }
 
   _handleFlowStop() {
+    const currentTaskId = state.activeTaskId;
+    const currentTask = TaskService.getActiveTask();
+
     const flowTime = state.timer.flowTime || 0;
     const isBreak = state.timer.currentPhase === "break";
 
