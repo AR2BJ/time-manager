@@ -11,7 +11,7 @@ export const TaskModalComponent = {
     return `
       <div
         id="task-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+        class="fixed inset-0 z-400 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       >
         <div
           id="task-modal-backdrop"
@@ -71,7 +71,7 @@ export const TaskModalComponent = {
           </div>
 
           <div class="pb-4 border-b border-border flex flex-col gap-3 shrink-0">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label
                   for="input-task-title"

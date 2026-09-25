@@ -95,10 +95,10 @@ export class NoteComponent {
 
                       <button
                         data-action="delete"
-                        class="delete-btn w-6 h-6 rounded-md bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer lg:opacity-0 group-hover:opacity-100 transition"
+                        class="delete-btn w-7 h-7 rounded-md bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer lg:opacity-0 group-hover:opacity-100 transition"
                       >
                         <i
-                          class="ti ti-trash text-red-500/80 text-[10px] lg:text-xs"
+                          class="ti ti-trash text-red-500/80 text-sm"
                         ></i>
                       </button>
                     </div>

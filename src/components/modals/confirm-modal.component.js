@@ -3,7 +3,7 @@ export const ConfirmModalComponent = {
     return `
       <div
         id="confirm-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+        class="fixed inset-0 z-400 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       >
         <div
           id="confirm-modal-backdrop"

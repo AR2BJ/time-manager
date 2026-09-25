@@ -13,7 +13,7 @@ export class FlipClockComponent {
     this.overlay.id = "flip-clock-overlay";
 
     this.overlay.className =
-      "fixed inset-0 z-400 hidden w-screen h-screen flex flex-col items-center justify-between bg-bg select-none overflow-hidden";
+      "fixed inset-0 z-500 hidden w-screen h-screen flex flex-col items-center justify-between bg-bg select-none overflow-hidden";
 
     this.overlay.innerHTML = `
       <div

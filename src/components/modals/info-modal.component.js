@@ -177,7 +177,7 @@ export const InfoModalComponent = {
     return `
       <div
         id="help-modal"
-        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+        class="fixed inset-0 z-400 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       >
         <div
           id="help-modal-backdrop"
