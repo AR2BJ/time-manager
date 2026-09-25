@@ -552,7 +552,7 @@ export class AutocompleteComponent {
             type="button"
             class="remove-chip-btn hover:text-red-500 transition cursor-pointer flex items-center justify-center"
           >
-            <i class="ti ti-x text-[11px] pb-0.5"></i>
+            <i class="ti ti-x text-[11px] pb-px"></i>
           </button>
         `;
       } else {
