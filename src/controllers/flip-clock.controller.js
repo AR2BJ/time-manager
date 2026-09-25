@@ -199,12 +199,12 @@ export const FlipClockController = {
           NotificationService.show({
             type: "warning",
             message: "You need an active task to start a focus session",
-            icon: "fa-bullseye-arrow",
+            icon: "ti-target-arrow",
             iconColor: "text-amber-500",
             duration: 5000,
             actionButton: {
               text: "Create Task",
-              icon: "fa-plus",
+              icon: "ti-plus",
               onClick: async () => {
                 if (document.fullscreenElement) await document.exitFullscreen();
                 ModalController.openTaskModal();

@@ -39,18 +39,18 @@ export class TimerDisplayComponent {
         <button
           id="mode-pomodoro"
           data-mode="pomodoro"
-          class="relative z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer text-center sm:w-35 xs:rounded-l-xl xs:rounded-tr-none"
+          class="relative z-10 flex-1 w-full rounded-t-xl py-2 text-sm font-medium text-(--color-btn-primary-text) transition cursor-pointer flex justify-center items-center gap-2 sm:w-35 xs:rounded-l-xl xs:rounded-tr-none"
         >
-          <i class="fa-regular fa-stopwatch pointer-events-none"></i>
+          <i class="ti ti-stopwatch text-base lg:text-lg pointer-events-none"></i>
           <span class="pointer-events-none">Pomodoro</span>
         </button>
 
         <button
           id="mode-flow"
           data-mode="flow"
-          class="relative z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer text-center sm:w-35"
+          class="relative z-10 flex-1 w-full rounded-none py-2 text-sm font-medium text-secondary transition cursor-pointer flex justify-center items-center gap-2 sm:w-35"
         >
-          <i class="fa-regular fa-water pointer-events-none"></i>
+          <i class="ti ti-ripple text-sm lg:text-base pointer-events-none"></i>
           <span class="pointer-events-none">Flow Mode</span>
         </button>
       </div>
@@ -66,7 +66,7 @@ export class TimerDisplayComponent {
           title="Enter Fullscreen Focus"
         >
           <i
-            class="fa-regular fa-expand text-xs sm:text-sm pointer-events-none"
+            class="ti ti-arrows-maximize text-xs sm:text-sm pointer-events-none"
           ></i>
         </button>
 

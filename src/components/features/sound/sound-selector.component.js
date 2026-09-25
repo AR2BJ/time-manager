@@ -35,7 +35,7 @@ export class SoundSelectorComponent {
     const noneOption = {
       title: "None (No Sound)",
       value: "none",
-      icon: "fa-solid fa-volume-xmark",
+      icon: "ti ti-volume-3 text-red-500/80",
       raw: { id: "none", title: "None" },
     };
 
@@ -43,7 +43,9 @@ export class SoundSelectorComponent {
       title: `${track.title} (${track.creator})`,
       value: track.id,
       icon:
-        track.type === "youtube" ? "fa-brands fa-youtube" : "fa-solid fa-music",
+        track.type === "youtube"
+          ? "ti ti-brand-youtube"
+          : "ti ti-music text-brand/80",
       raw: track,
     }));
 

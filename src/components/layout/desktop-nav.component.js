@@ -7,11 +7,14 @@ export const DesktopNavComponent = {
       >
         <div class="flex flex-col items-center gap-6 w-full px-3">
           <div class="w-13.5 h-13.5 flex flex-row justify-center items-center">
-            <a href="/">
+            <a
+              href="/"
+              class="w-13.5 h-13.5 flex flex-row justify-center items-center"
+            >
               <img
                 id="logo"
                 src="/picture/logo.png"
-                class="logo h-full justify-center shadow-brand/10"
+                class="logo w-13.5 h-13.5 justify-center shadow-brand/10"
                 title="Time Manager"
                 alt="Time Manager Logo"
               />
@@ -25,7 +28,7 @@ export const DesktopNavComponent = {
             class="nav-item justify-center shadow-brand/10"
             title="Timer"
           >
-            <i class="fa-regular fa-clock text-xl"></i>
+            <i class="ti ti-clock text-2xl"></i>
           </button>
 
           <button
@@ -33,7 +36,7 @@ export const DesktopNavComponent = {
             class="nav-item justify-center"
             title="Analytics"
           >
-            <i class="fa-regular fa-chart-line text-xl"></i>
+            <i class="ti ti-chart-line text-2xl"></i>
           </button>
         </div>
 
@@ -43,7 +46,7 @@ export const DesktopNavComponent = {
             class="nav-item justify-center"
             title="Settings"
           >
-            <i class="fa-regular fa-gear text-xl"></i>
+            <i class="ti ti-settings text-2xl"></i>
           </button>
         </div>
       </div>

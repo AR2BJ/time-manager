@@ -86,7 +86,7 @@ export const SettingsExportController = {
     NotificationService.show({
       type: "success",
       message: `Data ledger exported successfully as ${format.toUpperCase()}`,
-      icon: "fa-file-arrow-down",
+      icon: "ti-file-download",
       iconColor: "text-emerald-500/80",
       duration: 5000,
     });

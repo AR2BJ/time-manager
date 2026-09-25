@@ -1,92 +1,4 @@
-const HELP_SHORTCUTS = [
-  {
-    category: "Timer & Modes",
-    items: [
-      {
-        label: "Switch to Pomodoro Mode",
-        icon: "fa-stopwatch",
-        keys: [["Alt"], ["P"]],
-        separator: "+",
-      },
-      {
-        label: "Switch to Flow Mode",
-        icon: "fa-water",
-        keys: [["Alt"], ["F"]],
-        separator: "+",
-      },
-      {
-        label: "Start / Pause Timer",
-        icon: "fa-play-pause",
-        keys: [["Space"]],
-      },
-      {
-        label: "Volume up and down",
-        icon: "fa-volume",
-        keys: [
-          ["🠔", "🠖"],
-          ["🠕", "🠗"],
-        ],
-        separator: "or",
-      },
-    ],
-  },
-  {
-    category: "Navigation",
-    items: [
-      {
-        label: "Go to Timer View",
-        icon: "fa-clock",
-        keys: [["Shift"], ["T"]],
-        separator: "+",
-      },
-      {
-        label: "Go to Analytics View",
-        icon: "fa-chart-line",
-        keys: [["Shift"], ["A"]],
-        separator: "+",
-      },
-      {
-        label: "Go to Setting View",
-        icon: "fa-cog",
-        keys: [["Shift"], ["S"]],
-        separator: "+",
-      },
-    ],
-  },
-  {
-    category: "Quick Actions",
-    items: [
-      {
-        label: "Toggle Dark/Light Theme",
-        icon: "fa-circle-half-stroke",
-        keys: [["Alt"], ["T"]],
-        separator: "+",
-      },
-      {
-        label: "Toggle Navigation Menu",
-        icon: "fa-bars",
-        keys: [["Alt"], ["N"]],
-        separator: "+",
-      },
-      {
-        label: "Open Reset Data Modal",
-        icon: "fa-arrow-rotate-left",
-        keys: [["Alt"], ["R"]],
-        separator: "+",
-      },
-      {
-        label: "Close Active Modal / Blur Input",
-        icon: "fa-xmark",
-        keys: [["Esc"]],
-      },
-      {
-        label: "Toggle This Help Center",
-        icon: "fa-circle-question",
-        keys: [["?"]],
-      },
-    ],
-  },
-];
+import { HELP_SHORTCUTS } from "@/utils/constants/help-shortcuts.constants";
 
 export const InfoModalComponent = {
   renderShortcutsData() {
@@ -107,7 +19,7 @@ export const InfoModalComponent = {
                   <span
                     class="text-xs font-semibold text-secondary flex items-center gap-2"
                   >
-                    <i class="fa-regular ${item.icon} text-muted"></i>
+                    <i class="ti ${item.icon} pb-0.5 text-muted"></i>
                     ${item.label}
                   </span>
                   <div class="flex items-center gap-1 shrink-0">
@@ -142,6 +54,125 @@ export const InfoModalComponent = {
     ).join("");
   },
 
+  renderFeatureGuideData() {
+    return `
+      <div class="space-y-3">
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-stopwatch text-sm lg:text-base"></i> Pomodoro Technique
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            A structured timer that alternates between focused work sessions and
+            short breaks. When the timer naturally reaches zero, it
+            automatically transitions to the next phase. You can also manually
+            <strong class="text-color">Stop</strong> the timer at any time to
+            skip the current phase and move to the next one. After 4 completed
+            sessions (configurable), the system transitions to a longer break.
+          </p>
+        </div>
+
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-ripple text-sm lg:text-base"></i> Flow Mode
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            A continuous count-up timer designed for deep, uninterrupted work.
+            The timer runs until you manually pause or stop it. When you
+            <strong class="text-color">Stop</strong> the timer, your session is
+            saved and the system automatically transitions to a
+            <strong class="text-color">Flow Break</strong>. After the Flow Break
+            ends, the timer automatically returns to the main Flow Mode, ready
+            for your next session.
+          </p>
+        </div>
+
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-arrows-maximize text-sm lg:text-base"></i> Immersive Focus View
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            A fullscreen view that isolates your focus from distractions. The
+            timer is displayed as a flip-clock animation. You can start, pause,
+            or resume the session using the Space key or the on-screen buttons.
+            <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
+              <i class="ti ti-clock text-[10px] lg:text-xs pb-0.5 text-brand/70"></i>
+              Click on the header time to toggle between 12h / 24h format.
+            </span>
+          </p>
+        </div>
+
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-volume text-sm lg:text-base"></i> Audio & Haptics
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            You can configure notification sounds for Pomodoro end and Break end
+            in the Settings panel. Adjust the master volume or select a
+            background soundscape to enhance your focus.
+          </p>
+        </div>
+
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-database text-sm lg:text-base"></i> Data Management
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            All your tasks, sessions, and notes are stored locally on your
+            device. Use the Settings panel to export your data as JSON,
+            Markdown, or CSV. You can also import a previous backup to restore
+            your workspace.
+          </p>
+        </div>
+
+        <div class="p-4 bg-surface-2 border border-border rounded-2xl">
+          <h4
+            class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1 mb-1.5"
+          >
+            <i class="ti ti-keyboard text-sm lg:text-base"></i> Quick Actions & Shortcuts
+          </h4>
+          <p class="text-xs text-secondary leading-relaxed">
+            <strong class="text-color">Submit / Confirm:</strong> Use
+            <kbd
+              class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
+              >Ctrl</kbd
+            >
+            +
+            <kbd
+              class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
+              >Enter</kbd
+            >
+            (or
+            <kbd
+              class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
+              >Cmd</kbd
+            >
+            +
+            <kbd
+              class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
+              >Enter</kbd
+            >) to quickly create a task, save a note, or confirm any modal
+            without clicking the button.
+            <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
+              <i class="ti ti-help text-[10px] lg:text-xs pb-0.5 text-brand/70"></i>
+              <strong class="text-color">Escape</strong> closes any active modal
+              or removes focus from the current input field.
+            </span>
+          </p>
+        </div>
+      </div>
+    `;
+  },
+
   render() {
     return `
       <div
@@ -163,7 +194,7 @@ export const InfoModalComponent = {
               <div
                 class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-lg shrink-0"
               >
-                <i class="fa-regular fa-circle-question"></i>
+                <i class="ti ti-help text-lg lg:text-xl"></i>
               </div>
               <div>
                 <h3 class="text-base font-bold text-color">
@@ -179,8 +210,7 @@ export const InfoModalComponent = {
               type="button"
               class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
             >
-              <i class="fa-regular fa-xmark text-sm"></i>
-            </button>
+              <i class="ti ti-x text-sm lg:text-base"></i>            </button>
           </div>
 
           <div
@@ -188,15 +218,15 @@ export const InfoModalComponent = {
           >
             <button
               id="tab-help-safeguard"
-              class="flex-1 py-2 text-xs font-bold rounded-lg bg-brand text-white transition cursor-pointer"
+              class="flex-1 py-2 text-xs font-bold rounded-lg bg-brand text-white transition cursor-pointer flex justify-center items-center"
             >
-              <i class="fa-regular fa-compass me-1.5"></i> Workflow Guide
+              <i class="ti ti-compass text-sm lg:text-base me-1.5"></i> Workflow Guide
             </button>
             <button
               id="tab-help-shortcuts"
-              class="flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer"
+              class="flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer flex justify-center items-center"
             >
-              <i class="fa-regular fa-keyboard me-1.5"></i> Shortcuts
+              <i class="ti ti-keyboard text-sm lg:text-base me-1.5"></i> Shortcuts
             </button>
           </div>
 
@@ -206,127 +236,8 @@ export const InfoModalComponent = {
           >
             <div
               id="content-help-safeguard"
-              class="space-y-4"
             >
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-stopwatch"></i> Pomodoro Technique
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  A structured timer that alternates between focused work
-                  sessions and short breaks. When the timer naturally reaches
-                  zero, it automatically transitions to the next phase. You can
-                  also manually <strong class="text-color">Stop</strong> the
-                  timer at any time to skip the current phase and move to the
-                  next one. After 4 completed sessions (configurable), the
-                  system transitions to a longer break.
-                </p>
-              </div>
-
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-water"></i> Flow Mode
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  A continuous count-up timer designed for deep, uninterrupted
-                  work. The timer runs until you manually pause or stop it. When
-                  you <strong class="text-color">Stop</strong> the timer, your
-                  session is saved and the system automatically transitions to a
-                  <strong class="text-color">Flow Break</strong>. After the Flow
-                  Break ends, the timer automatically returns to the main Flow
-                  Mode, ready for your next session.
-                </p>
-              </div>
-
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-expand"></i> Immersive Focus View
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  A fullscreen view that isolates your focus from distractions.
-                  The timer is displayed as a flip-clock animation. You can
-                  start, pause, or resume the session using the Space key or the
-                  on-screen buttons.
-                  <span
-                    class="mt-2 text-[10px] text-muted flex items-center gap-1.5"
-                  >
-                    <i class="fa-regular fa-clock text-brand/70"></i>
-                    Click on the header time to toggle between 12h / 24h format.
-                  </span>
-                </p>
-              </div>
-
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-volume-high"></i> Audio & Haptics
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  You can configure notification sounds for Pomodoro end and
-                  Break end in the Settings panel. Adjust the master volume or
-                  select a background soundscape to enhance your focus.
-                </p>
-              </div>
-
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-database"></i> Data Management
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  All your tasks, sessions, and notes are stored locally on your
-                  device. Use the Settings panel to export your data as JSON,
-                  Markdown, or CSV. You can also import a previous backup to
-                  restore your workspace.
-                </p>
-              </div>
-
-              <div class="p-4 bg-surface-2 border border-border rounded-2xl">
-                <h4
-                  class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-2 mb-1.5"
-                >
-                  <i class="fa-regular fa-keyboard"></i> Quick Actions &
-                  Shortcuts
-                </h4>
-                <p class="text-xs text-secondary leading-relaxed">
-                  <strong class="text-color">Submit / Confirm:</strong> Use
-                  <kbd
-                    class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
-                    >Ctrl</kbd
-                  >
-                  +
-                  <kbd
-                    class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
-                    >Enter</kbd
-                  >
-                  (or
-                  <kbd
-                    class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
-                    >Cmd</kbd
-                  >
-                  +
-                  <kbd
-                    class="px-2 py-0.5 text-[10px] font-bold text-color bg-surface border border-border rounded-md shadow-2xs"
-                    >Enter</kbd
-                  >) to quickly create a task, save a note, or confirm any modal
-                  without clicking the button.
-                  <span
-                    class="mt-2 text-[10px] text-muted flex items-center gap-1.5"
-                  >
-                    <i class="fa-regular fa-circle-question text-brand/70"></i>
-                    <strong class="text-color">Escape</strong> closes any active
-                    modal or removes focus from the current input field.
-                  </span>
-                </p>
-              </div>
+              ${InfoModalComponent.renderFeatureGuideData()}
             </div>
 
             <div

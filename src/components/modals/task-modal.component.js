@@ -26,9 +26,9 @@ export const TaskModalComponent = {
           >
             <div class="min-w-0 flex-1 flex items-center gap-3">
               <div
-                class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-base shrink-0"
+                class="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center text-base lg:text-lg shrink-0"
               >
-                <i class="fa-regular fa-bullseye-arrow"></i>
+                <i class="ti ti-target-arrow"></i>
               </div>
               <div class="min-w-0">
                 <h3 class="text-base font-bold text-color truncate">
@@ -66,7 +66,7 @@ export const TaskModalComponent = {
               type="button"
               class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer shrink-0"
             >
-              <i class="fa-regular fa-xmark text-sm"></i>
+              <i class="ti ti-x text-sm lg:text-base"></i>
             </button>
           </div>
 
@@ -114,8 +114,8 @@ export const TaskModalComponent = {
               >
                 ${
                   isEditing
-                    ? `<i class="fa-regular fa-check"></i> Save Changes`
-                    : `<i class="fa-regular fa-plus"></i> Add & Select`
+                    ? `<i class="ti ti-check pb-0.5"></i> Save Changes`
+                    : `<i class="ti ti-plus pb-0.5"></i> Add & Select`
                 }
               </button>
 
@@ -145,7 +145,7 @@ export const TaskModalComponent = {
                       class="h-full flex flex-col justify-center items-center"
                     >
                       <div class="text-3xl">
-                        <i class="fa-regular fa-clipboard-list-check text-brand/60"></i>
+                        <i class="ti ti-clipboard-check text-brand/60"></i>
                       </div>
                       <p class="mt-3 text-secondary max-w-sm mx-auto text-sm">
                         No task defined yet.
@@ -177,9 +177,9 @@ export const TaskModalComponent = {
                             ${
                               isActive
                                 ? `<span
-                                    class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center text-[10px] shrink-0 shadow-xs"
+                                    class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center text-xs shrink-0 shadow-xs"
                                   >
-                                    <i class="fa-solid fa-check"></i>
+                                    <i class="ti ti-check"></i>
                                   </span>`
                                 : ""
                             }
@@ -221,7 +221,7 @@ export const TaskModalComponent = {
                                       title="Edit Task"
                                     >
                                       <i
-                                        class="fa-regular fa-pen-to-square text-blue-500/80 text-xs"
+                                        class="ti ti-edit-circle text-blue-500/80 text-xs lg:text-sm"
                                       ></i>
                                     </button>
                                   `
@@ -235,7 +235,7 @@ export const TaskModalComponent = {
                               title="Delete Task"
                             >
                               <i
-                                class="fa-regular fa-trash-can text-red-500/80 text-xs"
+                                class="ti ti-trash text-red-500/80 text-xs lg:text-sm"
                               ></i>
                             </button>
                           </div>

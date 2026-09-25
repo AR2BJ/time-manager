@@ -201,7 +201,7 @@ function renderChartEmptyState(chartEl, title, icon, subtitle) {
       class="empty-state-box flex w-full h-full min-h-60 items-center justify-center rounded-2xl border border-dashed border-border/80 bg-surface p-6 text-center"
     >
       <div class="max-w-xs">
-        <i class="text-4xl mb-3 fa-regular ${icon} text-brand/60"></i>
+        <i class="text-4xl mb-3 ti ${icon} text-brand/60"></i>
         <div
           class="mb-2 text-lg font-semibold text-color"
         >
@@ -220,14 +220,14 @@ function renderNoDataState() {
     {
       id: "apex-heatmap-chart",
       title: "Activity Heatmap",
-      icon: "fa-table-cells",
+      icon: "ti-chart-cohort",
       subtitle:
         "Complete a Pomodoro or Flow session to see your weekly, monthly, and yearly activity trend.",
     },
     {
       id: "apex-weekday-chart",
       title: "Weekly Activity",
-      icon: "fa-calendar-days",
+      icon: "ti-calendar",
       subtitle:
         "Your session activity by weekday will appear here once data exists.",
     },

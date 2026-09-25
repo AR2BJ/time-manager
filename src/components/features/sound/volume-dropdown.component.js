@@ -43,13 +43,13 @@ export class VolumeDropdownComponent {
 
     if (isMuted || volume === 0) {
       buttonColorClass = "text-brand hover:opacity-80";
-      iconHtml = `<i class="fa-solid fa-volume-xmark text-brand"></i>`;
+      iconHtml = `<i class="ti ti-volume-3 text-brand"></i>`;
     } else if (volume <= 33) {
-      iconHtml = `<i class="fa-solid fa-volume-low"></i>`;
+      iconHtml = `<i class="ti ti-volume-4"></i>`;
     } else if (volume <= 66) {
-      iconHtml = `<i class="fa-solid fa-volume"></i>`;
+      iconHtml = `<i class="ti ti-volume-2"></i>`;
     } else {
-      iconHtml = `<i class="fa-solid fa-volume-high"></i>`;
+      iconHtml = `<i class="ti ti-volume"></i>`;
     }
 
     this.container.innerHTML = `

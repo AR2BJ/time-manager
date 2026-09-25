@@ -194,11 +194,17 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  font-family: "Roboto Condensed";
+  font-family: "Roboto Condensed", "IranYekanRegular", sans-serif;
   transition:
     background 0.3s ease,
     color 0.3s ease,
     border-color 0.3s ease;
+}
+
+input,
+select,
+textarea {
+  font-family: "Roboto Condensed", "IranYekanRegular", sans-serif;
 }
 
 .btn-primary {
@@ -248,7 +254,7 @@ body {
 .nav-item.active {
   background-color: color-mix(in oklab, var(--color-brand) 80%, transparent);
   color: var(--color-btn-primary-text);
-  border-radius: 0.75rem;
+  border-radius: 16px;
   transition: all 0.3s ease;
 }
 

@@ -51,7 +51,7 @@ export class SoundPlayerComponent {
               title="Play / Pause"
             >
               <span id="btn-play-icon-slot" class="flex items-center justify-center">
-                <i class="fa-solid fa-play ms-0.5 text-base"></i>
+                <i class="ti ti-player-play-filled ms-0.5 text-base lg:text-lg"></i>
               </span>
             </button>
           </div>
@@ -94,7 +94,7 @@ export class SoundPlayerComponent {
             title="Toggle Mute"
           >
             <span class="inline-volume-icon flex items-center justify-center text-xs">
-              <i class="fa-solid fa-volume-high"></i>
+              <i class="ti ti-volume"></i>
             </span>
           </button>
 
@@ -123,9 +123,9 @@ export class SoundPlayerComponent {
           >
             <span
               id="player-volume-icon-slot"
-              class="pointer-events-none flex items-center justify-center text-sm"
+              class="pointer-events-none flex items-center justify-center text-sm lg:text-base"
             >
-              <i class="fa-solid fa-volume-high"></i>
+              <i class="ti ti-volume"></i>
             </span>
           </button>
 
@@ -151,7 +151,7 @@ export class SoundPlayerComponent {
               title="Toggle Mute"
             >
               <span class="popover-mute-icon-slot flex items-center justify-center">
-                <i class="fa-solid fa-volume-high"></i>
+                <i class="ti ti-volume"></i>
               </span>
             </button>
           </div>
@@ -238,9 +238,9 @@ export class SoundPlayerComponent {
           </svg>
         `;
       } else if (isPlaying) {
-        playSlot.innerHTML = `<i class="fa-solid fa-pause text-base"></i>`;
+        playSlot.innerHTML = `<i class="ti ti-player-pause-filled text-base lg:text-lg"></i>`;
       } else {
-        playSlot.innerHTML = `<i class="fa-solid fa-play ms-0.5 text-base"></i>`;
+        playSlot.innerHTML = `<i class="ti ti-player-play-filled ms-0.5 text-base lg:text-lg"></i>`;
       }
     }
 
@@ -252,15 +252,15 @@ export class SoundPlayerComponent {
     }
 
     // 3 Volume Levels (Low, Medium, High) + Mute State
-    let volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
+    let volumeIconHtml = `<i class="ti ti-volume"></i>`;
     if (isMuted || volume === 0) {
-      volumeIconHtml = `<i class="fa-solid fa-volume-xmark text-brand"></i>`;
+      volumeIconHtml = `<i class="ti ti-volume-3 text-red-500/80"></i>`;
     } else if (volume <= 33) {
-      volumeIconHtml = `<i class="fa-solid fa-volume-low"></i>`;
+      volumeIconHtml = `<i class="ti ti-volume-4"></i>`;
     } else if (volume <= 66) {
-      volumeIconHtml = `<i class="fa-solid fa-volume"></i>`;
+      volumeIconHtml = `<i class="ti ti-volume-2"></i>`;
     } else {
-      volumeIconHtml = `<i class="fa-solid fa-volume-high"></i>`;
+      volumeIconHtml = `<i class="ti ti-volume"></i>`;
     }
 
     const volSlot = this.container.querySelector("#player-volume-icon-slot");

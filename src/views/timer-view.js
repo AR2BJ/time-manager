@@ -54,7 +54,7 @@ export class TimerView {
                 <span
                   class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2"
                 >
-                  <i class="fa-regular fa-headphones text-brand"></i>
+                  <i class="ti ti-headphones text-brand text-xs lg:text-sm pb-0.5"></i>
                   Soundscape Player
                 </span>
               </div>

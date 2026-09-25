@@ -30,7 +30,7 @@ export const TaskService = {
       NotificationService.show({
         type: "warning",
         message: "Task title cannot be empty",
-        icon: "fa-pencil",
+        icon: "ti-pencil",
         iconColor: "text-amber-500",
         duration: 5000,
       });
@@ -41,7 +41,7 @@ export const TaskService = {
       NotificationService.show({
         type: "error",
         message: "A task with this title already exists",
-        icon: "fa-triangle-exclamation",
+        icon: "ti-alert-triangle",
         iconColor: "text-red-500/80",
         duration: 5000,
       });
@@ -63,7 +63,7 @@ export const TaskService = {
       NotificationService.show({
         type: "success",
         message: `Task "${newTask.title}" created`,
-        icon: "fa-plus",
+        icon: "ti-plus",
         iconColor: "text-emerald-500",
       });
       return inserted;
@@ -82,7 +82,7 @@ export const TaskService = {
       NotificationService.show({
         type: "warning",
         message: "Task title cannot be empty",
-        icon: "fa-pencil",
+        icon: "ti-pencil",
         iconColor: "text-amber-500",
         duration: 5000,
       });
@@ -93,7 +93,7 @@ export const TaskService = {
       NotificationService.show({
         type: "error",
         message: "A task with this title already exists",
-        icon: "fa-triangle-exclamation",
+        icon: "ti-alert-triangle",
         iconColor: "text-red-500/80",
         duration: 5000,
       });
@@ -118,7 +118,7 @@ export const TaskService = {
       NotificationService.show({
         type: "success",
         message: `Task "${updated.title}" updated`,
-        icon: "fa-pen-to-square",
+        icon: "ti-edit-circle",
         iconColor: "text-emerald-500",
       });
       return updated;
@@ -154,7 +154,7 @@ export const TaskService = {
         type: "error",
         message:
           "Cannot delete the active task while the timer is running. Stop the timer first.",
-        icon: "fa-triangle-exclamation",
+        icon: "ti-alert-triangle",
         iconColor: "text-red-500/80",
         duration: 5000,
       });

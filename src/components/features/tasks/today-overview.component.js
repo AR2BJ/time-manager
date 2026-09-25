@@ -75,8 +75,8 @@ export const TodayOverviewComponent = {
 
     return `
       <div class="bg-surface border border-border rounded-3xl p-5 shadow-xs flex flex-col gap-4">
-        <span class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
-          <i class="fa-regular fa-chart-line text-brand"></i>
+        <span class="text-xs lg:text-sm font-bold uppercase tracking-wider text-muted flex items-center gap-2">
+          <i class="ti ti-chart-line text-brand"></i>
           <span>Today's Overview</span>
         </span>
 
@@ -93,7 +93,7 @@ export const TodayOverviewComponent = {
 
           <div class="p-3.5 rounded-2xl bg-surface-2 border border-border text-center flex flex-col items-center justify-center">
             <span class="text-2xl font-black text-amber-500 mb-0.5 flex items-center gap-1">
-              <i class="fa-solid fa-fire text-xs"></i>${currentStreak}
+              <i class="ti ti-flame-filled text-xs lg:text-sm"></i>${currentStreak}
             </span>
             <span class="text-[10px] font-semibold text-muted uppercase tracking-wider">Day Streak</span>
           </div>

@@ -61,7 +61,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-brand/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-clock absolute -right-4 -bottom-6 text-[10rem] text-brand/80 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-clock-filled absolute -right-4 -bottom-6 text-[11rem] text-brand/80 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -87,7 +87,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-emerald-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-hourglass-half absolute -right-4 -bottom-6 text-[10rem] text-emerald-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-hourglass-filled absolute -right-4 -bottom-6 text-[11rem] text-emerald-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -113,7 +113,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-amber-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-fire absolute -right-4 -bottom-6 text-[10rem] text-yellow-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-flame-filled absolute -right-4 -bottom-6 text-[11rem] text-yellow-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -139,7 +139,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-indigo-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-list-check absolute -right-4 -bottom-6 text-[10rem] text-indigo-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-list-check absolute -right-4 -bottom-6 text-[11rem] text-indigo-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -165,7 +165,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-purple-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-stopwatch absolute -right-4 -bottom-6 text-[10rem] text-purple-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-alarm-filled absolute -right-4 -bottom-6 text-[12rem] text-purple-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -191,7 +191,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-rose-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-calendar-star absolute -right-4 -bottom-6 text-[10rem] text-rose-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-calendar-event-filled absolute -right-4 -bottom-6 text-[11rem] text-rose-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -224,7 +224,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-sky-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-calendar-day absolute -right-4 -bottom-6 text-[10rem] text-sky-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-calendar-filled absolute -right-4 -bottom-6 text-[11rem] text-sky-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -250,7 +250,7 @@ export const DashboardComponent = {
           class="relative overflow-hidden bg-surface-2 border border-border/70 hover:-translate-y-1 hover:border-orange-500/30 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between min-h-36 group"
         >
           <i
-            class="fa-solid fa-arrow-right-arrow-left absolute -right-4 -bottom-6 text-[10rem] text-orange-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
+            class="ti ti-arrows-right-left absolute -right-4 -bottom-6 text-[11rem] text-orange-500 opacity-[0.04] dark:opacity-[0.06] rotate-15 pointer-events-none group-hover:scale-110 group-hover:rotate-5 transition-transform duration-500"
           ></i>
           <div class="flex items-center justify-between z-10">
             <span
@@ -288,7 +288,7 @@ export const DashboardComponent = {
               <h4
                 class="text-lg font-bold text-color flex items-center gap-2"
               >
-                <i class="fa-regular fa-chart-network text-brand/80 text-xl"></i>
+                <i class="ti ti-affiliate text-brand/80 text-xl"></i>
                 Activity Heatmap
               </h4>
               <p class="text-xs text-secondary mt-1">
@@ -302,7 +302,7 @@ export const DashboardComponent = {
                 class="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-surface text-secondary hover:text-color transition shadow-sm cursor-pointer"
                 aria-label="Open view menu"
               >
-                <i class="fa-regular fa-ellipsis-vertical text-lg"></i>
+                <i class="ti ti-dots-vertical text-lg"></i>
               </button>
 
               <div
@@ -380,9 +380,7 @@ export const DashboardComponent = {
             <h4
               class="text-lg font-bold text-color flex items-center gap-2"
             >
-              <i
-                class="fa-regular fa-chart-simple text-amber-400 text-xl"
-              ></i>
+              <i class="ti ti-chart-bar text-brand text-xl rotate-90"></i>
                Weekly Distribution
             </h4>
             <p class="text-xs text-secondary mt-1">
@@ -412,7 +410,7 @@ export const DashboardComponent = {
               <h4
                 class="text-lg font-bold text-color flex items-center gap-2"
               >
-                <i class="fa-regular fa-clock text-brand/80 text-xl"></i>
+                <i class="ti ti-clock text-brand/80 text-xl"></i>
                 Session History
               </h4>
               <p class="text-xs text-secondary/80 mt-0.5 font-medium">
@@ -435,7 +433,7 @@ export const DashboardComponent = {
                     >
                       <div class="text-6xl mb-6">
                         <i
-                          class="fa-regular fa-clock text-brand/60"
+                          class="ti ti-clock text-brand/60"
                         ></i>
                       </div>
                       <h2 class="text-2xl font-bold text-color">
@@ -487,7 +485,7 @@ export const DashboardComponent = {
                               class="flex items-center gap-4 text-[11px] text-secondary/80 font-medium flex-wrap"
                             >
                               <span>
-                                <i class="fa-regular fa-calendar me-1 text-brand/80"></i>
+                                <i class="ti ti-calendar text-[10px] lg:text-xs me-1 text-brand/80"></i>
                                 ${session.completedAt}
                               </span>
                             </div>

@@ -14,7 +14,7 @@ export class AutocompleteComponent {
       multiple: false,
       chips: false,
       chipRemovable: true,
-      iconClass: "fa-regular fa-list",
+      iconClass: "ti ti-list",
       containerClass: "",
       inputClass: "",
       dropdownClass: "",
@@ -96,10 +96,10 @@ export class AutocompleteComponent {
               type="button"
               class="${
                 this.options.clearButtonClass
-              } absolute right-10 top-1/2 -translate-y-1/2 bg-brand/20 w-5.5 h-5.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-brand/40 text-muted p-1 items-center justify-center cursor-pointer flex z-10"
+              } absolute right-10 top-1/2 -translate-y-1/2 bg-brand/20 w-5 h-5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-brand/40 text-muted items-center justify-center cursor-pointer flex z-10"
               title="Clear"
             >
-              <i class="fa-regular fa-xmark-large text-[8px]"></i>
+              <i class="ti ti-x text-[11px]"></i>
             </button>
 
             <button
@@ -110,7 +110,7 @@ export class AutocompleteComponent {
             >
               <i
                 id="autocomplete-arrow-icon-${uuid}"
-                class="fa-regular fa-chevron-down text-xs"
+                class="ti ti-chevron-down text-base lg:text-lg"
               ></i>
             </button>
           </div>
@@ -385,7 +385,7 @@ export class AutocompleteComponent {
               </span>
               ${
                 isSelected
-                  ? `<i class="fa-regular fa-check text-brand/80 text-xs"></i>`
+                  ? `<i class="ti ti-check text-brand/80 text-sm lg:text-base"></i>`
                   : ""
               }
             </div>
@@ -433,9 +433,9 @@ export class AutocompleteComponent {
 
     this.elements.dropdown.innerHTML = `
       <div
-        class="px-3.5 py-3 text-xs text-muted text-center flex items-center justify-center gap-1 select-none"
+        class="px-3.5 py-3 text-xs lg:text-sm text-muted text-center flex items-center justify-center gap-1 select-none"
       >
-        <i class="fa-regular fa-circle-info text-brand/60"></i>
+        <i class="ti ti-info-circle text-brand/60"></i>
         <span>${message}</span>
       </div>
     `;
@@ -552,7 +552,7 @@ export class AutocompleteComponent {
             type="button"
             class="remove-chip-btn hover:text-red-500 transition cursor-pointer flex items-center justify-center"
           >
-            <i class="fa-regular fa-xmark text-[10px]"></i>
+            <i class="ti ti-x text-[11px] pb-0.5"></i>
           </button>
         `;
       } else {

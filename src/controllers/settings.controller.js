@@ -1,4 +1,5 @@
 import { AutocompleteComponent } from "@/components/ui/autocomplete.component.js";
+import { SOUND_OPTIONS } from "@/utils/constants/options-value.constants.js";
 import { SettingsExportController } from "./settings/settings-export.controller.js";
 import { SettingsImportController } from "./settings/settings-import.controller.js";
 import { SettingsResetController } from "./settings/settings-reset.controller.js";
@@ -144,14 +145,6 @@ export const SettingsController = {
   mountAlertSoundSelectors() {
     const { settings } = StateManager.getState();
 
-    const soundOptions = [
-      { title: "Digital Bell", value: "bell", icon: "fa-regular fa-bell" },
-      { title: "Soft Chime", value: "chime", icon: "fa-regular fa-wind" },
-      { title: "Deep Gong", value: "gong", icon: "fa-regular fa-circle-dot" },
-      { title: "Forest Birds", value: "birds", icon: "fa-regular fa-crow" },
-      { title: "Mute", value: "none", icon: "fa-regular fa-volume-xmark" },
-    ];
-
     let isInitializingPomo = true;
     const pomoContainer = document.getElementById(
       "sett-pomo-end-sound-container",
@@ -160,7 +153,7 @@ export const SettingsController = {
       pomoContainer.innerHTML = "";
       this.pomoSoundAutocomplete = new AutocompleteComponent(
         pomoContainer,
-        soundOptions,
+        SOUND_OPTIONS,
         {
           label: "Pomodoro End Sound",
           placeholder: "Select sound...",
@@ -192,7 +185,7 @@ export const SettingsController = {
       breakContainer.innerHTML = "";
       this.breakSoundAutocomplete = new AutocompleteComponent(
         breakContainer,
-        soundOptions,
+        SOUND_OPTIONS,
         {
           label: "Break End Sound",
           placeholder: "Select sound...",

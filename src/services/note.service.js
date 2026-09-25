@@ -13,7 +13,7 @@ export const NoteService = {
       NotificationService.show({
         type: "warning",
         message: "Please write something before adding a note",
-        icon: "fa-pencil",
+        icon: "ti-pencil",
         iconColor: "text-amber-500",
         duration: 3000,
       });
@@ -28,7 +28,7 @@ export const NoteService = {
       NotificationService.show({
         type: "error",
         message: "A note with this text already exists",
-        icon: "fa-triangle-exclamation",
+        icon: "ti-alert-triangle",
         iconColor: "text-red-500/80",
         duration: 4000,
       });
@@ -47,7 +47,7 @@ export const NoteService = {
       NotificationService.show({
         type: "success",
         message: "Note added successfully",
-        icon: "fa-sticky-note",
+        icon: "ti-note",
         iconColor: "text-emerald-500",
       });
       window.dispatchEvent(new CustomEvent("notesChanged"));

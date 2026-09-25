@@ -54,7 +54,7 @@ export const SettingsImportController = {
       NotificationService.show({
         type: "error",
         message: "Invalid format! Only JSON, MD, or CSV files are permitted",
-        icon: "fa-triangle-exclamation",
+        icon: "ti-alert-triangle",
         iconColor: "text-red-500/80",
         duration: 5000,
       });
@@ -160,7 +160,7 @@ export const SettingsImportController = {
           NotificationService.show({
             type: "success",
             message: `Data ledger synchronized successfully`,
-            icon: "fa-circle-check",
+            icon: "ti-circle-check",
             iconColor: "text-emerald-500/80",
             duration: 5000,
           });
@@ -169,7 +169,7 @@ export const SettingsImportController = {
           NotificationService.show({
             type: "error",
             message: "Failed to parse structural integrity of the file",
-            icon: "fa-triangle-exclamation",
+            icon: "ti-alert-triangle",
             iconColor: "text-red-500/80",
             duration: 5000,
           });

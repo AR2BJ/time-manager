@@ -22,7 +22,7 @@ export const ActiveTaskCardComponent = {
               class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer xs:pointer-events-none xs:cursor-default"
               data-tooltip-title="Active Focus Task"
             >
-              <i class="fa-regular fa-bullseye-arrow text-brand shrink-0"></i>
+              <i class="ti ti-target-arrow text-brand shrink-0"></i>
               <span class="text-xs font-bold uppercase tracking-wider text-muted truncate">
                 Active Focus Task
               </span>
@@ -60,7 +60,7 @@ export const ActiveTaskCardComponent = {
             class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer xs:pointer-events-none xs:cursor-default"
             data-tooltip-title="Active Focus Task"
           >
-            <i class="fa-regular fa-bullseye-arrow text-brand shrink-0"></i>
+            <i class="ti ti-target-arrow text-brand shrink-0"></i>
             <span class="text-xs font-bold uppercase tracking-wider text-muted truncate">
               Active Focus Task
             </span>

@@ -6,33 +6,33 @@ export const MobileNavComponent = {
       >
         <button
           id="mobile-timer"
-          class="mobile-nav-btn snap-center shrink-0 flex flex-col items-center justify-center gap-1.5 text-secondary w-[23vw] max-w-21.25 xs:w-auto xs:max-w-none xs:flex-1 py-1"
+          class="mobile-nav-btn flex flex-col items-center justify-center gap-2 text-secondary"
         >
-          <i class="fa-regular fa-clock text-xl xs:text-2xl"></i>
+          <i class="ti ti-clock text-2xl"></i>
           <span
-            class="text-[10px] xs:text-xs font-medium tracking-wide whitespace-nowrap"
+            class="text-xs font-medium tracking-wide"
             >Timer</span
           >
         </button>
 
         <button
           id="mobile-analytics"
-          class="mobile-nav-btn snap-center shrink-0 flex flex-col items-center justify-center gap-1.5 text-secondary w-[23vw] max-w-21.25 xs:w-auto xs:max-w-none xs:flex-1 py-1"
+          class="mobile-nav-btn flex flex-col items-center justify-center gap-2 text-secondary"
         >
-          <i class="fa-regular fa-chart-line text-xl xs:text-2xl"></i>
+          <i class="ti ti-chart-line text-2xl"></i>
           <span
-            class="text-[10px] xs:text-xs font-medium tracking-wide whitespace-nowrap"
+            class="text-xs font-medium tracking-wide"
             >Analytics</span
           >
         </button>
 
         <button
           id="mobile-settings"
-          class="mobile-nav-btn snap-center shrink-0 flex flex-col items-center justify-center gap-1.5 text-secondary w-[23vw] max-w-21.25 xs:w-auto xs:max-w-none xs:flex-1 py-1"
+          class="mobile-nav-btn flex flex-col items-center justify-center gap-2 text-secondary"
         >
-          <i class="fa-regular fa-gear text-xl xs:text-2xl"></i>
+          <i class="ti ti-settings text-2xl"></i>
           <span
-            class="text-[10px] xs:text-xs font-medium tracking-wide whitespace-nowrap"
+            class="text-xs font-medium tracking-wide"
             >Settings</span
           >
         </button>

@@ -97,12 +97,12 @@ export const TimerController = {
           NotificationService.show({
             type: "warning",
             message: "You need an active task to start a focus session",
-            icon: "fa-bullseye-arrow",
+            icon: "ri-target-arrow",
             iconColor: "text-amber-500",
             duration: 5000,
             actionButton: {
               text: "Create Task",
-              icon: "fa-plus",
+              icon: "ti-plus",
               onClick: async () => {
                 if (document.fullscreenElement) await document.exitFullscreen();
                 ModalController.openTaskModal();
@@ -563,7 +563,7 @@ export const TimerController = {
               id="btn-timer-start"
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-regular fa-play pointer-events-none"></i>
+              <i class="ti ti-player-play pb-0.5 pointer-events-none"></i>
               <span class="pointer-events-none">${btnText}</span>
             </button>
           `;
@@ -573,7 +573,7 @@ export const TimerController = {
               id="btn-timer-pause"
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-amber-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-amber-600/50 transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-regular fa-pause pointer-events-none"></i>
+              <i class="ti ti-player-pause  pb-0.5 pointer-events-none"></i>
               <span class="pointer-events-none">Pause</span>
             </button>
           `;
@@ -584,7 +584,7 @@ export const TimerController = {
               class="flex h-10 sm:h-14 min-w-40 sm:min-w-0 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-red-500/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-red-600/50 transition-all cursor-pointer active:scale-95"
               title="Stop & Reset"
             >
-              <i class="fa-regular fa-square pointer-events-none"></i>
+              <i class="ti ti-player-stop pb-0.5 pointer-events-none"></i>
               <span class="pointer-events-none">Stop</span>
             </button>
 
@@ -592,7 +592,7 @@ export const TimerController = {
               id="btn-timer-continue"
               class="flex h-10 sm:h-14 min-w-40 items-center justify-center gap-2 rounded-xl sm:rounded-2xl bg-brand/80 px-8 text-xs xs:text-sm sm:text-base font-bold text-(--color-btn-primary-text) hover:bg-brand/50 transition-all cursor-pointer active:scale-95"
             >
-              <i class="fa-regular fa-play pointer-events-none"></i>
+              <i class="ti ti-player-play pb-0.5 pointer-events-none"></i>
               <span class="pointer-events-none">Continue</span>
             </button>
           `;
@@ -655,8 +655,8 @@ export const TimerController = {
     if (btnToggleSound) {
       const soundState = SoundModel.getState();
       const iconClass = soundState.isPlaying
-        ? "fa-regular fa-volume-high text-brand"
-        : "fa-regular fa-volume-xmark";
+        ? "ti ti-volume text-brand"
+        : "ti ti-volume-3";
 
       btnToggleSound.innerHTML = `<i id="sound-icon" class="${iconClass}"></i>`;
     }

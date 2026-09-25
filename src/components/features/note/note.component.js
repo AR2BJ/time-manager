@@ -35,7 +35,7 @@ export class NoteComponent {
         <div 
           class="flex items-center gap-2 min-w-0 flex-1"
         >
-          <i class="fa-regular fa-lightbulb text-brand shrink-0"></i>
+          <i class="ti ti-bulb text-brand shrink-0"></i>
           <span
             class="text-xs font-bold uppercase tracking-wider text-muted truncate"
           >
@@ -61,7 +61,7 @@ export class NoteComponent {
           id="btn-submit-note"
           class="absolute right-0 p-2.5 rounded-e-xl bg-brand/10 text-brand/80 transition hover:bg-brand/20 font-semibold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
-          <i class="fa-regular fa-plus"></i> Add
+          <i class="ti ti-plus pb-0.5"></i> Add
         </button>
       </div>
 
@@ -73,7 +73,7 @@ export class NoteComponent {
               >
                 <div class="h-full flex flex-col justify-center items-center">
                   <div class="text-2xl">
-                    <i class="fa-regular fa-sticky-note text-brand/60"></i>
+                    <i class="ti ti-note text-brand/60"></i>
                   </div>
                   <p class="mt-1 text-secondary max-w-sm mx-auto text-xs">
                     No quick notes yet.
@@ -98,7 +98,7 @@ export class NoteComponent {
                         class="delete-btn w-6 h-6 rounded-md bg-surface-2 hover:bg-red-600/10 border border-border flex items-center justify-center hover:cursor-pointer lg:opacity-0 group-hover:opacity-100 transition"
                       >
                         <i
-                          class="fa-regular fa-trash-can text-red-500/80 text-xs"
+                          class="ti ti-trash text-red-500/80 text-[10px] lg:text-xs"
                         ></i>
                       </button>
                     </div>
