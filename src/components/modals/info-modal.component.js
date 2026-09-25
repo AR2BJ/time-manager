@@ -61,7 +61,8 @@ export const InfoModalComponent = {
           <h4
             class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-1 mb-1.5"
           >
-            <i class="ti ti-stopwatch text-sm lg:text-base"></i> Pomodoro Technique
+            <i class="ti ti-stopwatch text-sm lg:text-base"></i> Pomodoro
+            Technique
           </h4>
           <p class="text-xs text-secondary leading-relaxed">
             A structured timer that alternates between focused work sessions and
@@ -94,14 +95,17 @@ export const InfoModalComponent = {
           <h4
             class="text-xs font-bold text-brand uppercase tracking-wider flex items-center gap-1 mb-1.5"
           >
-            <i class="ti ti-arrows-maximize text-sm lg:text-base"></i> Immersive Focus View
+            <i class="ti ti-arrows-maximize text-sm lg:text-base"></i> Immersive
+            Focus View
           </h4>
           <p class="text-xs text-secondary leading-relaxed">
             A fullscreen view that isolates your focus from distractions. The
             timer is displayed as a flip-clock animation. You can start, pause,
             or resume the session using the Space key or the on-screen buttons.
             <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
-              <i class="ti ti-clock text-[10px] lg:text-xs pb-0.5 text-brand/70"></i>
+              <i
+                class="ti ti-clock text-[10px] lg:text-xs pb-0.5 text-brand/70"
+              ></i>
               Click on the header time to toggle between 12h / 24h format.
             </span>
           </p>
@@ -138,7 +142,8 @@ export const InfoModalComponent = {
           <h4
             class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1 mb-1.5"
           >
-            <i class="ti ti-keyboard text-sm lg:text-base"></i> Quick Actions & Shortcuts
+            <i class="ti ti-keyboard text-sm lg:text-base"></i> Quick Actions &
+            Shortcuts
           </h4>
           <p class="text-xs text-secondary leading-relaxed">
             <strong class="text-color">Submit / Confirm:</strong> Use
@@ -163,7 +168,9 @@ export const InfoModalComponent = {
             >) to quickly create a task, save a note, or confirm any modal
             without clicking the button.
             <span class="mt-2 text-[10px] text-muted flex items-center gap-1.5">
-              <i class="ti ti-help text-[10px] lg:text-xs pb-0.5 text-brand/70"></i>
+              <i
+                class="ti ti-help text-[10px] lg:text-xs pb-0.5 text-brand/70"
+              ></i>
               <strong class="text-color">Escape</strong> closes any active modal
               or removes focus from the current input field.
             </span>
@@ -210,7 +217,8 @@ export const InfoModalComponent = {
               type="button"
               class="w-8 h-8 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border text-secondary hover:text-color flex items-center justify-center transition cursor-pointer"
             >
-              <i class="ti ti-x text-sm lg:text-base"></i>            </button>
+              <i class="ti ti-x text-sm lg:text-base"></i>
+            </button>
           </div>
 
           <div
@@ -220,13 +228,15 @@ export const InfoModalComponent = {
               id="tab-help-safeguard"
               class="flex-1 py-2 text-xs font-bold rounded-lg bg-brand text-white transition cursor-pointer flex justify-center items-center"
             >
-              <i class="ti ti-compass text-sm lg:text-base me-1.5"></i> Workflow Guide
+              <i class="ti ti-compass text-sm lg:text-base me-1.5"></i> Workflow
+              Guide
             </button>
             <button
               id="tab-help-shortcuts"
               class="flex-1 py-2 text-xs font-bold rounded-lg text-secondary hover:text-color transition cursor-pointer flex justify-center items-center"
             >
-              <i class="ti ti-keyboard text-sm lg:text-base me-1.5"></i> Shortcuts
+              <i class="ti ti-keyboard text-sm lg:text-base me-1.5"></i>
+              Shortcuts
             </button>
           </div>
 
@@ -234,9 +244,7 @@ export const InfoModalComponent = {
             class="flex-1 overflow-y-auto pe-1 scrollbar-thin scrollbar-thumb-surface-2"
             id="help-modal-content"
           >
-            <div
-              id="content-help-safeguard"
-            >
+            <div id="content-help-safeguard">
               ${InfoModalComponent.renderFeatureGuideData()}
             </div>
 
