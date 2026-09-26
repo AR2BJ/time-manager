@@ -13,7 +13,7 @@
 <br>
 
 <p align="center">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-6.x-646CFF?style=flat-square&logo=vite" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite" />
   <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES2026-F7DF1E?style=flat-square&logo=javascript" />
   <img alt="LocalStorage" src="https://img.shields.io/badge/Storage-LocalStorage-4FC3F7?style=flat-square" />
   <img alt="Responsive" src="https://img.shields.io/badge/Responsive-Desktop%20%26%20Mobile-34A853?style=flat-square" />
