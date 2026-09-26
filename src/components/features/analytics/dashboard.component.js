@@ -462,7 +462,7 @@ export const DashboardComponent = {
                           <div class="flex flex-col gap-1.5 min-w-0 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
                               <span
-                                class="inline-flex items-center rounded px-2 py-0.5 text-[9px] uppercase font-bold tracking-wider border ${
+                                class="min-h-5.5 inline-flex items-center rounded-md px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider border ${
                                   typeBadgeStyles[session.type] ||
                                   typeBadgeStyles.pomodoro
                                 }"
@@ -471,7 +471,7 @@ export const DashboardComponent = {
                               </span>
                               
                               <span
-                                class="text-[9px] text-secondary/80 font-medium border border-border/40 px-2 py-0.5 rounded bg-surface-2/50"
+                                class="min-h-5.5 inline-flex items-center rounded-md px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider border border-border/40 bg-surface-2/50 text-secondary/80"
                               >
                                 ${formattedDuration}
                               </span>
