@@ -5,39 +5,39 @@ import { DEFAULT_TRACK_LIST } from "@/models/constants/sound.constants.json";
 
 const defaultTrackList = DEFAULT_TRACK_LIST;
 
-export const soundState = {
+export const SOUND_STATE = {
   isPlaying: false,
   isLoading: false,
   isMuted: false,
   currentSoundId: "none",
   volume: 50,
   previousVolume: 50,
-  trackList: [...defaultTrackList],
 };
+
+export const stateSound = { ...SOUND_STATE };
 
 const listeners = new Set();
 
 export const SoundModel = {
-  init(savedSettings = {}) {
-    soundState.isPlaying = false;
-    soundState.isLoading = false;
-    soundState.isMuted = Boolean(savedSettings.isMuted);
+  init(savedSettings = { ...SOUND_STATE }) {
+    stateSound.isPlaying = false;
+    stateSound.isLoading = false;
+    stateSound.isMuted = Boolean(savedSettings.isMuted);
 
-    const savedTrackId = savedSettings.currentSoundId;
-    soundState.currentSoundId = savedTrackId || "none";
+    stateSound.currentSoundId = savedSettings.currentSoundId;
 
-    soundState.volume =
+    stateSound.volume =
       typeof savedSettings.volume === "number" && savedSettings.volume >= 0
         ? savedSettings.volume
         : 50;
-    soundState.previousVolume = soundState.volume > 0 ? soundState.volume : 50;
+    stateSound.previousVolume = stateSound.volume > 0 ? stateSound.volume : 50;
 
     this.notify();
-    return soundState;
+    return stateSound;
   },
 
   getState() {
-    return soundState;
+    return stateSound;
   },
 
   subscribe(listener) {
@@ -48,44 +48,44 @@ export const SoundModel = {
   },
 
   notify() {
-    listeners.forEach((listener) => listener(soundState));
+    listeners.forEach((listener) => listener(stateSound));
 
     eventBus.emit(TIME_MANAGER_EVENTS.SOUND_CHANGED, {
-      currentSoundId: soundState.currentSoundId,
+      currentSoundId: stateSound.currentSoundId,
       volume: this.getEffectiveVolume(),
-      soundState: { ...soundState },
+      stateSound: { ...stateSound },
     });
   },
 
   getCurrentTrack() {
-    if (!soundState.currentSoundId || soundState.currentSoundId === "none") {
+    if (!stateSound.currentSoundId || stateSound.currentSoundId === "none") {
       return null;
     }
 
     return (
-      soundState.trackList.find((t) => t.id === soundState.currentSoundId) ||
+      [...defaultTrackList].find((t) => t.id === stateSound.currentSoundId) ||
       null
     );
   },
 
   getCurrentSoundId() {
-    return soundState.currentSoundId || "none";
+    return stateSound.currentSoundId || "none";
   },
 
   getTrackList() {
-    return soundState.trackList;
+    return [...defaultTrackList];
   },
 
   getEffectiveVolume() {
-    return soundState.isMuted ? 0 : soundState.volume;
+    return stateSound.isMuted ? 0 : stateSound.volume;
   },
 
   getNextTrack() {
-    const list = soundState.trackList;
+    const list = [...defaultTrackList];
     if (!list || list.length === 0) return null;
 
     const currentIndex = list.findIndex(
-      (t) => t.id === soundState.currentSoundId,
+      (t) => t.id === stateSound.currentSoundId,
     );
 
     if (currentIndex === -1) return list[0];
@@ -95,18 +95,18 @@ export const SoundModel = {
   },
 
   setPlaying(isPlaying) {
-    soundState.isPlaying = Boolean(isPlaying);
+    stateSound.isPlaying = Boolean(isPlaying);
     this.notify();
   },
 
   setLoading(isLoading) {
-    soundState.isLoading = Boolean(isLoading);
+    stateSound.isLoading = Boolean(isLoading);
     this.notify();
   },
 
   setSoundTrack(soundId) {
     const targetId = soundId || "none";
-    soundState.currentSoundId = targetId;
+    stateSound.currentSoundId = targetId;
 
     if (typeof StateManager?.updateSettings === "function") {
       StateManager.updateSettings({ currentSoundId: targetId });
@@ -118,19 +118,19 @@ export const SoundModel = {
 
   setVolume(volume) {
     const numericVol = Math.max(0, Math.min(100, Number(volume)));
-    soundState.volume = numericVol;
+    stateSound.volume = numericVol;
 
     if (numericVol > 0) {
-      soundState.isMuted = false;
-      soundState.previousVolume = numericVol;
+      stateSound.isMuted = false;
+      stateSound.previousVolume = numericVol;
     } else {
-      soundState.isMuted = true;
+      stateSound.isMuted = true;
     }
 
     if (typeof StateManager?.updateSettings === "function") {
       StateManager.updateSettings({
         volume: numericVol,
-        isMuted: soundState.isMuted,
+        isMuted: stateSound.isMuted,
       });
     }
 
@@ -142,19 +142,19 @@ export const SoundModel = {
   },
 
   toggleMute() {
-    if (soundState.isMuted) {
-      soundState.isMuted = false;
-      soundState.volume = soundState.previousVolume || 50;
+    if (stateSound.isMuted) {
+      stateSound.isMuted = false;
+      stateSound.volume = stateSound.previousVolume || 50;
     } else {
-      soundState.previousVolume =
-        soundState.volume > 0 ? soundState.volume : 50;
-      soundState.isMuted = true;
+      stateSound.previousVolume =
+        stateSound.volume > 0 ? stateSound.volume : 50;
+      stateSound.isMuted = true;
     }
 
     if (typeof StateManager?.updateSettings === "function") {
       StateManager.updateSettings({
-        volume: soundState.volume,
-        isMuted: soundState.isMuted,
+        volume: stateSound.volume,
+        isMuted: stateSound.isMuted,
       });
     }
 
@@ -166,11 +166,7 @@ export const SoundModel = {
   },
 
   reset() {
-    soundState.isPlaying = false;
-    soundState.isLoading = false;
-    soundState.isMuted = false;
-    soundState.volume = 50;
-    soundState.previousVolume = 50;
+    Object.assign(stateSound, SOUND_STATE);
 
     this.setSoundTrack("none");
   },

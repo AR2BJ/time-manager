@@ -46,18 +46,13 @@ export const state = {
 };
 
 const listeners = new Set();
-let isInitialized = false;
 
 export const StateManager = {
   _rawCache: "",
 
   init() {
-    if (isInitialized) return state;
-
     this.reloadFromStorage(false);
     this.setupReactiveEngine();
-
-    isInitialized = true;
     return state;
   },
 
@@ -68,31 +63,39 @@ export const StateManager = {
       state.tasks = saved.tasks || [];
       state.sessions = saved.sessions || [];
       state.notes = saved.notes || [];
-      state.activeTaskId = saved.activeTaskId || null;
-
-      if (saved.settings) {
-        state.settings = {
-          ...DEFAULT_SETTINGS,
-          ...saved.settings,
-          pomodoroEndSound:
-            saved.settings.pomodoroEndSound ??
-            DEFAULT_SETTINGS.pomodoroEndSound,
-          breakEndSound:
-            saved.settings.breakEndSound ?? DEFAULT_SETTINGS.breakEndSound,
-          longBreakInterval:
-            Number(saved.settings.longBreakInterval) ||
-            DEFAULT_SETTINGS.longBreakInterval,
-        };
-        SoundModel.init(state.settings);
-      } else {
-        SoundModel.init(DEFAULT_SETTINGS);
-      }
-
-      if (saved.timer) {
-        state.timer = { ...state.timer, ...saved.timer };
-      }
+      state.activeTaskId = saved.activeTaskId
+        ? String(saved.activeTaskId)
+        : null;
+      state.settings = {
+        ...DEFAULT_SETTINGS,
+        ...saved.settings,
+        pomodoroEndSound:
+          saved.settings.pomodoroEndSound ?? DEFAULT_SETTINGS.pomodoroEndSound,
+        breakEndSound:
+          saved.settings.breakEndSound ?? DEFAULT_SETTINGS.breakEndSound,
+        longBreakInterval:
+          Number(saved.settings.longBreakInterval) ||
+          DEFAULT_SETTINGS.longBreakInterval,
+      };
+      state.timer = { ...state.timer, ...saved.timer };
     } else {
-      SoundModel.init(DEFAULT_SETTINGS);
+      state.currentView = "timer";
+      state.activeTaskId = null;
+      state.activeMode = "pomodoro";
+      state.tasks = [];
+      state.sessions = [];
+      state.notes = [];
+      state.settings = { ...DEFAULT_SETTINGS };
+      state.timer = {
+        isRunning: false,
+        isPaused: false,
+        timeRemaining: 25 * 60,
+        duration: 25 * 60,
+        flowTime: 0,
+        pomodoroSessionCount: 0,
+        currentPhase: "work",
+      };
+      SoundModel.reset();
     }
 
     const hasActiveTask = state.tasks.some(
@@ -135,17 +138,13 @@ export const StateManager = {
   setupReactiveEngine() {
     window.addEventListener("storage", (event) => {
       if (event.key === STORAGE_KEY) {
-        this.reloadFromStorage(true);
+        try {
+          this.reloadFromStorage(true);
+        } catch (error) {
+          console.error("Error syncing cross-tab storage:", error);
+        }
       }
     });
-
-    setInterval(() => {
-      const currentRaw = localStorage.getItem(STORAGE_KEY) || "";
-      if (currentRaw !== this._rawCache) {
-        this._rawCache = currentRaw;
-        this.reloadFromStorage(true);
-      }
-    }, 300);
   },
 
   getState() {

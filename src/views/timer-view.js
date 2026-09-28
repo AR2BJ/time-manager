@@ -1,4 +1,3 @@
-import { NoteComponent } from "@/components/features/note/note.component";
 import { SoundModel } from "@/models/sound.model.js";
 import { SoundPlayerComponent } from "@/components/features/sound/sound-player.component.js";
 import { SoundSelectorComponent } from "@/components/features/sound/sound-selector.component.js";
@@ -11,7 +10,6 @@ export class TimerView {
     this.timerDisplay = new TimerDisplayComponent();
     this.soundPlayer = new SoundPlayerComponent();
     this.soundSelector = new SoundSelectorComponent();
-    this.note = new NoteComponent();
     this.unsubscribeSound = null;
   }
 
@@ -76,11 +74,6 @@ export class TimerView {
     const selectorSlot = this.container.querySelector("#sound-selector-slot");
     if (selectorSlot) {
       selectorSlot.appendChild(this.soundSelector.render());
-    }
-
-    const noteSlot = this.container.querySelector("#note-slot");
-    if (noteSlot) {
-      noteSlot.appendChild(this.note.render());
     }
 
     const playerSlot = this.container.querySelector("#sound-player-slot");
