@@ -9,6 +9,8 @@ import { formatDate, generateId, todayISO } from "@/utils/helpers.js";
 import { NoteModel } from "./note.model.js";
 import { SoundModel } from "./sound.model.js";
 
+export const MIN_SESSION_SECONDS = 15 * 60;
+
 export const DEFAULT_SETTINGS = {
   pomodoroWorkTime: 25,
   shortBreakTime: 5,
@@ -115,11 +117,11 @@ export const StateManager = {
   },
 
   dispatchStateEvents() {
-    eventBus.emit(TIME_MANAGER_EVENTS.TASKS_CHANGED, state.tasks);
-    eventBus.emit(TIME_MANAGER_EVENTS.NOTES_CHANGED, state.notes);
-    eventBus.emit(TIME_MANAGER_EVENTS.SESSIONS_CHANGED, state.sessions);
-    eventBus.emit(TIME_MANAGER_EVENTS.SETTINGS_CHANGED, state.settings);
-    eventBus.emit(TIME_MANAGER_EVENTS.TIMER_CHANGED, state.timer);
+    eventBus.emit(TIME_MANAGER_EVENTS.TASKS_CHANGED);
+    eventBus.emit(TIME_MANAGER_EVENTS.NOTES_CHANGED);
+    eventBus.emit(TIME_MANAGER_EVENTS.SESSIONS_CHANGED);
+    eventBus.emit(TIME_MANAGER_EVENTS.SETTINGS_CHANGED);
+    eventBus.emit(TIME_MANAGER_EVENTS.TIMER_CHANGED);
 
     const currentSoundId = state.settings.currentSoundId || "none";
     const volume = state.settings.volume ?? 50;
@@ -198,9 +200,14 @@ export const StateManager = {
     return { sessionsDone, totalMinutes };
   },
 
-  updateTimerState(newTimerState) {
+  updateTimerState(newTimerState, { silent = false } = {}) {
     state.timer = { ...state.timer, ...newTimerState };
-    this.save();
+
+    if (!silent) {
+      this.save();
+    } else {
+      this.notify();
+    }
   },
 
   updateSettings(newSettings = {}) {
