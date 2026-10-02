@@ -209,7 +209,7 @@ Potential future improvements include:
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/AR2BJ/time-manager/blob/dev/LICENSE).
+This project is licensed under the [MIT License](https://github.com/AR2BJ/time-manager/blob/master/LICENSE).
 
 ## Contributing
 
